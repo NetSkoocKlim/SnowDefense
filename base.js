@@ -1,0 +1,84 @@
+import {Bullet} from "./bullet.js";
+import {Collision} from "./collision.js";
+import {ObjectType} from './utilities.js'
+
+class BaseGun {
+    constructor(size, center, ctx) {
+        this.ctx = ctx;
+        this.size = size*0.1;
+        this.width = this.size*3.5;
+        this.height = this.size*2;
+        this.center = center;
+        this.currentAngle = 0;
+        this.smoothing = 0.015;
+        this.bullets = [];
+    }
+
+    updatePosition(size, center) {
+        this.size = size * 0.15;
+        this.width = this.size*3;
+        this.height = this.size*1.5;
+        this.center = center;
+    }
+
+    lerpAngle(target) {
+
+        const shortAngle = ((target - this.currentAngle) % (Math.PI * 2) + Math.PI * 3) % (Math.PI * 2) - Math.PI;
+        this.currentAngle += shortAngle * this.smoothing;
+        return shortAngle;
+    }
+
+    draw(mouseX, mouseY) {
+        const targetAngle = Math.atan2(mouseY - this.center.y,mouseX-this.center.x);
+        this.lerpAngle(targetAngle);
+        this.ctx.fillStyle = 'black';
+        this.ctx.save();
+        this.ctx.translate(this.center.x, this.center.y);
+        this.ctx.rotate(this.currentAngle);
+        this.ctx.fillRect(-this.height/2, -this.height/2,  this.width,  this.height );
+        this.ctx.restore();
+    }
+
+    fire() {
+        let bullet = new Bullet(
+            this.center.x+Math.cos(this.currentAngle) * (this.width * 0.75),
+            this.center.y+Math.sin(this.currentAngle) * (this.width * 0.75),
+            {x: Math.cos(this.currentAngle), y: Math.sin(this.currentAngle)},
+            this.ctx
+        )
+        this.bullets.push(bullet);
+    }
+}
+
+
+export class Base {
+    constructor(size, sceneSize, ctx) {
+        this.ctx = ctx;
+        this.objectType = ObjectType.Base;
+        this.update(size, sceneSize);
+        this.collision = new Collision(this, this.position, this.size, this.size, this.ctx);
+        this.gun = new BaseGun(this.size, this.center, this.ctx);
+    }
+
+    update = (size, sceneSize) => {
+        this.size = size*0.2;
+        this.position = {
+            x: sceneSize/2 - this.size/2,
+            y: sceneSize/2 - this.size/2,
+        }
+        if (this.gun) this.gun.updatePosition(this.size, this.center);
+    }
+
+    get center() {
+        return {
+            x: this.position.x + this.size / 2,
+            y: this.position.y + this.size / 2,
+        }
+    }
+
+    draw() {
+        this.ctx.fillStyle = 'brown';
+        this.ctx.fillRect(this.position.x,this.position.y,  this.size, this.size);
+    }
+
+}
