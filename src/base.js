@@ -4,19 +4,19 @@ import {getRectangleBorders, ObjectType} from './utilities.js'
 
 
 export class Base {
-    constructor(size, sceneSize, ctx) {
+    constructor(sceneSize, ctx) {
         this.ctx = ctx;
         this.objectType = ObjectType.Base;
-        this.update(size, sceneSize);
+        this.update(sceneSize);
         this.collision = new PolygonCollision(this, this.position, getRectangleBorders(this.size, this.size), 0, this.ctx);
         this.gun = new BaseGun(this.size, this.center, this.ctx);
     }
 
-    update = (size, sceneSize) => {
+    update = (size) => {
         this.size = size*0.2;
         this.position = {
-            x: sceneSize/2 - this.size/2,
-            y: sceneSize/2 - this.size/2,
+            x: size/2 - this.size/2,
+            y: size/2 - this.size/2,
         }
         if (this.gun) this.gun.updatePosition(this.size, this.center);
     }

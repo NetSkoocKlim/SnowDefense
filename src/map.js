@@ -25,7 +25,7 @@ export class Map {
     constructor(canvas, sceneSize, ctx) {
         this.sceneSize = sceneSize;
         this.ctx = ctx;
-        this.base = new Base(canvas.width, sceneSize, ctx);
+        this.base = new Base(sceneSize, this.ctx);
         this.createPathes();
     }
 
@@ -51,11 +51,14 @@ export class Map {
         )
     }
 
-    draw() {
+    draw({collision=false}) {
         this.ctx.fillStyle = '#ad5f3e';
         this.ctx.fillRect(0, 0, this.sceneSize, this.sceneSize);
         Map.pathes.forEach(path => {
             path.draw();
+        })
+        if (collision) Collision.pathCollisions.forEach(pathCollision => {
+            pathCollision.draw();
         })
     }
 
