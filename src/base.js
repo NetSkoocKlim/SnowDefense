@@ -1,6 +1,40 @@
 import {Bullet} from "./bullet.js";
-import {Collision} from "./collision.js";
-import {ObjectType} from './utilities.js'
+import {Collision, PolygonCollision} from "./collision.js";
+import {getRectangleBorders, ObjectType} from './utilities.js'
+
+
+export class Base {
+    constructor(size, sceneSize, ctx) {
+        this.ctx = ctx;
+        this.objectType = ObjectType.Base;
+        this.update(size, sceneSize);
+        this.collision = new PolygonCollision(this, this.position, getRectangleBorders(this.size, this.size), 0, this.ctx);
+        this.gun = new BaseGun(this.size, this.center, this.ctx);
+    }
+
+    update = (size, sceneSize) => {
+        this.size = size*0.2;
+        this.position = {
+            x: sceneSize/2 - this.size/2,
+            y: sceneSize/2 - this.size/2,
+        }
+        if (this.gun) this.gun.updatePosition(this.size, this.center);
+    }
+
+    get center() {
+        return {
+            x: this.position.x + this.size / 2,
+            y: this.position.y + this.size / 2,
+        }
+    }
+
+    draw({collision=false}) {
+        this.ctx.fillStyle = 'brown';
+        this.ctx.fillRect(this.position.x,this.position.y,  this.size, this.size);
+        if (collision) this.collision.draw();
+    }
+}
+
 
 class BaseGun {
     constructor(size, center, ctx) {
@@ -11,6 +45,7 @@ class BaseGun {
         this.center = center;
         this.currentAngle = 0;
         this.smoothing = 0.015;
+        this.rotation = {x: null, y: null}
         this.bullets = [];
     }
 
@@ -21,15 +56,19 @@ class BaseGun {
         this.center = center;
     }
 
-    lerpAngle(target) {
+    updateRotation(mouseX, mouseY) {
+        this.rotation.x = mouseX - this.center.x;
+        this.rotation.y = mouseY - this.center.y;
+    }
 
+    lerpAngle(target) {
         const shortAngle = ((target - this.currentAngle) % (Math.PI * 2) + Math.PI * 3) % (Math.PI * 2) - Math.PI;
         this.currentAngle += shortAngle * this.smoothing;
         return shortAngle;
     }
 
-    draw(mouseX, mouseY) {
-        const targetAngle = Math.atan2(mouseY - this.center.y,mouseX-this.center.x);
+    draw() {
+        const targetAngle = Math.atan2(this.rotation.y,this.rotation.x);
         this.lerpAngle(targetAngle);
         this.ctx.fillStyle = 'black';
         this.ctx.save();
@@ -51,34 +90,3 @@ class BaseGun {
 }
 
 
-export class Base {
-    constructor(size, sceneSize, ctx) {
-        this.ctx = ctx;
-        this.objectType = ObjectType.Base;
-        this.update(size, sceneSize);
-        this.collision = new Collision(this, this.position, this.size, this.size, this.ctx);
-        this.gun = new BaseGun(this.size, this.center, this.ctx);
-    }
-
-    update = (size, sceneSize) => {
-        this.size = size*0.2;
-        this.position = {
-            x: sceneSize/2 - this.size/2,
-            y: sceneSize/2 - this.size/2,
-        }
-        if (this.gun) this.gun.updatePosition(this.size, this.center);
-    }
-
-    get center() {
-        return {
-            x: this.position.x + this.size / 2,
-            y: this.position.y + this.size / 2,
-        }
-    }
-
-    draw() {
-        this.ctx.fillStyle = 'brown';
-        this.ctx.fillRect(this.position.x,this.position.y,  this.size, this.size);
-    }
-
-}

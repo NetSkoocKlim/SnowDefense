@@ -1,5 +1,5 @@
-import {ObjectType} from "./utilities.js";
-import {Collision} from "./collision.js";
+import {getRectangleBorders, ObjectType} from "./utilities.js";
+import {Collision, PolygonCollision} from "./collision.js";
 
 
 export class Enemy {
@@ -9,6 +9,8 @@ export class Enemy {
     static spawnTimer = null;
 
     constructor(baseSize, sceneSize, ctx) {
+        this.objectType = ObjectType.Enemy;
+
         this.ctx = ctx;
         this.img = new Image();
         this.img.src = './sprite.png';
@@ -23,7 +25,7 @@ export class Enemy {
         this.width = this.imgDestWidth;
         this.height = this.imgDestHeight;
 
-        this.objectType = ObjectType.Enemy;
+
         this.sceneSize = sceneSize;
         this.baseSize = baseSize;
         this.position = {x: null, y: null};
@@ -66,21 +68,12 @@ export class Enemy {
         this.position.x = x;
         this.position.y = y;
         this.velocity = velocity;
-        this.collision = new Collision(this, this.position, this.width, this.height, this.ctx);
+        this.collision = new PolygonCollision(this, this.position, getRectangleBorders(this.width, this.height), 0, this.ctx);
     }
 
-    checkBaseCollision(baseCollision) {
-        let {x:x1, y:y1} = this.collision.position;
-        let w1 = this.collision.width;
-        let h1 = this.collision.height;
-        let {x:x2, y:y2} = baseCollision.position;
-        let w2 = baseCollision.width;
-        let h2 = baseCollision.height;
 
-        let intersect_x = (x1 < x2 + w2) && (x2 < x1 + w1)
-        let intersect_y = (y1 < y2 + h2) && (y2 < y1 + h1)
-
-        return intersect_x && intersect_y
+    checkBaseConflict(baseCollision) {
+        return Collision.checkPolygonsCollision(baseCollision, this.collision);
     }
 
     move() {
@@ -117,7 +110,7 @@ export class Enemy {
     }
 
     static spawnEnemy(base, sceneSize, ctx) {
-        let count = 4;
+        let count = 1;
         for (let i = 0; i < count; i++) {
             let enemy = new Enemy(base.size, sceneSize, ctx);
             enemy.spawn();
