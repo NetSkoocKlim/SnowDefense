@@ -1,38 +1,69 @@
 import {Enemy} from "./enemy.js";
+import {Map} from "./map.js";
+import {Canvas} from "./canvas.js";
 
 export const addPauseListeners = (game, startFunction) => {
-    let pause = game.pause;
-
     window.addEventListener('keydown', (event) => {
         if (event.code === 'KeyP') {
-            if (!pause.buttonPause) {
+            if (!game.pause.buttonPause) {
                 Enemy.stopSpawn();
-                pause.buttonPause = true;
+                game.pause.buttonPause = true;
             } else {
-                pause.buttonPause = false;
+                game.pause.buttonPause = false;
                 startFunction();
             }
         }
     });
 
     window.addEventListener('blur', () => {
-        pause.windowPause = true;
+        game.pause.windowPause = true;
         Enemy.stopSpawn()
     });
 
     window.addEventListener('focus', () => {
-        pause.windowPause = false;
-        if (!pause.buttonPause) startFunction();
+        game.pause.windowPause = false;
+        if (!game.buttonPause) startFunction();
     });
 }
 
 export const addGunInteractionListeners = (game) => {
-    game.canvas.addEventListener('click', () => {
-        if (!game.pause.buttonPause) game.base.gun.fire();
+    Canvas.canvas.addEventListener('click', () => {
+        if (!game.pause.buttonPause && !game.pause.windowPause) game.base.gun.fire();
     })
 
-    window.addEventListener('mousemove', (event) => {
-        const rect = game.canvas.getBoundingClientRect();
+    Canvas.canvas.addEventListener('mousemove', (event) => {
+        const rect = Canvas.canvas.getBoundingClientRect();
         game.base.gun.updateRotation(event.clientX - rect.left, event.clientY - rect.top);
     })
+}
+
+export const addTowerInteractionListeners = (game) => {
+    const rect = Canvas.canvas.getBoundingClientRect();
+
+    Map.towerPlaces.forEach(place => {
+        place.towerPlaceDiv.addEventListener('mouseover', (event) => {
+            if (game.pause.buttonPause || game.pause.windowPause) return ;
+            place.isSelected = true;
+        })
+        place.towerPlaceDiv.addEventListener('mouseout', (event) => {
+            if (game.pause.buttonPause || game.pause.windowPause) return ;
+            place.isSelected = false;
+        })
+        place.towerPlaceDiv.addEventListener('click', (event) => {
+            if (game.pause.buttonPause || game.pause.windowPause) return ;
+            place.setTower();
+        })
+    })
+
+    window.addEventListener('click', (event) => {
+        if (event.target.classList.contains('tower')) {
+            event.stopPropagation();
+        }
+        if (event.target.classList.contains('towerPlace')) {
+            Map.towerPlaces.forEach(place => {
+                if (place.isSelected) place.setTower();
+            });
+        }
+    })
+
 }

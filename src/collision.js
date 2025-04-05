@@ -1,4 +1,5 @@
 import {rotatePoint} from "./utilities.js";
+import {Canvas} from "./canvas.js";
 
 export class Collision {
     static pathCollisions = [];
@@ -77,12 +78,11 @@ export class Collision {
 
 export class PolygonCollision {
 
-    constructor(obj, position, points, angle, ctx) {
+    constructor(obj, position, points, angle) {
         this.obj = obj;
         this.points = points;
         this.position = position;
         this.angle = angle;
-        this.ctx = ctx;
     }
 
     getRotatedPoints() {
@@ -110,27 +110,26 @@ export class PolygonCollision {
 
     draw() {
         const points = this.getRotatedPoints();
-        this.ctx.beginPath();
-        this.ctx.moveTo(points[0].x, points[0].y);
-        points.slice(1).forEach(p => this.ctx.lineTo(p.x, p.y));
-        this.ctx.closePath();
-        this.ctx.stroke();
+        Canvas.ctx.beginPath();
+        Canvas.ctx.moveTo(points[0].x, points[0].y);
+        points.slice(1).forEach(p => Canvas.ctx.lineTo(p.x, p.y));
+        Canvas.ctx.closePath();
+        Canvas.ctx.stroke();
     }
 }
 
 
 export class CircleCollision {
-    constructor(obj, position, radius, ctx) {
+    constructor(obj, position, radius) {
         this.obj = obj;
-        this.ctx = ctx;
         this.position = position;
         this.radius = radius;
     }
 
     draw() {
-        this.ctx.beginPath();
-        this.ctx.arc(this.position.x, this.position.y, this.radius, 0, 2 * Math.PI);
-        this.ctx.stroke();
+        Canvas.ctx.beginPath();
+        Canvas.ctx.arc(this.position.x, this.position.y, this.radius, 0, 2 * Math.PI);
+        Canvas.ctx.stroke();
     }
 }
 

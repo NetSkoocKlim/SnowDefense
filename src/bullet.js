@@ -1,10 +1,10 @@
 import {CircleCollision, Collision, PolygonCollision} from "./collision.js";
 import {getTriangleBorder} from "./utilities.js";
+import {Canvas} from "./canvas.js";
 
 
 export class Bullet {
-    constructor(x, y, velocity, ctx) {
-        this.ctx = ctx;
+    constructor(x, y, velocity) {
         this.velocity = velocity;
         this.angle = Math.atan2(this.velocity.y, this.velocity.x);
 
@@ -22,20 +22,18 @@ export class Bullet {
             y: this.startPosition.y + this.triangleSize.width * Math.sin(this.angle)
         }
 
-        this.speed = 0.5;
+        this.speed = 1;
 
         this.circleCollision = new CircleCollision(
             this,
             this.endPosition,
             this.circleRadius,
-            this.ctx
         );
         this.triangleCollision = new PolygonCollision(
             this,
             this.startPosition,
             getTriangleBorder(this.triangleSize.width, this.triangleSize.height),
             this.angle,
-            this.ctx
         );
     }
 
@@ -53,7 +51,7 @@ export class Bullet {
             return false;
         }
         let {x:xt, y: yt} = this.triangleCollision.position;
-        if (xt < 0 || x > sceneSize || y < 0 || y > sceneSize) return true;
+        if (xt < 0 || x > sceneSize || yt < 0 || yt > sceneSize) return true;
         for (let i = 0; i < Collision.pathCollisions.length; i++) {
             let path = Collision.pathCollisions[i];
             if (Collision.checkPolygonAndCircleCollision(path, this.circleCollision)) return true;
@@ -70,26 +68,26 @@ export class Bullet {
     drawCircle() {
         const cos = Math.cos(this.angle);
         const sin = Math.sin(this.angle);
-        this.ctx.fillStyle = 'pink';
-        this.ctx.beginPath();
-        this.ctx.arc(
+        Canvas.ctx.fillStyle = 'pink';
+        Canvas.ctx.beginPath();
+        Canvas.ctx.arc(
             this.startPosition.x + this.triangleSize.width * cos,
             this.startPosition.y + this.triangleSize.width * sin,
             this.circleRadius,
             0,
             Math.PI * 2
         );
-        this.ctx.fill();
+        Canvas.ctx.fill();
     }
 
     drawTriangle() {
         const points = this.triangleCollision.getRotatedPoints();
-        this.ctx.fillStyle = 'orange';
-        this.ctx.beginPath();
-        this.ctx.moveTo(points[0].x, points[0].y);
-        points.slice(1).forEach(p => this.ctx.lineTo(p.x, p.y));
-        this.ctx.closePath();
-        this.ctx.fill();
+        Canvas.ctx.fillStyle = 'orange';
+        Canvas.ctx.beginPath();
+        Canvas.ctx.moveTo(points[0].x, points[0].y);
+        points.slice(1).forEach(p => Canvas.ctx.lineTo(p.x, p.y));
+        Canvas.ctx.closePath();
+        Canvas.ctx.fill();
     }
 
     update() {

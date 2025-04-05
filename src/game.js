@@ -1,33 +1,66 @@
 import {Collision} from "./collision.js";
 import {Enemy} from "./enemy.js";
 import {Map} from "./map.js";
+import {Canvas} from "./canvas.js";
 
 export class SnowDefense {
 
-    constructor(canvas, pause) {
-        this.canvas = canvas;
-        this.pause = pause;
-        this.ctx = this.canvas.getContext('2d');
-        this.setCanvasSize();
-        this.map = new Map(this.canvas, this.canvas.width, this.ctx);
+    constructor() {
+        this.pause = {
+            buttonPause: false,
+            windowPause: false
+        };
+        this.map = new Map();
         this.base = this.map.base;
     }
 
-    setCanvasSize() {
-        const canvasSize = Math.min(document.documentElement.clientHeight, document.documentElement.clientWidth);
-        this.canvas.width = canvasSize;
-        this.canvas.height = canvasSize;
-        this.canvas.style.position = "fixed";
-        this.canvas.style.left = "50%";
-        this.canvas.style.top = "50%";
-        this.canvas.style.transform = "translate(-50%, -50%)";
-    }
 
     draw() {
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        Canvas.ctx.clearRect(0, 0, Canvas.width, Canvas.height);
         this.map.draw({collision: true});
         this.base.draw({collision: true});
         this.base.gun.draw();
+
+        Map.towers.forEach(tower => {
+            let targetEnemy = null;
+            let dif = Canvas.width * Canvas.height;
+            Enemy.enemies.forEach((enemy) => {
+                if (Collision.checkPolygonAndCircleCollision(enemy.collision, tower.gun.collision)) {
+                    let difX = enemy.center.x - tower.center.x;
+                    let difY = enemy.center.y - tower.center.y;
+                        if (difX * difX + difY*difY < dif) {
+                            targetEnemy = enemy;
+                            dif = difX * difX + difY*difY;
+                        }
+                }
+            })
+            if (targetEnemy !== null) {
+                tower.gun.updateRotation(targetEnemy.center.x, targetEnemy.center.y);
+                tower.gun.fire();
+            }
+
+            tower.draw();
+            for (let i = tower.gun.bullets.length - 1; i >= 0; i--) {
+                let bullet = tower.gun.bullets[i];
+                bullet.draw();
+                bullet.circleCollision.draw();
+                bullet.triangleCollision.draw();
+                let wasHit = false;
+                for (let j = Enemy.enemies.length - 1; j >= 0; j--) {
+                    let enemy = Enemy.enemies[j];
+                    if (bullet.checkHit(enemy)) {
+                        this.base.gun.bullets.splice(i, 1);
+                        Enemy.enemies.splice(j, 1);
+                        wasHit = true;
+                        break;
+                    }
+                }
+                if (!wasHit) {
+                    console.log('updated');
+                    bullet.update();
+                }
+            }
+        })
 
         Enemy.enemies.forEach((enemy) => {
             enemy.draw();
@@ -42,7 +75,7 @@ export class SnowDefense {
             bullet.draw();
             bullet.circleCollision.draw();
             bullet.triangleCollision.draw();
-            if (bullet.checkWallConflict(this.base, this.canvas.width)) {
+            if (bullet.checkWallConflict(this.base)) {
                 this.base.gun.bullets.splice(i, 1);
                 continue;
             }
@@ -60,6 +93,6 @@ export class SnowDefense {
                 bullet.update();
             }
         }
-        if (!this.pause.buttonPause && !this.pause.windowPause)requestAnimationFrame(() => this.draw());
+        if (!this.pause.buttonPause && !this.pause.windowPause) requestAnimationFrame(() => this.draw());
     }
 }

@@ -1,15 +1,15 @@
 import {Bullet} from "./bullet.js";
-import {Collision, PolygonCollision} from "./collision.js";
+import {PolygonCollision} from "./collision.js";
 import {getRectangleBorders, ObjectType} from './utilities.js'
+import {Canvas} from "./canvas.js";
 
 
 export class Base {
-    constructor(sceneSize, ctx) {
-        this.ctx = ctx;
+    constructor(sceneSize) {
         this.objectType = ObjectType.Base;
         this.update(sceneSize);
-        this.collision = new PolygonCollision(this, this.position, getRectangleBorders(this.size, this.size), 0, this.ctx);
-        this.gun = new BaseGun(this.size, this.center, this.ctx);
+        this.collision = new PolygonCollision(this, this.position, getRectangleBorders(this.size, this.size), 0);
+        this.gun = new BaseGun(this.size, this.center);
     }
 
     update = (size) => {
@@ -29,16 +29,15 @@ export class Base {
     }
 
     draw({collision=false}) {
-        this.ctx.fillStyle = 'brown';
-        this.ctx.fillRect(this.position.x,this.position.y,  this.size, this.size);
+        Canvas.ctx.fillStyle = 'brown';
+        Canvas.ctx.fillRect(this.position.x,this.position.y,  this.size, this.size);
         if (collision) this.collision.draw();
     }
 }
 
 
 class BaseGun {
-    constructor(size, center, ctx) {
-        this.ctx = ctx;
+    constructor(size, center) {
         this.size = size*0.1;
         this.width = this.size*3.5;
         this.height = this.size*2;
@@ -70,12 +69,12 @@ class BaseGun {
     draw() {
         const targetAngle = Math.atan2(this.rotation.y,this.rotation.x);
         this.lerpAngle(targetAngle);
-        this.ctx.fillStyle = 'black';
-        this.ctx.save();
-        this.ctx.translate(this.center.x, this.center.y);
-        this.ctx.rotate(this.currentAngle);
-        this.ctx.fillRect(-this.height/2, -this.height/2,  this.width,  this.height );
-        this.ctx.restore();
+        Canvas.ctx.fillStyle = 'black';
+        Canvas.ctx.save();
+        Canvas.ctx.translate(this.center.x, this.center.y);
+        Canvas.ctx.rotate(this.currentAngle);
+        Canvas.ctx.fillRect(-this.height/2, -this.height/2,  this.width,  this.height );
+        Canvas.ctx.restore();
     }
 
     fire() {
@@ -83,7 +82,6 @@ class BaseGun {
             this.center.x+Math.cos(this.currentAngle) * (this.width * 0.75),
             this.center.y+Math.sin(this.currentAngle) * (this.width * 0.75),
             {x: Math.cos(this.currentAngle), y: Math.sin(this.currentAngle)},
-            this.ctx
         )
         this.bullets.push(bullet);
     }

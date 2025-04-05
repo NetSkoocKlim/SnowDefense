@@ -1,17 +1,16 @@
 import {getRectangleBorders, ObjectType} from "./utilities.js";
 import {Collision, PolygonCollision} from "./collision.js";
+import {Canvas} from "./canvas.js";
 
 
 export class Enemy {
 
-
     static enemies = [];
     static spawnTimer = null;
 
-    constructor(baseSize, sceneSize, ctx) {
+    constructor(baseSize, sceneSize) {
         this.objectType = ObjectType.Enemy;
 
-        this.ctx = ctx;
         this.img = new Image();
         this.img.src = './sprite.png';
 
@@ -25,17 +24,16 @@ export class Enemy {
         this.width = this.imgDestWidth;
         this.height = this.imgDestHeight;
 
-
         this.sceneSize = sceneSize;
         this.baseSize = baseSize;
         this.position = {x: null, y: null};
-        this.speed = 0.3;
+        this.speed = 0.35;
     }
 
     spawn() {
-        this.side = Math.floor(1 + Math.random()*4);
+        this.side = Math.floor(1 + Math.random() * 4);
         let x, y, velocity, temp;
-        switch(this.side) {
+        switch (this.side) {
             case 1:
                 temp = this.height;
                 this.height = this.width;
@@ -68,12 +66,20 @@ export class Enemy {
         this.position.x = x;
         this.position.y = y;
         this.velocity = velocity;
-        this.collision = new PolygonCollision(this, this.position, getRectangleBorders(this.width, this.height), 0, this.ctx);
+        this.collision = new PolygonCollision(this, this.position,
+            getRectangleBorders(this.width, this.height), 0);
     }
 
 
     checkBaseConflict(baseCollision) {
         return Collision.checkPolygonsCollision(baseCollision, this.collision);
+    }
+
+    get center() {
+        return {
+            x: this.collision.position.x + this.width / 2,
+            y: this.collision.position.y + this.height / 2,
+        };
     }
 
     move() {
@@ -84,33 +90,31 @@ export class Enemy {
     rotateImg() {
 
         if (this.side === 1) {
-            this.ctx.rotate(Math.PI / 2);
-            this.ctx.translate(0, -this.imgDestHeight);
-        }
-        else if (this.side === 3) {
-            this.ctx.rotate(-Math.PI/2);
-            this.ctx.translate(-this.imgDestWidth, 0);
-        }
-        else if (this.side === 4) {
-            this.ctx.rotate(Math.PI);
-            this.ctx.translate(-this.imgDestWidth, -this.imgDestHeight);
+            Canvas.ctx.rotate(Math.PI / 2);
+            Canvas.ctx.translate(0, -this.imgDestHeight);
+        } else if (this.side === 3) {
+            Canvas.ctx.rotate(-Math.PI / 2);
+            Canvas.ctx.translate(-this.imgDestWidth, 0);
+        } else if (this.side === 4) {
+            Canvas.ctx.rotate(Math.PI);
+            Canvas.ctx.translate(-this.imgDestWidth, -this.imgDestHeight);
         }
     }
 
     draw() {
-        this.ctx.save();
-        this.ctx.translate(this.position.x, this.position.y);
+        Canvas.ctx.save();
+        Canvas.ctx.translate(this.position.x, this.position.y);
         this.rotateImg();
-        this.ctx.drawImage(
+        Canvas.ctx.drawImage(
             this.img,
             0, 0, this.imgSourceWidth, this.imgSourceHeight,
             0, 0, this.imgDestWidth, this.imgDestHeight
         );
-        this.ctx.restore();
+        Canvas.ctx.restore();
     }
 
     static spawnEnemy(base, sceneSize, ctx) {
-        let count = 1;
+        let count = 3;
         for (let i = 0; i < count; i++) {
             let enemy = new Enemy(base.size, sceneSize, ctx);
             enemy.spawn();
@@ -119,7 +123,9 @@ export class Enemy {
     }
 
     static setSpawnRate(base, sceneSize, ctx) {
-        Enemy.spawnTimer = setInterval(() => {Enemy.spawnEnemy(base, sceneSize, ctx)}, 2000);
+        Enemy.spawnTimer = setInterval(() => {
+            Enemy.spawnEnemy(base, sceneSize, ctx)
+        }, 2000);
     }
 
     static stopSpawn() {

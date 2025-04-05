@@ -1,27 +1,26 @@
 import {Enemy} from './src/enemy.js'
 import {SnowDefense} from "./src/game.js";
-import {addGunInteractionListeners, addPauseListeners} from "./src/listeners.js";
+import {addGunInteractionListeners, addPauseListeners, addTowerInteractionListeners} from "./src/listeners.js";
+import {Canvas} from "./src/canvas.js";
 
-
-const canvas = document.querySelector('#canvas');
-const pause = {
-    buttonPause: false,
-    windowPause: false
-};
 let game;
 
 function checkAndStart() {
     if (Enemy.spawnTimer === null) {
-        Enemy.setSpawnRate(game.base, game.canvas.width, game.ctx);
+        Enemy.setSpawnRate(game.base, Canvas.width);
     }
     game.draw();
 }
 
 const start = () => {
-    game = new SnowDefense(canvas, pause);
+    Canvas.initCanvas();
+    game = new SnowDefense();
     addPauseListeners(game, checkAndStart);
     addGunInteractionListeners(game);
-    checkAndStart();
+    addTowerInteractionListeners(game);
+    if (document.hasFocus()) checkAndStart();
 }
 
-start();
+document.addEventListener("DOMContentLoaded", start);
+
+

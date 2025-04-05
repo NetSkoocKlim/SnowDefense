@@ -1,65 +1,151 @@
-import {getRectangleBorders, ObjectType} from "./utilities.js";
+import {createDivElement, getRectangleBorders, ObjectType} from "./utilities.js";
 import {Collision, PolygonCollision} from "./collision.js";
 import {Base} from "./base.js";
-export class Path {
-    constructor(position, width, height, ctx) {
+import {Canvas} from "./canvas.js";
+import {Tower} from "./tower.js";
+
+class Way {
+    constructor(position, width, height) {
         this.objectType = ObjectType.Path;
         this.position = position;
         this.width = width;
         this.height = height;
-        this.ctx = ctx;
-        this.collision = new PolygonCollision(this, this.position, getRectangleBorders(this.width, this.height), 0, this.ctx);
+        this.collision = new PolygonCollision(this, this.position, getRectangleBorders(this.width, this.height),
+            0);
         Collision.pathCollisions.push(this.collision);
     }
 
     draw() {
-        this.ctx.fillStyle = '#fff';
-        this.ctx.fillRect(this.position.x, this.position.y, this.width, this.height);
+        Canvas.ctx.fillStyle = '#fff';
+        Canvas.ctx.fillRect(this.position.x, this.position.y, this.width, this.height);
     }
 }
 
+class TowerPlace {
+    constructor(position, size) {
+
+
+        this.position = position;
+        this.size = size;
+        this.towerIsPlaced = false;
+        this.collision = new PolygonCollision(this, {x: this.position.x - 5,
+            y: this.position.y - 5}, getRectangleBorders(this.size + 10, this.size + 10), 0);
+        this.towerPlaceDiv = createDivElement(document.querySelector('#game'), this.collision.position, this.size, this.size, 'towerPlace');
+        this.isSelected = false;
+    }
+
+    draw() {
+        if (!this.isSelected && ! this.towerIsPlaced)
+            Canvas.ctx.fillStyle = '#ff0000';
+        else
+            Canvas.ctx.fillStyle =  'rgba(255, 0, 0, 0.5)';
+        Canvas.ctx.fillRect(this.position.x, this.position.y, this.size, this.size);
+        this.collision.draw();
+    }
+
+    get center() {
+        return {
+            x: this.position.x + this.size / 2,
+            y: this.position.y + this.size / 2
+        }
+    }
+
+    checkSelection(mouseX, mouseY) {
+        let {x, y} = this.collision.position;
+        if (x <= mouseX && mouseX <= x + this.size && y <= mouseY && mouseY <= y + this.size) {
+            this.isSelected = true;
+        }
+        else {
+            this.isSelected = false;
+        }
+    }
+
+    setTower() {
+        if (!this.towerIsPlaced) {
+            this.towerIsPlaced = true;
+            const tower = new Tower(this.towerPlaceDiv, this.center, this.size);
+            Map.towers.push(tower);
+        }
+    }
+}
 
 export class Map {
-    static pathes = [];
+    static ways = [];
+    static towerPlaces = [];
+    static towers = [];
 
-    constructor(canvas, sceneSize, ctx) {
-        this.sceneSize = sceneSize;
-        this.ctx = ctx;
-        this.base = new Base(sceneSize, this.ctx);
+    constructor() {
+        this.sceneSize = Canvas.width;
+        this.base = new Base(this.sceneSize);
         this.createPathes();
+        this.createTowerPlaces();
     }
 
     createPathes() {
         let pathSize =  (this.sceneSize - this.base.size) / 2;
-        Map.pathes.push(
-            new Path({
+        Map.ways.push(
+            new Way({
                 x: 0,
                 y: 0
-            }, pathSize, pathSize, this.ctx),
-            new Path( {
+            }, pathSize, pathSize),
+            new Way( {
                 x: pathSize + this.base.size,
                 y: 0
-            }, pathSize, pathSize, this.ctx),
-            new Path( {
+            }, pathSize, pathSize),
+            new Way( {
                 x: pathSize + this.base.size,
                 y: pathSize + this.base.size
-            }, pathSize, pathSize, this.ctx),
-            new Path( {
+            }, pathSize, pathSize),
+            new Way( {
                 x: 0,
                 y: pathSize + this.base.size
-            }, pathSize, pathSize, this.ctx),
-        )
+            }, pathSize, pathSize),
+        );
+    }
+
+    createTowerPlaces() {
+        const baseSize = this.base.size;
+        const towerSize = baseSize / 3;
+        const {x, y} = this.base.position;
+        const towerPosition1 = {
+            x: x - towerSize*1.5,
+            y: y - towerSize*1.5
+        };
+        const towerPosition2 = {
+            x: x - towerSize*1.5,
+            y: y + baseSize + towerSize/2
+        };
+        const towerPosition3 = {
+            x: x + baseSize + towerSize/2,
+            y: y - towerSize*1.5
+        };
+        const towerPosition4 = {
+            x: x + baseSize + towerSize/2,
+            y: y + baseSize + towerSize/2
+        };
+        Map.towerPlaces.push(
+            new TowerPlace(towerPosition1, towerSize),
+            new TowerPlace(towerPosition2, towerSize),
+            new TowerPlace(towerPosition3, towerSize),
+            new TowerPlace(towerPosition4, towerSize)
+        );
     }
 
     draw({collision=false}) {
-        this.ctx.fillStyle = '#ad5f3e';
-        this.ctx.fillRect(0, 0, this.sceneSize, this.sceneSize);
-        Map.pathes.forEach(path => {
-            path.draw();
-        })
+        Canvas.ctx.fillStyle = '#ad5f3e';
+        Canvas.ctx.fillRect(0, 0, this.sceneSize, this.sceneSize);
+
+        Map.ways.forEach(way => {
+            way.draw();
+        });
+
+        Map.towerPlaces.forEach((towerPlace) => {
+            towerPlace.draw();
+        });
+
         if (collision) Collision.pathCollisions.forEach(pathCollision => {
             pathCollision.draw();
-        })
+        });
     }
 
 }
