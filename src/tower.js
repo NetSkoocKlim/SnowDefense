@@ -1,16 +1,41 @@
 import {Canvas} from "./canvas.js";
 import {createDivElement} from "./utilities.js";
 import {CircleCollision} from "./collision.js";
-import {Bullet} from "./bullet.js";
+import {TowerGunBullet} from "./bullet.js";
 
 class TowerGun {
     constructor(center, width, height) {
         this.center = center;
         this.width = width;
         this.height = height;
-        this.collision = new CircleCollision(this, this.center, 175);
+        this.collision = new CircleCollision(this.center, 175);
         this.rotation = {x: null, y: null}
         this.bullets = [];
+        this.canFire = true;
+        this.reloadMaxTime = 500;
+        this.reloadTime = 0;
+        this.reloadTimerId = null;
+        this.reloadStartTime = null;
+    }
+
+    reload(timeLeft) {
+        this.reloadStartTime = Date.now();
+        this.reloadTimerId = setTimeout(() => {
+            this.canFire = true
+            this.reloadTime = 0;
+        }, timeLeft);
+    }
+
+    pauseReload() {
+        this.reloadTime += (Date.now() - this.reloadStartTime);
+        clearTimeout(this.reloadTimerId);
+    }
+
+    resumeReload() {
+        if (!this.canFire) {
+
+            this.reload(this.reloadMaxTime - this.reloadTime)
+        }
     }
 
     updateRotation(enemyX, enemyY) {
@@ -19,13 +44,19 @@ class TowerGun {
         this.currentAngle = Math.atan2(this.rotation.y,this.rotation.x);
     }
 
-    fire() {
-        let bullet = new Bullet(
-            this.center.x+Math.cos(this.currentAngle) * (this.width * 0.75),
-            this.center.y+Math.sin(this.currentAngle) * (this.width * 0.75),
-            {x: Math.cos(this.currentAngle), y: Math.sin(this.currentAngle)},
-        )
-        this.bullets.push(bullet);
+    fire(enemy) {
+        if (this.canFire) {
+            let bullet = new TowerGunBullet(
+                this.center.x + Math.cos(this.currentAngle) * (this.width * 0.75),
+                this.center.y + Math.sin(this.currentAngle) * (this.width * 0.75),
+                {x: Math.cos(this.currentAngle), y: Math.sin(this.currentAngle)},
+                enemy.center
+            )
+            this.reloadStartTime = null;
+            this.reload(this.reloadMaxTime);
+            this.canFire = false;
+            this.bullets.push(bullet);
+        }
     }
 
     get position() {
@@ -42,11 +73,12 @@ class TowerGun {
         Canvas.ctx.rotate(this.currentAngle);
         Canvas.ctx.fillRect(-this.height/2, -this.height/2,  this.width,  this.height );
         Canvas.ctx.restore();
-        this.collision.draw();
+        //this.collision.draw();
     }
 }
 
 export class Tower {
+    static cost = 100;
     constructor(placeDiv, center, size) {
         this.center = center;
         this.sizeDifference = 5;

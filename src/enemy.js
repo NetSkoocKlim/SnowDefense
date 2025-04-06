@@ -1,4 +1,4 @@
-import {getRectangleBorders, ObjectType} from "./utilities.js";
+import {getRectangleBorders} from "./utilities.js";
 import {Collision, PolygonCollision} from "./collision.js";
 import {Canvas} from "./canvas.js";
 
@@ -9,7 +9,6 @@ export class Enemy {
     static spawnTimer = null;
 
     constructor(baseSize, sceneSize) {
-        this.objectType = ObjectType.Enemy;
 
         this.img = new Image();
         this.img.src = './sprite.png';
@@ -17,6 +16,7 @@ export class Enemy {
         this.imgSourceHeight = 520;
         this.imgSourceWidth = 224;
         this.scale = 0.125;
+        this.reward = 5;
 
         this.imgDestHeight = this.imgSourceHeight * this.scale;
         this.imgDestWidth = this.imgSourceWidth * this.scale;
@@ -66,7 +66,7 @@ export class Enemy {
         this.position.x = x;
         this.position.y = y;
         this.velocity = velocity;
-        this.collision = new PolygonCollision(this, this.position,
+        this.collision = new PolygonCollision(this.position,
             getRectangleBorders(this.width, this.height), 0);
     }
 

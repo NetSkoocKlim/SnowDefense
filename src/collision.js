@@ -78,8 +78,7 @@ export class Collision {
 
 export class PolygonCollision {
 
-    constructor(obj, position, points, angle) {
-        this.obj = obj;
+    constructor(position, points, angle) {
         this.points = points;
         this.position = position;
         this.angle = angle;
@@ -120,8 +119,7 @@ export class PolygonCollision {
 
 
 export class CircleCollision {
-    constructor(obj, position, radius) {
-        this.obj = obj;
+    constructor(position, radius) {
         this.position = position;
         this.radius = radius;
     }

@@ -1,14 +1,13 @@
-import {Bullet} from "./bullet.js";
+import {BaseGunBullet} from "./bullet.js";
 import {PolygonCollision} from "./collision.js";
-import {getRectangleBorders, ObjectType} from './utilities.js'
+import {getRectangleBorders} from './utilities.js'
 import {Canvas} from "./canvas.js";
 
 
 export class Base {
     constructor(sceneSize) {
-        this.objectType = ObjectType.Base;
         this.update(sceneSize);
-        this.collision = new PolygonCollision(this, this.position, getRectangleBorders(this.size, this.size), 0);
+        this.collision = new PolygonCollision(this.position, getRectangleBorders(this.size, this.size), 0);
         this.gun = new BaseGun(this.size, this.center);
     }
 
@@ -78,7 +77,7 @@ class BaseGun {
     }
 
     fire() {
-        let bullet = new Bullet(
+        let bullet = new BaseGunBullet(
             this.center.x+Math.cos(this.currentAngle) * (this.width * 0.75),
             this.center.y+Math.sin(this.currentAngle) * (this.width * 0.75),
             {x: Math.cos(this.currentAngle), y: Math.sin(this.currentAngle)},

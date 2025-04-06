@@ -5,22 +5,18 @@ import {Canvas} from "./src/canvas.js";
 
 let game;
 
-function checkAndStart() {
-    if (Enemy.spawnTimer === null) {
-        Enemy.setSpawnRate(game.base, Canvas.width);
-    }
-    game.draw();
-}
-
 const start = () => {
     Canvas.initCanvas();
     game = new SnowDefense();
-    addPauseListeners(game, checkAndStart);
+    addPauseListeners(game);
     addGunInteractionListeners(game);
     addTowerInteractionListeners(game);
-    if (document.hasFocus()) checkAndStart();
+    if (document.hasFocus()) game.checkAndStart();
 }
 
 document.addEventListener("DOMContentLoaded", start);
+window.addEventListener("mousedown", (evt) => {
+    evt.preventDefault();
+})
 
 

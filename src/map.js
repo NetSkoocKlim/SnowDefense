@@ -1,16 +1,16 @@
-import {createDivElement, getRectangleBorders, ObjectType} from "./utilities.js";
+import {createDivElement, getRectangleBorders} from "./utilities.js";
 import {Collision, PolygonCollision} from "./collision.js";
 import {Base} from "./base.js";
 import {Canvas} from "./canvas.js";
 import {Tower} from "./tower.js";
+import {SnowDefense} from "./game.js";
 
 class Way {
     constructor(position, width, height) {
-        this.objectType = ObjectType.Path;
         this.position = position;
         this.width = width;
         this.height = height;
-        this.collision = new PolygonCollision(this, this.position, getRectangleBorders(this.width, this.height),
+        this.collision = new PolygonCollision(this.position, getRectangleBorders(this.width, this.height),
             0);
         Collision.pathCollisions.push(this.collision);
     }
@@ -23,12 +23,10 @@ class Way {
 
 class TowerPlace {
     constructor(position, size) {
-
-
         this.position = position;
         this.size = size;
         this.towerIsPlaced = false;
-        this.collision = new PolygonCollision(this, {x: this.position.x - 5,
+        this.collision = new PolygonCollision({x: this.position.x - 5,
             y: this.position.y - 5}, getRectangleBorders(this.size + 10, this.size + 10), 0);
         this.towerPlaceDiv = createDivElement(document.querySelector('#game'), this.collision.position, this.size, this.size, 'towerPlace');
         this.isSelected = false;
@@ -50,18 +48,9 @@ class TowerPlace {
         }
     }
 
-    checkSelection(mouseX, mouseY) {
-        let {x, y} = this.collision.position;
-        if (x <= mouseX && mouseX <= x + this.size && y <= mouseY && mouseY <= y + this.size) {
-            this.isSelected = true;
-        }
-        else {
-            this.isSelected = false;
-        }
-    }
-
     setTower() {
-        if (!this.towerIsPlaced) {
+        if (!this.towerIsPlaced && SnowDefense.points.currentPoints >= Tower.cost) {
+            SnowDefense.points.currentPoints -= Tower.cost;
             this.towerIsPlaced = true;
             const tower = new Tower(this.towerPlaceDiv, this.center, this.size);
             Map.towers.push(tower);

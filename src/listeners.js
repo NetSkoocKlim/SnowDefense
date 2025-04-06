@@ -2,27 +2,29 @@ import {Enemy} from "./enemy.js";
 import {Map} from "./map.js";
 import {Canvas} from "./canvas.js";
 
-export const addPauseListeners = (game, startFunction) => {
+export const addPauseListeners = (game) => {
     window.addEventListener('keydown', (event) => {
         if (event.code === 'KeyP') {
             if (!game.pause.buttonPause) {
-                Enemy.stopSpawn();
                 game.pause.buttonPause = true;
+                game.pauseGame();
             } else {
                 game.pause.buttonPause = false;
-                startFunction();
+                game.resumeGame();
             }
         }
     });
 
     window.addEventListener('blur', () => {
         game.pause.windowPause = true;
-        Enemy.stopSpawn()
+        game.pauseGame();
     });
 
     window.addEventListener('focus', () => {
-        game.pause.windowPause = false;
-        if (!game.buttonPause) startFunction();
+        if (document.hasFocus()) {
+            game.pause.windowPause = false;
+            game.resumeGame();
+        }
     });
 }
 
@@ -38,8 +40,6 @@ export const addGunInteractionListeners = (game) => {
 }
 
 export const addTowerInteractionListeners = (game) => {
-    const rect = Canvas.canvas.getBoundingClientRect();
-
     Map.towerPlaces.forEach(place => {
         place.towerPlaceDiv.addEventListener('mouseover', (event) => {
             if (game.pause.buttonPause || game.pause.windowPause) return ;
@@ -56,6 +56,7 @@ export const addTowerInteractionListeners = (game) => {
     })
 
     window.addEventListener('click', (event) => {
+
         if (event.target.classList.contains('tower')) {
             event.stopPropagation();
         }

@@ -23,4 +23,6 @@ export class Canvas {
 
         Canvas.canvas.style.position = "absolute";
     }
+
+
 }

@@ -1,8 +1,3 @@
-export class ObjectType {
-    static Base = Symbol('base');
-    static Enemy = Symbol('enemy');
-    static Path = Symbol('path');
-}
 
 export function rotatePoint(point, angle) {
     const cos = Math.cos(angle);
@@ -40,4 +35,26 @@ export function createDivElement(parent, position, width, height, className) {
     div.style.position = 'absolute';
     parent.appendChild(div);
     return div;
+}
+
+export function drawCircle(ctx, x, y, radius, color) {
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(
+        x,
+        y,
+        radius,
+        0,
+        Math.PI * 2
+    );
+    ctx.fill();
+}
+
+export function drawPolygon(ctx, points, color) {
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(points[0].x, points[0].y);
+    points.slice(1).forEach(p => ctx.lineTo(p.x, p.y));
+    ctx.closePath();
+    ctx.fill();
 }

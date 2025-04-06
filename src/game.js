@@ -2,8 +2,12 @@ import {Collision} from "./collision.js";
 import {Enemy} from "./enemy.js";
 import {Map} from "./map.js";
 import {Canvas} from "./canvas.js";
+import {Points} from "./gui/points.js";
+
 
 export class SnowDefense {
+
+    static points = new Points();
 
     constructor() {
         this.pause = {
@@ -14,6 +18,28 @@ export class SnowDefense {
         this.base = this.map.base;
     }
 
+    pauseGame() {
+        Map.towers.forEach((tower) => {
+            if (!tower.gun.canFire) tower.gun.pauseReload();
+        })
+        Enemy.stopSpawn()
+    }
+
+    resumeGame() {
+        if (!this.pause.buttonPause) {
+            Map.towers.forEach((tower) => {
+                if (!tower.gun.canFire) tower.gun.resumeReload();
+            })
+            this.checkAndStart();
+        }
+    }
+
+    checkAndStart() {
+        if (Enemy.spawnTimer === null) {
+            Enemy.setSpawnRate(this.base, Canvas.width);
+        }
+        this.draw();
+    }
 
     draw() {
         Canvas.ctx.clearRect(0, 0, Canvas.width, Canvas.height);
@@ -34,37 +60,42 @@ export class SnowDefense {
                         }
                 }
             })
+
             if (targetEnemy !== null) {
                 tower.gun.updateRotation(targetEnemy.center.x, targetEnemy.center.y);
-                tower.gun.fire();
+                tower.gun.fire(targetEnemy);
             }
 
             tower.draw();
             for (let i = tower.gun.bullets.length - 1; i >= 0; i--) {
                 let bullet = tower.gun.bullets[i];
                 bullet.draw();
-                bullet.circleCollision.draw();
-                bullet.triangleCollision.draw();
+                bullet.collisions.circleCollision.draw();
+                bullet.collisions.triangleCollision.draw();
                 let wasHit = false;
                 for (let j = Enemy.enemies.length - 1; j >= 0; j--) {
                     let enemy = Enemy.enemies[j];
                     if (bullet.checkHit(enemy)) {
-                        this.base.gun.bullets.splice(i, 1);
+                        tower.gun.bullets.splice(i, 1);
                         Enemy.enemies.splice(j, 1);
+                        SnowDefense.points.increase(enemy.reward);
                         wasHit = true;
                         break;
                     }
                 }
                 if (!wasHit) {
-                    console.log('updated');
-                    bullet.update();
+                    if (bullet.checkEnd()) {
+                        tower.gun.bullets.splice(i, 1);
+                    }
+                    else {
+                        bullet.update();
+                    }
                 }
             }
         })
 
         Enemy.enemies.forEach((enemy) => {
             enemy.draw();
-            enemy.collision.draw();
             if (!enemy.checkBaseConflict(this.base.collision)) {
                  enemy.move();
             }
@@ -73,12 +104,13 @@ export class SnowDefense {
         for (let i = this.base.gun.bullets.length - 1; i >= 0; i--) {
             let bullet = this.base.gun.bullets[i];
             bullet.draw();
-            bullet.circleCollision.draw();
-            bullet.triangleCollision.draw();
+            bullet.collisions.circleCollision.draw();
+            bullet.collisions.triangleCollision.draw();
             if (bullet.checkWallConflict(this.base)) {
                 this.base.gun.bullets.splice(i, 1);
                 continue;
             }
+
             let wasHit = false;
             for (let j = Enemy.enemies.length - 1; j >= 0; j--) {
                 let enemy = Enemy.enemies[j];
@@ -86,6 +118,7 @@ export class SnowDefense {
                     this.base.gun.bullets.splice(i, 1);
                     Enemy.enemies.splice(j, 1);
                     wasHit = true;
+                    SnowDefense.points.increase(enemy.reward);
                     break;
                 }
             }
