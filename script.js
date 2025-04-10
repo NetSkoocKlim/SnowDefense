@@ -1,20 +1,20 @@
-import {Enemy} from './src/enemy.js'
-import {SnowDefense} from "./src/game.js";
+import {Game} from "./src/game.js";
 import {addGunInteractionListeners, addPauseListeners, addTowerInteractionListeners} from "./src/listeners.js";
-import {Canvas} from "./src/canvas.js";
+import {Canvas} from "./src/entities/canvas/";
+import {levelDescription} from "./src/level/levelManager/levelDescription.js"
 
-let game;
 
 const start = () => {
     Canvas.initCanvas();
-    game = new SnowDefense();
-    addPauseListeners(game);
-    addGunInteractionListeners(game);
-    addTowerInteractionListeners(game);
-    if (document.hasFocus()) game.checkAndStart();
+    Game.initGame();
+    addPauseListeners();
+    addGunInteractionListeners();
+    addTowerInteractionListeners();
+    if (document.hasFocus()) Game.checkAndStart();
 }
 
 document.addEventListener("DOMContentLoaded", start);
+
 window.addEventListener("mousedown", (evt) => {
     evt.preventDefault();
 })

@@ -12,9 +12,7 @@ export class Points {
         this.block =  createDivElement(document.querySelector('div#game'), {x: 0, y: 0}, null, null, 'points');
         this.span = document.createElement("span");
         this.block.appendChild(this.span);
-
     }
-
 
     increase(value) {
         this.currentPoints += value;
@@ -22,7 +20,7 @@ export class Points {
     }
 
     decrease(value) {
-        this.currentPoints += value;
+        this.currentPoints -= value;
         this.span.innerHTML = this.currentPoints.toString().padStart(5, '0');
     }
 

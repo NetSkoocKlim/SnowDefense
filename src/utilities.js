@@ -1,3 +1,10 @@
+import {Enemy} from "./entities/enemy/";
+import {Game} from "./game.js";
+
+export class ObjType {
+    static Base = Symbol();
+    static Tower = Symbol();
+}
 
 export function rotatePoint(point, angle) {
     const cos = Math.cos(angle);
@@ -30,8 +37,10 @@ export function createDivElement(parent, position, width, height, className) {
     div.classList.add(className);
     div.style.width = width + 'px';
     div.style.height = height + 'px';
-    div.style.left = position.x + 'px';
-    div.style.top = position.y + 'px';
+    if (position) {
+        div.style.left = position.x + 'px';
+        div.style.top = position.y + 'px';
+    }
     div.style.position = 'absolute';
     parent.appendChild(div);
     return div;
@@ -57,4 +66,35 @@ export function drawPolygon(ctx, points, color) {
     points.slice(1).forEach(p => ctx.lineTo(p.x, p.y));
     ctx.closePath();
     ctx.fill();
+}
+
+export function processHit(source) {
+    for (let i = source.gun.bullets.length - 1; i >= 0; i--) {
+        let bullet = source.gun.bullets[i];
+        bullet.draw({collision: true});
+        if (source.type === ObjType.Base) {
+            if (bullet.checkWallConflict(source)) {
+               source.gun.bullets.splice(i, 1);
+            }
+        }
+        let wasHit = false;
+        for (let j = Enemy.enemies.length - 1; j >= 0; j--) {
+            let enemy = Enemy.enemies[j];
+            if (bullet.checkHit(enemy)) {
+                source.gun.bullets.splice(i, 1);
+                Enemy.enemies.splice(j, 1);
+                Game.points.increase(enemy.reward);
+                wasHit = true;
+                break;
+            }
+        }
+        if (!wasHit) {
+            if (source.type === ObjType.Tower && bullet.checkEnd()) {
+                source.gun.bullets.splice(i, 1);
+            }
+            else {
+                bullet.update();
+            }
+        }
+    }
 }

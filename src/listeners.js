@@ -1,62 +1,61 @@
-import {Enemy} from "./enemy.js";
-import {Map} from "./map.js";
-import {Canvas} from "./canvas.js";
+import {Map} from "./entities/map/";
+import {Canvas} from "./entities/canvas/";
+import {Game} from "./game.js";
 
-export const addPauseListeners = (game) => {
+export const addPauseListeners = () => {
     window.addEventListener('keydown', (event) => {
         if (event.code === 'KeyP') {
-            if (!game.pause.buttonPause) {
-                game.pause.buttonPause = true;
-                game.pauseGame();
+            if (!Game.pause.buttonPause) {
+                Game.pause.buttonPause = true;
+                Game.pauseGame();
             } else {
-                game.pause.buttonPause = false;
-                game.resumeGame();
+                Game.pause.buttonPause = false;
+                Game.resumeGame();
             }
         }
     });
 
     window.addEventListener('blur', () => {
-        game.pause.windowPause = true;
-        game.pauseGame();
+        Game.pause.windowPause = true;
+        Game.pauseGame();
     });
 
     window.addEventListener('focus', () => {
         if (document.hasFocus()) {
-            game.pause.windowPause = false;
-            game.resumeGame();
+            Game.pause.windowPause = false;
+            Game.resumeGame();
         }
     });
 }
 
-export const addGunInteractionListeners = (game) => {
+export const addGunInteractionListeners = () => {
     Canvas.canvas.addEventListener('click', () => {
-        if (!game.pause.buttonPause && !game.pause.windowPause) game.base.gun.fire();
+        if (!Game.pause.buttonPause && !Game.pause.windowPause) Game.base.gun.fire();
     })
 
     Canvas.canvas.addEventListener('mousemove', (event) => {
         const rect = Canvas.canvas.getBoundingClientRect();
-        game.base.gun.updateRotation(event.clientX - rect.left, event.clientY - rect.top);
+        Game.base.gun.updateRotation(event.clientX - rect.left, event.clientY - rect.top);
     })
 }
 
-export const addTowerInteractionListeners = (game) => {
+export const addTowerInteractionListeners = () => {
     Map.towerPlaces.forEach(place => {
         place.towerPlaceDiv.addEventListener('mouseover', (event) => {
-            if (game.pause.buttonPause || game.pause.windowPause) return ;
+            if (Game.pause.buttonPause || Game.pause.windowPause) return ;
             place.isSelected = true;
         })
         place.towerPlaceDiv.addEventListener('mouseout', (event) => {
-            if (game.pause.buttonPause || game.pause.windowPause) return ;
+            if (Game.pause.buttonPause || Game.pause.windowPause) return ;
             place.isSelected = false;
         })
         place.towerPlaceDiv.addEventListener('click', (event) => {
-            if (game.pause.buttonPause || game.pause.windowPause) return ;
+            if (Game.pause.buttonPause || Game.pause.windowPause) return ;
             place.setTower();
         })
     })
 
     window.addEventListener('click', (event) => {
-
         if (event.target.classList.contains('tower')) {
             event.stopPropagation();
         }

@@ -1,9 +1,9 @@
-import {CircleCollision, Collision, PolygonCollision} from "./collision.js";
-import {drawCircle, drawPolygon, getTriangleBorder} from "./utilities.js";
-import {Canvas} from "./canvas.js";
+import {CircleCollision, Collision, PolygonCollision} from "../../collision.js";
+import {drawCircle, drawPolygon, getTriangleBorder} from "../../utilities.js";
+import {Canvas} from "../canvas/";
 
 
-class Bullet {
+export class Bullet {
 
     constructor(x, y, velocity, scale, speed) {
         this.velocity = velocity;
@@ -36,8 +36,10 @@ class Bullet {
     }
 
     checkHit(enemy) {
-        return Collision.checkPolygonAndCircleCollision(enemy.collision, this.collisions.circleCollision)
-            || Collision.checkPolygonsCollision(this.collisions.triangleCollision, enemy.collision);
+        return Collision.checkPolygonAndCircleCollision(enemy.collisions.headCollision, this.collisions.circleCollision) ||
+            Collision.checkPolygonAndCircleCollision(enemy.collisions.bodyCollision, this.collisions.circleCollision) ||
+            Collision.checkPolygonsCollision(this.collisions.triangleCollision, enemy.collisions.headCollision) ||
+            Collision.checkPolygonsCollision(this.collisions.triangleCollision, enemy.collisions.bodyCollision);
     }
 
 
@@ -48,7 +50,7 @@ class Bullet {
         this.circlePosition.y += this.velocity.y * this.speed;
     }
 
-    draw() {
+    draw({collision = false}) {
         drawPolygon(Canvas.ctx, this.collisions.triangleCollision.getRotatedPoints(), 'orange');
         const cos = Math.cos(this.angle);
         const sin = Math.sin(this.angle);
@@ -56,42 +58,9 @@ class Bullet {
             this.trianglePosition.y + this.triangleSize.width * sin,
             this.circleRadius,
             'pink');
-    }
-}
-
-
-export class BaseGunBullet extends Bullet {
-    constructor(x, y, velocity) {
-        super(x, y, velocity, 6, 1);
-    }
-
-    checkWallConflict(base, sceneSize) {
-        let {x, y} = this.collisions.circleCollision.position;
-        if (x >= base.position.x && x <= (base.position.x + base.size) &&
-            y >= base.position.y && y <= (base.position.y + base.size)) {
-            return false;
+        if (collision) {
+            this.collisions.circleCollision.draw();
+            this.collisions.triangleCollision.draw();
         }
-        let {x: xt, y: yt} = this.collisions.triangleCollision.position;
-        if (xt < 0 || x > sceneSize || yt < 0 || yt > sceneSize) return true;
-        for (let i = 0; i < Collision.pathCollisions.length; i++) {
-            let path = Collision.pathCollisions[i];
-            if (Collision.checkPolygonAndCircleCollision(path, this.collisions.circleCollision)) return true;
-            if (Collision.checkPolygonsCollision(path, this.collisions.triangleCollision)) return true;
-        }
-        return false;
     }
-
-}
-
-export class TowerGunBullet extends Bullet {
-    constructor(x, y, velocity, fireSource) {
-        super(x, y, velocity, 4, 1);
-        this.fireSource = fireSource;
-    }
-
-    checkEnd() {
-        let {x, y} = this.collisions.circleCollision.position;
-        return Math.abs(x - this.fireSource.x) < this.speed && Math.abs(y - this.fireSource.y) <= this.speed;
-    }
-
 }

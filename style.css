@@ -17,3 +17,12 @@ div.points {
     margin-top: 2%;
     padding: 1%;
 }
+
+div.timer {
+    border: 1px solid black;
+    position: absolute;
+    margin-right: 2%;
+    margin-top: 2%;
+    right: 0;
+    padding: 1%
+}

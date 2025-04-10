@@ -1,9 +1,9 @@
-import {createDivElement, getRectangleBorders} from "./utilities.js";
-import {Collision, PolygonCollision} from "./collision.js";
-import {Base} from "./base.js";
-import {Canvas} from "./canvas.js";
-import {Tower} from "./tower.js";
-import {SnowDefense} from "./game.js";
+import {createDivElement, getRectangleBorders} from "../../utilities.js";
+import {Collision, PolygonCollision} from "../../collision.js";
+import {Base} from "../base/";
+import {Canvas} from "../canvas/";
+import {Tower} from "../tower";
+import {Game} from "../../game.js";
 
 class Way {
     constructor(position, width, height) {
@@ -49,11 +49,8 @@ class TowerPlace {
     }
 
     setTower() {
-        if (!this.towerIsPlaced && SnowDefense.points.currentPoints >= Tower.cost) {
-            SnowDefense.points.currentPoints -= Tower.cost;
-            this.towerIsPlaced = true;
-            const tower = new Tower(this.towerPlaceDiv, this.center, this.size);
-            Map.towers.push(tower);
+        if (!this.towerIsPlaced && Game.points.currentPoints >= Tower.cost) {
+            Tower.buyTower(this);
         }
     }
 }
@@ -65,7 +62,7 @@ export class Map {
 
     constructor() {
         this.sceneSize = Canvas.width;
-        this.base = new Base(this.sceneSize);
+        this.base = new Base();
         this.createPathes();
         this.createTowerPlaces();
     }
