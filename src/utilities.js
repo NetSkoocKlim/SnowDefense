@@ -1,5 +1,6 @@
 import {Enemy} from "./entities/enemy/";
 import {Game} from "./game.js";
+import {EnemySpawner} from "./entities/enemy/enemy.js";
 
 export class ObjType {
     static Base = Symbol();
@@ -78,11 +79,11 @@ export function processHit(source) {
             }
         }
         let wasHit = false;
-        for (let j = Enemy.enemies.length - 1; j >= 0; j--) {
-            let enemy = Enemy.enemies[j];
+        for (let j = EnemySpawner.enemies.length - 1; j >= 0; j--) {
+            let enemy = EnemySpawner.enemies[j];
             if (bullet.checkHit(enemy)) {
                 source.gun.bullets.splice(i, 1);
-                Enemy.enemies.splice(j, 1);
+                EnemySpawner.enemies.splice(j, 1);
                 Game.points.increase(enemy.reward);
                 wasHit = true;
                 break;

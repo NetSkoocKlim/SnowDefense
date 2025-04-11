@@ -6,7 +6,7 @@ export const levelDescription = {
         {
             waves: [
                 {
-                    minTimerValue: 60,
+                    endWaveTime: 60,
                     spawnsCount: 5,
                     randomSpawnsCount: 3,
                     spawns: [
@@ -15,11 +15,11 @@ export const levelDescription = {
                             enemies: {
                                 common: [
                                     {
-                                        side: 0,
+                                        side: 1,
                                         count: 1,
                                     },
                                     {
-                                        side: 2,
+                                        side: 3,
                                         count: 1,
                                     },
                                 ],
@@ -31,11 +31,11 @@ export const levelDescription = {
                             enemies: {
                                 common: [
                                     {
-                                        side: 1,
+                                        side: 2,
                                         count: 1,
                                     },
                                     {
-                                        side: 3,
+                                        side: 4,
                                         count: 1,
                                     }
                                 ],
@@ -47,7 +47,7 @@ export const levelDescription = {
                             enemies: {
                                 common: [
                                     {
-                                        side: 0,
+                                        side: 1,
                                         count: 3,
                                     },
                                 ],
@@ -59,7 +59,7 @@ export const levelDescription = {
                             enemies: {
                                 common: [
                                     {
-                                        side: 0,
+                                        side: 1,
                                         count: 3,
                                     },
                                 ],
@@ -71,7 +71,7 @@ export const levelDescription = {
                             enemies: {
                                 common: [
                                     {
-                                        side: 0,
+                                        side: 1,
                                         count: 3,
                                     },
                                 ],
@@ -83,18 +83,18 @@ export const levelDescription = {
                         {
                             timerValue: 3,
                             enemyCount: 1,
-                            delay: 800,
+                            delay: 0.8,
                             elite: null,
                         },
                         {
                             timerValue: 15,
                             enemyCount: 2,
-                            delay: 1200,
+                            delay: 1.2,
                             elite: null,
                         },
                         {
                             timerValue: 35,
-                            delay: 1200,
+                            delay: 1.2,
                             enemyCount: 3,
                             elite: {
                                 chanceOfSpawn: 0.05,
@@ -103,9 +103,6 @@ export const levelDescription = {
                         },
                     ],
                     enemyModification: null,
-                },
-                {
-
                 }
             ],
             waveCount: 1,

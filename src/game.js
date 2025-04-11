@@ -4,6 +4,8 @@ import {Canvas} from "./entities/canvas/";
 import {Points} from "./gui/points.js";
 import {processHit} from "./utilities.js";
 import {GameTimer, Timer} from "./entities/timer/timer.js";
+import {EnemySpawner} from "./entities/enemy/enemy.js";
+import {LevelManager} from "./level/levelManager/levelManager.js";
 
 
 export class Game {
@@ -12,12 +14,16 @@ export class Game {
     static map;
     static base;
     static timer;
+    static levelStarted = false;
+    static levelManager;
 
     static initGame () {
         Game.points = new Points();
         Game.map = new Map();
         Game.base = Game.map.base;
-        Game.timer = new GameTimer(6);
+        Game.timer = new GameTimer(600);
+        Game.levelManager = new LevelManager();
+        EnemySpawner.initTimer();
     }
 
     static pause = {
@@ -26,9 +32,6 @@ export class Game {
     };
 
     static pauseGame() {
-        Map.towers.forEach((tower) => {
-            if (!tower.gun.canFire) tower.gun.pauseReload();
-        })
         Timer.timers.forEach((timer) => {
             timer.pause();
         })
@@ -36,9 +39,6 @@ export class Game {
 
     static resumeGame() {
         if (!Game.pause.buttonPause) {
-            Map.towers.forEach((tower) => {
-                if (!tower.gun.canFire) tower.gun.resumeReload();
-            })
             Game.checkAndStart();
         }
     };
@@ -49,8 +49,9 @@ export class Game {
                 timer.resume();
             }
         });
-        if (Enemy.spawnTimer === -1) {
-            Enemy.initTimer({seconds:1});
+        if (!this.levelStarted) {
+            this.levelManager.startNextLevel();
+            this.levelStarted = true;
         }
         Game.draw();
     };
@@ -60,7 +61,7 @@ export class Game {
         Game.map.draw({collision: true});
         Game.base.draw({collision: true});
         Game.base.gun.draw();
-        Enemy.enemies.forEach((enemy) => {
+        EnemySpawner.enemies.forEach((enemy) => {
             enemy.draw({collision: true});
             if (!enemy.checkBaseConflict()) {
                 enemy.move();

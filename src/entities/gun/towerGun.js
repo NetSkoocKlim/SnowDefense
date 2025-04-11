@@ -1,7 +1,8 @@
 import {CircleCollision, Collision} from "../../collision.js";
-import {Enemy} from "../enemy/";
 import {TowerGunBullet} from "../bullet/";
 import {Gun} from "./gun.js";
+import {CooldownTimer} from "../timer/timer.js";
+import {EnemySpawner} from "../enemy/enemy.js";
 
 export class TowerGun extends Gun {
     constructor(center, width, height)
@@ -10,10 +11,8 @@ export class TowerGun extends Gun {
         this.attackRadius = 175;
         this.attackRadiusShow = new CircleCollision(this.center, this.attackRadius);
         this.canFire = true;
-        this.reloadMaxTime = 500;
-        this.reloadTime = 0;
-        this.reloadTimerId = null;
-        this.reloadStartTime = null;
+        this.reloadTimer = new CooldownTimer(0.5, {shouldReset:false});
+        this.reloadTimer.onComplete = () => {this.reload();};
     }
 
     updateRotation(mouseX, mouseY) {
@@ -21,23 +20,8 @@ export class TowerGun extends Gun {
         this.currentAngle = Math.atan2(this.rotation.y,this.rotation.x);
     }
 
-    reload(timeLeft) {
-        this.reloadStartTime = Date.now();
-        this.reloadTimerId = setTimeout(() => {
-            this.canFire = true
-            this.reloadTime = 0;
-        }, timeLeft);
-    }
-
-    pauseReload() {
-        this.reloadTime += (Date.now() - this.reloadStartTime);
-        clearTimeout(this.reloadTimerId);
-    }
-
-    resumeReload() {
-        if (!this.canFire) {
-            this.reload(this.reloadMaxTime - this.reloadTime)
-        }
+    reload() {
+        this.canFire = true;
     }
 
     get position() {
@@ -50,7 +34,7 @@ export class TowerGun extends Gun {
     isEnemyInRadius() {
         let targetEnemy = null;
         let dif = Infinity;
-        Enemy.enemies.forEach((enemy) => {
+        EnemySpawner.enemies.forEach((enemy) => {
             if (Collision.checkPolygonAndCircleCollision(enemy.collisions.headCollision, this.attackRadiusShow) ||
                 Collision.checkPolygonAndCircleCollision(enemy.collisions.bodyCollision, this.attackRadiusShow)
             ) {
@@ -77,8 +61,7 @@ export class TowerGun extends Gun {
                 {x: Math.cos(this.currentAngle), y: Math.sin(this.currentAngle)},
                 enemy.headPosition
             )
-            this.reloadStartTime = null;
-            this.reload(this.reloadMaxTime);
+            this.reloadTimer.runTimer();
             this.canFire = false;
             this.bullets.push(bullet);
         }
