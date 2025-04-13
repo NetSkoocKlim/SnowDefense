@@ -5,19 +5,21 @@ import {CooldownTimer} from "../timer/timer.js";
 import {EnemySpawner} from "../enemy/enemy.js";
 
 export class TowerGun extends Gun {
-    constructor(center, width, height)
-    {
+    constructor(center, width, height) {
         super(center, width, height);
         this.attackRadius = 175;
         this.attackRadiusShow = new CircleCollision(this.center, this.attackRadius);
         this.canFire = true;
-        this.reloadTimer = new CooldownTimer(0.5, {shouldReset:false});
-        this.reloadTimer.onComplete = () => {this.reload();};
+        this.reloadTime = 0.125;
+        this.reloadTimer = new CooldownTimer("TowerGunReload", this.reloadTime, {shouldReset: false});
+        this.reloadTimer.onComplete = () => {
+            this.reload();
+        };
     }
 
     updateRotation(mouseX, mouseY) {
         super.updateRotation(mouseX, mouseY);
-        this.currentAngle = Math.atan2(this.rotation.y,this.rotation.x);
+        this.currentAngle = Math.atan2(this.rotation.y, this.rotation.x);
     }
 
     reload() {
@@ -40,9 +42,9 @@ export class TowerGun extends Gun {
             ) {
                 let difX = enemy.headPosition.x - this.center.x;
                 let difY = enemy.headPosition.y - this.center.y;
-                if (difX * difX + difY*difY < dif) {
+                if (difX * difX + difY * difY < dif) {
                     targetEnemy = enemy;
-                    dif = difX * difX + difY*difY;
+                    dif = difX * difX + difY * difY;
                 }
             }
         })
@@ -61,13 +63,13 @@ export class TowerGun extends Gun {
                 {x: Math.cos(this.currentAngle), y: Math.sin(this.currentAngle)},
                 enemy.headPosition
             )
-            this.reloadTimer.runTimer();
+            this.reloadTimer.resume();
             this.canFire = false;
             this.bullets.push(bullet);
         }
     }
 
-    draw({collision=false}) {
+    draw({collision = false}) {
         super.draw();
         if (collision) this.attackRadiusShow.draw();
     }

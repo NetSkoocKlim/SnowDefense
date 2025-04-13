@@ -6,7 +6,7 @@ export const levelDescription = {
         {
             waves: [
                 {
-                    endWaveTime: 60,
+                    endWaveTime: 5,
                     spawnsCount: 5,
                     randomSpawnsCount: 3,
                     spawns: [
@@ -103,9 +103,12 @@ export const levelDescription = {
                         },
                     ],
                     enemyModification: null,
+                },
+                {
+                    endWaveTime: 5,
                 }
             ],
-            waveCount: 1,
+            waveCount: 2,
         },
 
 

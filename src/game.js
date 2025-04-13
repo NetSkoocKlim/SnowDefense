@@ -21,7 +21,8 @@ export class Game {
         Game.points = new Points();
         Game.map = new Map();
         Game.base = Game.map.base;
-        Game.timer = new GameTimer(600);
+        Game.timer = new GameTimer("GameTimer", 600);
+        Game.timer.isShouldContinue = true;
         Game.levelManager = new LevelManager();
         EnemySpawner.initTimer();
     }
@@ -45,7 +46,7 @@ export class Game {
 
     static checkAndStart() {
         Timer.timers.forEach((timer) => {
-            if (timer.timerId === null) {
+            if (timer.isShouldContinue && timer.timerId === null ) {
                 timer.resume();
             }
         });

@@ -1,4 +1,4 @@
-import {levelDescription} from "./levelDescription.js"
+import {levelDescription} from "../levelDescription.js"
 import {WaveManager} from "./waveManager/waveManager.js"
 
 export class LevelManager {

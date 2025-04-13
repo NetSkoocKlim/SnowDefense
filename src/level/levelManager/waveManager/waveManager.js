@@ -1,13 +1,14 @@
-import {IncrementTimer} from "../../../entities/timer/timer.js";
+import {CooldownTimer, IncrementTimer} from "../../../entities/timer/timer.js";
 import {EnemySpawner} from "../../../entities/enemy/enemy.js";
 
 export class WaveManager {
 
     constructor(levelDescription) {
-        this.timer = new IncrementTimer();
+        this.waveTimer = new IncrementTimer("Wave timer");
         this.currentWave = 0;
         this.waveCount = levelDescription.waves.length;
-        this.wavesDelay = 15;
+        this.waveDelay = 5;
+        this.waveEndTimer = new CooldownTimer("WaveEndTimer", this.waveDelay, {shouldReset: false});
         this.levelDescription = levelDescription;
     }
 
@@ -19,14 +20,20 @@ export class WaveManager {
     }
 
     startNextWave() {
-        if (this.currentWave >= this.waveCount) {
-            this.endLevel();
-            return;
-        }
+        this.waveTimer.reset();
+        this.waveTimer.resume();
+        this.waveTimer.isShouldContinue = true;
+
+        this.waveEndTimer.pause();
+        this.waveEndTimer.reset({});
+        this.waveEndTimer.isShouldContinue = false;
+
         this.getWaveDescription();
+        console.log("New wave started. Duration: ", this.waveDescription.endWaveTime, "seconds");
+
         for (let i = 0; i < this.waveDescription.spawnsCount; i++) {
             let spawnDetails = this.waveDescription.spawns[i];
-            this.timer.scheduleEvent(spawnDetails.timerValue, () => {
+            this.waveTimer.scheduleEvent(spawnDetails.timerValue, () => {
                 if (spawnDetails.enemies.common) {
                     spawnDetails.enemies.common.forEach((enemyDescription) => {
                         EnemySpawner.spawnEnemy({side: enemyDescription.side, count: enemyDescription.count});
@@ -43,17 +50,39 @@ export class WaveManager {
         for (let i = 0; i < this.waveDescription.randomSpawnsCount; i++) {
             let spawnDetails = this.waveDescription.randomSpawns[i];
             let timerValue = spawnDetails.timerValue;
-            this.timer.scheduleEvent(timerValue, () => {
+            this.waveTimer.scheduleEvent(timerValue, () => {
                 EnemySpawner.setSpawnRate(spawnDetails.enemyCount, spawnDetails.delay);
             });
         }
 
-        this.timer.scheduleEvent(this.endWaveTime, () => {
-            this.timer.clearEvents();
-            this.startNextWave();
+        this.waveTimer.scheduleEvent(this.endWaveTime, () => {
+            this.endWave();
         });
-        this.currentWave++;
+
     }
-    endLevel() {
+
+    endWave() {
+        console.log("Wave ended");
+        this.waveTimer.clearEvents();
+        this.waveTimer.pause();
+        this.waveTimer.isShouldContinue = false;
+
+        EnemySpawner.spawnTimer.pause();
+        EnemySpawner.spawnTimer.isShouldContinue = false;
+
+        this.currentWave += 1;
+        if (this.currentWave >= this.waveCount) {
+            console.log("this was last wave ;(")
+            this.waveTimer.pause();
+            return;
+        }
+        console.log("Next wave in:", this.waveDelay, "seconds");
+
+        this.waveEndTimer.reset({startTime: this.waveDelay});
+        this.waveEndTimer.isShouldContinue = true;
+        this.waveEndTimer.onComplete = () => {
+            this.startNextWave();
+        }
+        this.waveEndTimer.resume();
     }
 }

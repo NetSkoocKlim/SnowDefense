@@ -4,15 +4,12 @@ export class Timer {
 
     static timers = [];
 
-    constructor() {
+    constructor(name) {
+        this.name = name;
         this.time = 0;
-        this.timerId = 0;
-        this.resume();
+        this.timerId = null;
+        this.isShouldContinue = false;
         Timer.timers.push(this);
-    }
-
-    runTimer() {
-        this.timerId = setTimeout(() => this.runTimer(), 100);
     }
 
     pause() {
@@ -20,20 +17,26 @@ export class Timer {
         this.timerId = null;
     }
 
+    runTimer() {
+        if (this.timerId !== null) {
+            this.timerId = setTimeout(() => this.runTimer(), 50);
+        }
+    }
+
     resume() {
-        this.timerId = setTimeout(() => this.runTimer(), 100);
+        this.timerId = setTimeout(() => this.runTimer(), 50);
     }
 
     toString() {
-        const minutes = Math.floor(this.time / 60);
-        const seconds = Math.floor(this.time % 60);
+        const minutes = Math.floor((this.time+0.9999) / 60);
+        const seconds = Math.floor((this.time+0.9999) % 60);
         return minutes.toString().padStart(2, "0") + ':' + seconds.toString().padStart(2, "0");
     }
 }
 
 export class IncrementTimer extends Timer {
-    constructor() {
-        super();
+    constructor(name) {
+        super(name);
         this.scheduledEvents = [];
     }
 
@@ -55,7 +58,7 @@ export class IncrementTimer extends Timer {
     }
 
     runTimer() {
-        this.time += 0.1;
+        this.time += 0.05;
         this.checkEvents();
         super.runTimer();
     }
@@ -66,17 +69,16 @@ export class IncrementTimer extends Timer {
 }
 
 export class CooldownTimer extends Timer {
-
-    constructor(startTime, {shouldReset = true}) {
-        super();
-        this.startTime = startTime + 0.9;
+    constructor(name, startTime, {shouldReset = true}) {
+        super(name);
+        this.startTime = startTime;
         this.time = this.startTime;
         this.onComplete = null;
         this.shouldReset = shouldReset;
     }
 
     runTimer() {
-        this.time -= 0.1;
+        this.time -= 0.05;
         if (this.time <= 0) {
             if (this.onComplete !== null) {
                 this.onComplete();
@@ -100,8 +102,8 @@ export class CooldownTimer extends Timer {
 }
 
 export class GameTimer extends CooldownTimer {
-    constructor(startTime) {
-        super(startTime, {});
+    constructor(name, startTime) {
+        super(name, startTime, {});
         this.timerDiv = createDivElement(document.querySelector("#game"), null, null, null, 'timer');
         this.span = document.createElement("span");
         this.span.id = "timer";

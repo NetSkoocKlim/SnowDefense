@@ -10,8 +10,7 @@ export class EnemySpawner {
     static spawnTimer = -1;
 
     static initTimer() {
-        EnemySpawner.spawnTimer = new CooldownTimer(1, {});
-        EnemySpawner.spawnTimer.pause();
+        EnemySpawner.spawnTimer = new CooldownTimer("EnemySpawner", 10, {});
     }
 
     static spawnEnemy({side=null, count=1}) {
@@ -23,7 +22,10 @@ export class EnemySpawner {
     }
 
     static setSpawnRate(spawnCount, seconds) {
+        EnemySpawner.spawnTimer.isShouldContinue = true;
+        EnemySpawner.spawnTimer.pause();
         EnemySpawner.spawnTimer.reset({startTime: seconds});
+        EnemySpawner.spawnTimer.resume();
         EnemySpawner.spawnTimer.onComplete = () => {
             EnemySpawner.spawnEnemy({side:null, count:spawnCount});
         }
@@ -77,7 +79,7 @@ export class Enemy {
             case 2:
                 velocity = {x: 0, y: -1};
                 x = this.sceneSize / 2 - this.baseSize / 2 + Math.random() * (this.baseSize - this.width);
-                y = this.sceneSize + this.height;
+                y = this.sceneSize;
                 break;
             case 3:
                 temp = this.height;
