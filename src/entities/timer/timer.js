@@ -69,8 +69,8 @@ export class CooldownTimer extends Timer {
 }
 
 export class GameTimer extends CooldownTimer {
-    constructor() {
-        super(6);
+    constructor(startTime) {
+        super(startTime);
         this.timerDiv = createDivElement(document.querySelector("#game"), null, null, null, 'timer');
         this.span = document.createElement("span");
         this.span.id = "timer";

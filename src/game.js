@@ -4,7 +4,7 @@ import {Canvas} from "./entities/canvas/";
 import {Points} from "./gui/points.js";
 import {processHit} from "./utilities.js";
 import {GameTimer, Timer} from "./entities/timer/timer.js";
-
+import {mainMenu} from "./gui/mainMenu/mainMenu.js";
 
 export class Game {
 
@@ -12,18 +12,22 @@ export class Game {
     static map;
     static base;
     static timer;
+    static mainMenu;
 
     static initGame () {
         Game.points = new Points();
         Game.map = new Map();
         Game.base = Game.map.base;
-        Game.timer = new GameTimer(6);
+        Game.timer = new GameTimer(600);
+        Game.timer.pause();
+        Game.mainMenu = new mainMenu();
     }
 
     static pause = {
         buttonPause: false,
-        windowPause: false
+        windowPause: false,
     };
+
 
     static pauseGame() {
         Map.towers.forEach((tower) => {

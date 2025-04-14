@@ -1,6 +1,7 @@
 
 body {
     margin: 0;
+    background-color: red;
 }
 
 div#game {
@@ -26,3 +27,35 @@ div.timer {
     right: 0;
     padding: 1%
 }
+div.wrapper {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    height: 110px;
+    transition: all 0.3s ease;
+}
+
+button {
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    width: 100px;
+    height: 50px;
+    margin-bottom: 10px;
+    background-color: white;
+    border: 3px solid red;
+    cursor: pointer;
+    font-family: Arial, sans-serif;
+}
+
+button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.button1 {
+    background: #e74c3c !important;
+    color: white;
+}
+

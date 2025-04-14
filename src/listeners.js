@@ -4,7 +4,7 @@ import {Game} from "./game.js";
 
 export const addPauseListeners = () => {
     window.addEventListener('keydown', (event) => {
-        if (event.code === 'KeyP') {
+        if (event.code === 'KeyP' && !Game.mainMenu.isActive) {
             if (!Game.pause.buttonPause) {
                 Game.pause.buttonPause = true;
                 Game.pauseGame();
@@ -13,6 +13,7 @@ export const addPauseListeners = () => {
                 Game.resumeGame();
             }
         }
+
     });
 
     window.addEventListener('blur', () => {
@@ -21,7 +22,7 @@ export const addPauseListeners = () => {
     });
 
     window.addEventListener('focus', () => {
-        if (document.hasFocus()) {
+        if (document.hasFocus() && !Game.mainMenu.isActive) {
             Game.pause.windowPause = false;
             Game.resumeGame();
         }

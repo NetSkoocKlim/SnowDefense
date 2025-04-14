@@ -1,6 +1,7 @@
 import {rotatePoint} from "./utilities.js";
 import {Canvas} from "./entities/canvas/";
 
+
 export class Collision {
     static pathCollisions = [];
 
