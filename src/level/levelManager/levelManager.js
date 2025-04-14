@@ -1,7 +1,7 @@
-import {levelDescription} from "./levelDescription.js"
-import {WaveManager} from "./waveManager/waveManager"
+import {levelDescription} from "../levelDescription.js"
+import {WaveManager} from "./waveManager/waveManager.js"
 
-class LevelManager {
+export class LevelManager {
 
     constructor() {
         this.currentLevel = 1;
@@ -10,12 +10,8 @@ class LevelManager {
     }
 
     startNextLevel() {
-        this.levelCount += 1;
-
+        this.waveManager.startNextWave();
+        this.currentLevel += 1;
     }
-
-
-
-
 
 }

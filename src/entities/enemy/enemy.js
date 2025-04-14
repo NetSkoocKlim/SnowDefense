@@ -5,24 +5,46 @@ import {Game} from "../../game.js";
 import {CooldownTimer} from "../timer/timer.js";
 
 
-export class Enemy {
-
+export class EnemySpawner {
     static enemies = [];
     static spawnTimer = -1;
 
-    static initTimer({seconds=1}) {
-        Enemy.spawnTimer = new CooldownTimer(seconds);
-        Enemy.spawnTimer.onComplete = function () {
-            Enemy.spawnEnemy();
-        }
-    }p
+    static initTimer() {
+        EnemySpawner.spawnTimer = new CooldownTimer("EnemySpawner", 10, {});
+    }
 
-    constructor(baseSize, sceneSize) {
+    static spawnEnemy({side=null, count=1}) {
+        for (let i = 0; i < count; i++) {
+            let enemy = new Enemy();
+            enemy.spawn({side: side});
+            EnemySpawner.enemies.push(enemy);
+        }
+    }
+
+    static setSpawnRate(spawnCount, seconds) {
+        EnemySpawner.spawnTimer.isShouldContinue = true;
+        EnemySpawner.spawnTimer.pause();
+        EnemySpawner.spawnTimer.reset({startTime: seconds});
+        EnemySpawner.spawnTimer.resume();
+        EnemySpawner.spawnTimer.onComplete = () => {
+            EnemySpawner.spawnEnemy({side:null, count:spawnCount});
+        }
+    }
+}
+
+export class Enemy {
+
+    constructor() {
         this.img = new Image();
         this.img.src = './sprite.png';
         this.imgSourceHeight = 520;
         this.imgSourceWidth = 224;
+
+        this.sceneSize = Canvas.width;
+        this.baseSize = Game.base.size;
+
         this.scale = 0.125;
+
         this.reward = 5;
 
         this.imgDestHeight = this.imgSourceHeight * this.scale;
@@ -31,15 +53,19 @@ export class Enemy {
         this.width = this.imgDestWidth;
         this.height = this.imgDestHeight;
 
-        this.sceneSize = sceneSize;
-        this.baseSize = baseSize;
         this.position = {x: null, y: null};
+
         this.speed = 0.35;
     }
 
-    spawn() {
-        //if (this.side === null)
+    spawn({side=null}) {
+        if (side===null) {
             this.side = Math.floor(1 + Math.random() * 4);
+        }
+        else {
+            this.side = side;
+        }
+
         let x, y, velocity, temp;
         switch (this.side) {
             case 1:
@@ -53,7 +79,7 @@ export class Enemy {
             case 2:
                 velocity = {x: 0, y: -1};
                 x = this.sceneSize / 2 - this.baseSize / 2 + Math.random() * (this.baseSize - this.width);
-                y = this.sceneSize + this.height;
+                y = this.sceneSize;
                 break;
             case 3:
                 temp = this.height;
@@ -188,23 +214,5 @@ export class Enemy {
             this.collisions.headCollision.draw();
             this.collisions.bodyCollision.draw();
         }
-    }
-
-    static spawnEnemy() {
-        let count = 3;
-        for (let i = 0; i < count; i++) {
-            let enemy = new Enemy(Game.base.size, Canvas.width);
-            enemy.spawn();
-            Enemy.enemies.push(enemy);
-        }
-    }
-
-    static setSpawnRate(seconds) {
-        Enemy.spawnTimer.reset({startTime: seconds});
-    }
-
-    static stopSpawn() {
-        clearInterval(Enemy.spawnTimer);
-        Enemy.spawnTimer = null;
     }
 }
