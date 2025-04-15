@@ -62,7 +62,7 @@ export class WaveManager {
     }
 
     endWave() {
-        console.log("Wave ended");
+
         this.waveTimer.clearEvents();
         this.waveTimer.pause();
         this.waveTimer.isShouldContinue = false;

@@ -23,7 +23,6 @@ export class Gun {
         Canvas.ctx.rotate(this.currentAngle);
         Canvas.ctx.fillRect(-this.height/2, -this.height/2,  this.width,  this.height );
         Canvas.ctx.restore();
-
     }
 }
 

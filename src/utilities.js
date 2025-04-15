@@ -1,4 +1,3 @@
-import {Enemy} from "./entities/enemy/";
 import {Game} from "./game.js";
 import {EnemySpawner} from "./entities/enemy/enemy.js";
 

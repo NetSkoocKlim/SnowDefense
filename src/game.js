@@ -1,4 +1,3 @@
-import {Enemy} from "./entities/enemy/";
 import {Map} from "./entities/map/";
 import {Canvas} from "./entities/canvas/";
 import {Points} from "./gui/points.js";

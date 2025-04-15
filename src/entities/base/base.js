@@ -7,8 +7,8 @@ import {BaseGun} from "../gun/";
 export class Base {
     constructor() {
         this.type = ObjType.Base;
-
         this.size = Canvas.width*0.2;
+
         this.position = {
             x: Canvas.width/2 - this.size/2,
             y: Canvas.width/2 - this.size/2,

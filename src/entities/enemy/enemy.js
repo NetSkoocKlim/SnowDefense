@@ -3,6 +3,7 @@ import {Collision, PolygonCollision} from "../../collision.js";
 import {Canvas} from "../canvas/";
 import {Game} from "../../game.js";
 import {CooldownTimer} from "../timer/timer.js";
+import {EnemyAnimator} from "../../spriteAnimator/spriteAnimator.js";
 
 
 export class EnemySpawner {
@@ -35,27 +36,31 @@ export class EnemySpawner {
 export class Enemy {
 
     constructor() {
-        this.img = new Image();
-        this.img.src = './sprite.png';
-        this.imgSourceHeight = 520;
-        this.imgSourceWidth = 224;
+        this.enemyAnimator = new EnemyAnimator();
+
+        this.enemyAnimator.setMove();
 
         this.sceneSize = Canvas.width;
         this.baseSize = Game.base.size;
 
-        this.scale = 0.125;
-
+        this.imgScale = 0.125;
         this.reward = 5;
+
+        this.imgSourceHeight = this.enemyAnimator.currentState.sprite.height;
+        this.imgSourceWidth = this.enemyAnimator.currentState.sprite.width / this.enemyAnimator.framesCount;
 
         this.imgDestHeight = this.imgSourceHeight * this.scale;
         this.imgDestWidth = this.imgSourceWidth * this.scale;
 
         this.width = this.imgDestWidth;
         this.height = this.imgDestHeight;
-
         this.position = {x: null, y: null};
 
         this.speed = 0.35;
+    }
+
+    get scale() {
+        return this.imgScale * Canvas.scale;
     }
 
     spawn({side=null}) {
@@ -65,7 +70,6 @@ export class Enemy {
         else {
             this.side = side;
         }
-
         let x, y, velocity, temp;
         switch (this.side) {
             case 1:
@@ -83,10 +87,8 @@ export class Enemy {
                 break;
             case 3:
                 temp = this.height;
-
                 this.height = this.width;
                 this.width = temp;
-
                 velocity = {x: -1, y: 0};
                 x = this.sceneSize;
                 y = this.sceneSize / 2 - this.baseSize / 2 + Math.random() * (this.baseSize - this.height);
@@ -101,6 +103,7 @@ export class Enemy {
         this.position.y = y;
         this.velocity = velocity;
         this.addCollisions();
+        this.enemyAnimator.frameDelayTimer.resume();
     }
 
     addCollisions() {
@@ -187,6 +190,8 @@ export class Enemy {
         this.collisions.bodyCollision.position.y += this.velocity.y * this.speed;
     }
 
+
+
     rotateImg() {
         if (this.side === 1) {
             Canvas.ctx.rotate(Math.PI / 2);
@@ -200,14 +205,15 @@ export class Enemy {
         }
     }
 
+
     draw({collision=false}) {
         Canvas.ctx.save();
         Canvas.ctx.translate(this.position.x, this.position.y);
         this.rotateImg();
         Canvas.ctx.drawImage(
-            this.img,
-            0, 0, this.imgSourceWidth, this.imgSourceHeight,
-            0, 0, this.imgDestWidth, this.imgDestHeight
+            this.enemyAnimator.currentState.img,
+            this.enemyAnimator.spriteWidth*this.enemyAnimator.currentFrame, 0, this.enemyAnimator.spriteWidth, this.imgSourceHeight,
+            0, 0, this.enemyAnimator.spriteWidth*this.scale, this.imgDestHeight
         );
         Canvas.ctx.restore();
         if (collision) {

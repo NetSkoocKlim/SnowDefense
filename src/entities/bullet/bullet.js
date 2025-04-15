@@ -8,7 +8,7 @@ export class Bullet {
     constructor(x, y, velocity, scale, speed) {
         this.velocity = velocity;
         this.angle = Math.atan2(this.velocity.y, this.velocity.x);
-        this.scale = scale;
+        this.scale = scale * Canvas.scale;
         this.triangleSize = {width: 3 * this.scale, height: 2 * this.scale};
         this.circleRadius = this.scale;
         this.trianglePosition = {
