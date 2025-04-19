@@ -36,10 +36,10 @@ export class Bullet {
     }
 
     checkHit(enemy) {
-        return Collision.checkPolygonAndCircleCollision(enemy.collisions.headCollision, this.collisions.circleCollision) ||
-            Collision.checkPolygonAndCircleCollision(enemy.collisions.bodyCollision, this.collisions.circleCollision) ||
-            Collision.checkPolygonsCollision(this.collisions.triangleCollision, enemy.collisions.headCollision) ||
-            Collision.checkPolygonsCollision(this.collisions.triangleCollision, enemy.collisions.bodyCollision);
+        return Collision.checkPolygonAndCircleCollision(enemy.collisions.head, this.collisions.circleCollision) ||
+            Collision.checkPolygonAndCircleCollision(enemy.collisions.body, this.collisions.circleCollision) ||
+            Collision.checkPolygonsCollision(this.collisions.triangleCollision, enemy.collisions.head) ||
+            Collision.checkPolygonsCollision(this.collisions.triangleCollision, enemy.collisions.body);
     }
 
 

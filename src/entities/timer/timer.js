@@ -99,6 +99,7 @@ export class CooldownTimer extends Timer {
         this.time = this.startTime;
     }
 
+
 }
 
 export class GameTimer extends CooldownTimer {

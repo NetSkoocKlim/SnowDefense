@@ -9,7 +9,6 @@ const start = () => {
     addPauseListeners();
     addGunInteractionListeners();
     addTowerInteractionListeners();
-    if (document.hasFocus()) Game.checkAndStart();
 }
 
 document.addEventListener("DOMContentLoaded", start);
@@ -21,5 +20,4 @@ window.addEventListener("mousedown", (event) => {
 window.addEventListener("contextmenu", (event) => {
     event.preventDefault();
 })
-
 
