@@ -20,7 +20,7 @@ export class Canvas {
         Canvas.canvas.height = canvasSize;
         Canvas.width = canvasSize;
         Canvas.height = canvasSize;
-
+        Canvas.scale = Canvas.width / 844;
         Canvas.canvas.style.position = "absolute";
     }
 

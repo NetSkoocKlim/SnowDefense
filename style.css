@@ -1,7 +1,6 @@
 
 body {
     margin: 0;
-    background-color: red;
 }
 
 div#game {
@@ -27,6 +26,7 @@ div.timer {
     right: 0;
     padding: 1%
 }
+
 div.wrapper {
     position: absolute;
     left: 50%;
@@ -58,4 +58,3 @@ button:hover {
     background: #e74c3c !important;
     color: white;
 }
-

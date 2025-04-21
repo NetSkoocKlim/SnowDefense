@@ -58,27 +58,34 @@ export class Collision {
             const distToStartSq = (ax - cx)**2 + (ay - cy)**2;
             const distToEndSq = (bx - cx)**2 + (by - cy)**2;
             const rSq = circle.radius**2;
-            if (distToStartSq <= rSq || distToEndSq <= rSq) return true;
+
+            if (distToStartSq <= rSq || distToEndSq <= rSq)
+                return true;
+
             const abx = bx - ax;
             const aby = by - ay;
             const acx = cx - ax;
             const acy = cy - ay;
             const lenAbSq = abx**2 + aby**2;
-            if (lenAbSq === 0) return false;
+
+            if (lenAbSq === 0)
+                return false;
+
             const t = Math.max(0, Math.min(1, (acx * abx + acy * aby) / lenAbSq));
             const nearestX = ax + t * abx;
             const nearestY = ay + t * aby;
             const dx = cx - nearestX;
             const dy = cy - nearestY;
-            if (dx**2 + dy**2 <= rSq) return true;
+
+            if (dx**2 + dy**2 <= rSq)
+                return true;
         }
         return false;
     }
-
 }
 
-export class PolygonCollision {
 
+export class PolygonCollision {
     constructor(position, points, angle) {
         this.points = points;
         this.position = position;

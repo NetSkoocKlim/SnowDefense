@@ -1,15 +1,21 @@
 import {CooldownTimer, IncrementTimer} from "../../../entities/timer/timer.js";
-import {EnemySpawner} from "../../../entities/enemy/enemy.js";
+
+import {EnemySpawner} from "../../../entities/enemy/enemySpawner.js";
+import {LevelManager} from "../levelManager.js";
+import {Game} from "../../../game.js";
 
 export class WaveManager {
 
-    constructor(levelDescription) {
+    constructor() {
         this.waveTimer = new IncrementTimer("Wave timer");
         this.currentWave = 0;
-        this.waveCount = levelDescription.waves.length;
         this.waveDelay = 5;
         this.waveEndTimer = new CooldownTimer("WaveEndTimer", this.waveDelay, {shouldReset: false});
+    }
+
+    setLevelDescription(levelDescription) {
         this.levelDescription = levelDescription;
+        this.waveCount = this.levelDescription.waves.length;
     }
 
     getWaveDescription() {
@@ -62,7 +68,7 @@ export class WaveManager {
     }
 
     endWave() {
-        console.log("Wave ended");
+
         this.waveTimer.clearEvents();
         this.waveTimer.pause();
         this.waveTimer.isShouldContinue = false;
@@ -73,6 +79,7 @@ export class WaveManager {
         this.currentWave += 1;
         if (this.currentWave >= this.waveCount) {
             console.log("this was last wave ;(")
+            Game.levelManager.startNextLevel();
             this.waveTimer.pause();
             return;
         }

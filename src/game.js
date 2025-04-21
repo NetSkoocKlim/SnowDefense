@@ -1,11 +1,10 @@
-import {Enemy} from "./entities/enemy/";
 import {Map} from "./entities/map/";
 import {Canvas} from "./entities/canvas/";
 import {Points} from "./gui/points.js";
 import {processHit} from "./utilities.js";
 import {GameTimer, Timer} from "./entities/timer/timer.js";
-import {EnemySpawner} from "./entities/enemy/enemy.js";
 import {LevelManager} from "./level/levelManager/levelManager.js";
+import {EnemySpawner} from "./entities/enemy/enemySpawner.js";
 
 
 export class Game {
@@ -17,14 +16,19 @@ export class Game {
     static levelStarted = false;
     static levelManager;
 
-    static initGame () {
+    static initGame() {
         Game.points = new Points();
         Game.map = new Map();
         Game.base = Game.map.base;
         Game.timer = new GameTimer("GameTimer", 600);
         Game.timer.isShouldContinue = true;
-        Game.levelManager = new LevelManager();
-        EnemySpawner.initTimer();
+        EnemySpawner.init();
+        fetch('src/level/levelDescription.json')
+            .then(response => response.json())
+            .then(data => {
+                Game.levelManager = new LevelManager(data);
+                Game.checkAndStart();
+            })
     }
 
     static pause = {
@@ -46,7 +50,7 @@ export class Game {
 
     static checkAndStart() {
         Timer.timers.forEach((timer) => {
-            if (timer.isShouldContinue && timer.timerId === null ) {
+            if (timer.isShouldContinue && timer.timerId === null) {
                 timer.resume();
             }
         });
@@ -63,9 +67,14 @@ export class Game {
         Game.base.draw({collision: true});
         Game.base.gun.draw();
         EnemySpawner.enemies.forEach((enemy) => {
-            enemy.draw({collision: true});
-            if (!enemy.checkBaseConflict()) {
-                enemy.move();
+            if (enemy.isAlive) {
+                enemy.draw({collision: true});
+                if (enemy.currentState === "Attack") {
+                    enemy.handleAttack();
+                }
+                else if (enemy.currentState === "Move") {
+                    enemy.move();
+                }
             }
         });
         Map.towers.forEach(tower => {

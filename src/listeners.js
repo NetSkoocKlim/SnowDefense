@@ -3,17 +3,24 @@ import {Canvas} from "./entities/canvas/";
 import {Game} from "./game.js";
 
 export const addPauseListeners = () => {
+    let key_pressed = false;
     window.addEventListener('keydown', (event) => {
-        if (event.code === 'KeyP' && !Game.mainMenu.isActive) {
-            if (!Game.pause.buttonPause) {
-                Game.pause.buttonPause = true;
-                Game.pauseGame();
-            } else {
-                Game.pause.buttonPause = false;
-                Game.resumeGame();
+        if (!key_pressed) {
+            if (event.code === 'KeyP') {
+                if (!Game.pause.buttonPause) {
+                    Game.pause.buttonPause = true;
+                    Game.pauseGame();
+                } else {
+                    Game.pause.buttonPause = false;
+                    Game.resumeGame();
+                }
+                key_pressed = true;
             }
         }
+    });
 
+    window.addEventListener('keyup', (event) => {
+        key_pressed = false;
     });
 
     window.addEventListener('blur', () => {
@@ -22,7 +29,7 @@ export const addPauseListeners = () => {
     });
 
     window.addEventListener('focus', () => {
-        if (document.hasFocus() && !Game.mainMenu.isActive) {
+        if (document.hasFocus()) {
             Game.pause.windowPause = false;
             Game.resumeGame();
         }
