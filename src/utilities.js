@@ -7,6 +7,24 @@ export class ObjType {
     static Tower = Symbol();
 }
 
+
+export function createImg(src, parent, className){
+    const img = document.createElement("img");
+    img.src = src;
+    img.classList.add(className);
+    parent.appendChild(img);
+
+    return img;
+}
+
+export function createButton(text, parent, className){
+    const Button = document.createElement("button");
+    Button.innerText = text;
+    Button.classList.add(className);
+    parent.appendChild(Button);
+    return Button;
+}
+
 export function rotatePoint(point, angle) {
     const cos = Math.cos(angle);
     const sin = Math.sin(angle);

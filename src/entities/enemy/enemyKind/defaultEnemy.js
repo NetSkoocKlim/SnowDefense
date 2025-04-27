@@ -3,7 +3,6 @@ import {EnemyAnimator} from "../../../spriteAnimator/spriteAnimator.js";
 import {Canvas} from "../../canvas";
 
 export class DefaultEnemy extends Enemy {
-
     constructor() {
         super(28 * Canvas.scale,65 * Canvas.scale, 0.35, DefaultEnemy.createAnimator());
         this.reward = 5;

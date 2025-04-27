@@ -3,8 +3,9 @@ import {Canvas} from "./entities/canvas/";
 import {Points} from "./gui/points.js";
 import {processHit} from "./utilities.js";
 import {GameTimer, Timer} from "./entities/timer/timer.js";
-import {LevelManager} from "./level/levelManager/levelManager.js";
 import {EnemySpawner} from "./entities/enemy/enemySpawner.js";
+import {LevelManager} from "./level/levelManager/levelManager.js";
+import {Menu, EscapeMenu} from "./gui/mainMenu/menu.js";
 
 
 export class Game {
@@ -16,19 +17,25 @@ export class Game {
     static levelStarted = false;
     static levelManager;
 
-    static initGame() {
+    static async initGame() {
         Game.points = new Points();
         Game.map = new Map();
         Game.base = Game.map.base;
         Game.timer = new GameTimer("GameTimer", 600);
         Game.timer.isShouldContinue = true;
         EnemySpawner.init();
-        fetch('src/level/levelDescription.json')
-            .then(response => response.json())
-            .then(data => {
-                Game.levelManager = new LevelManager(data);
-                Game.checkAndStart();
+        Game.mainMenu = new Menu();
+        Game.escapeMenu = new EscapeMenu();
+        await fetch('./src/level/levelDescription.json')
+            .then(response => {
+                console.log(response.status);
+                return response.json();
             })
+            .then(data => {
+                console.log(data);
+                Game.levelManager = new LevelManager(data);
+            })
+
     }
 
     static pause = {
@@ -62,6 +69,9 @@ export class Game {
     };
 
     static draw() {
+        console.log(Game.pause.buttonPause, Game.pause.windowPause, Game.mainMenu.isActive, Game.escapeMenu.isActive);
+        if (Game.pause.buttonPause || Game.pause.windowPause || Game.mainMenu.isActive || Game.escapeMenu.isActive) return;
+
         Canvas.ctx.clearRect(0, 0, Canvas.width, Canvas.height);
         Game.map.draw({collision: true});
         Game.base.draw({collision: true});
@@ -83,6 +93,6 @@ export class Game {
             processHit(tower);
         });
         processHit(Game.base);
-        if (!Game.pause.buttonPause && !Game.pause.windowPause) requestAnimationFrame(() => Game.draw());
+        requestAnimationFrame(() => Game.draw());
     };
 }
