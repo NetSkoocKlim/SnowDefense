@@ -1,22 +1,34 @@
 import {Game} from "./src/game.js";
-import {addGunInteractionListeners, addPauseListeners, addTowerInteractionListeners} from "./src/listeners.js";
+import {addGunInteractionListeners,
+    addPauseListeners,
+    addTowerInteractionListeners,
+    addInteractionMainMenu,
+    addInteractionEscapeMenu,} from "./src/listeners.js";
 import {Canvas} from "./src/entities/canvas/";
-import {levelDescription} from "./src/level/levelManager/levelDescription.js"
 
-
-const start = () => {
+const start = async () => {
     Canvas.initCanvas();
-    Game.initGame();
+    await Game.initGame()
     addPauseListeners();
     addGunInteractionListeners();
     addTowerInteractionListeners();
-    if (document.hasFocus()) Game.checkAndStart();
+    addInteractionMainMenu();
+    addInteractionEscapeMenu();
 }
 
 document.addEventListener("DOMContentLoaded", start);
 
-window.addEventListener("mousedown", (evt) => {
-    evt.preventDefault();
+window.addEventListener("mousedown", (event) => {
+    event.preventDefault();
 })
 
+window.addEventListener("contextmenu", (event) => {
+    event.preventDefault();
+})
 
+window.addEventListener('keydown', (event) => {
+    console.log(event.code);
+    if (event.code !== 'F5' && event.code !== "F12") {
+        event.preventDefault();
+    }
+});

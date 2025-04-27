@@ -11,6 +11,7 @@ export class Tower {
         this.type = ObjType.Tower;
         this.center = center;
         this.sizeDifference = 5;
+        this.attack = 5;
         this.size = size + 2 * this.sizeDifference;
         this.gun = new TowerGun(this.center, this.size * 0.4, this.size * 0.2);
         this.towerDiv = createDivElement(placeDiv, {x: -this.sizeDifference, y:-this.sizeDifference}, this.size, this.size, 'tower');

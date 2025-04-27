@@ -1,9 +1,28 @@
-import {Enemy} from "./entities/enemy/";
 import {Game} from "./game.js";
+
+import {EnemySpawner} from "./entities/enemy/enemySpawner.js";
 
 export class ObjType {
     static Base = Symbol();
     static Tower = Symbol();
+}
+
+
+export function createImg(src, parent, className){
+    const img = document.createElement("img");
+    img.src = src;
+    img.classList.add(className);
+    parent.appendChild(img);
+
+    return img;
+}
+
+export function createButton(text, parent, className){
+    const Button = document.createElement("button");
+    Button.innerText = text;
+    Button.classList.add(className);
+    parent.appendChild(Button);
+    return Button;
 }
 
 export function rotatePoint(point, angle) {
@@ -78,12 +97,11 @@ export function processHit(source) {
             }
         }
         let wasHit = false;
-        for (let j = Enemy.enemies.length - 1; j >= 0; j--) {
-            let enemy = Enemy.enemies[j];
-            if (bullet.checkHit(enemy)) {
+        for (let j = EnemySpawner.enemies.length - 1; j >= 0; j--) {
+            let enemy = EnemySpawner.enemies[j];
+            if (enemy.isAlive && bullet.checkHit(enemy)) {
                 source.gun.bullets.splice(i, 1);
-                Enemy.enemies.splice(j, 1);
-                Game.points.increase(enemy.reward);
+                enemy.handleDamage(source.attack);
                 wasHit = true;
                 break;
             }

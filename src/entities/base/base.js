@@ -7,13 +7,14 @@ import {BaseGun} from "../gun/";
 export class Base {
     constructor() {
         this.type = ObjType.Base;
-
         this.size = Canvas.width*0.2;
+
         this.position = {
             x: Canvas.width/2 - this.size/2,
             y: Canvas.width/2 - this.size/2,
         }
-
+        this.healthPoints = 10000;
+        this.attack = 60;
         this.collision = new PolygonCollision(this.position, getRectangleBorders(this.size, this.size), 0);
         this.gun = new BaseGun(this.center, this.size * 0.35, this.size * 0.2);
     }

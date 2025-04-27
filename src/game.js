@@ -1,9 +1,11 @@
-import {Enemy} from "./entities/enemy/";
 import {Map} from "./entities/map/";
 import {Canvas} from "./entities/canvas/";
 import {Points} from "./gui/points.js";
 import {processHit} from "./utilities.js";
 import {GameTimer, Timer} from "./entities/timer/timer.js";
+import {EnemySpawner} from "./entities/enemy/enemySpawner.js";
+import {LevelManager} from "./level/levelManager/levelManager.js";
+import {Menu, EscapeMenu} from "./gui/mainMenu/menu.js";
 
 
 export class Game {
@@ -12,12 +14,28 @@ export class Game {
     static map;
     static base;
     static timer;
+    static levelStarted = false;
+    static levelManager;
 
-    static initGame () {
+    static async initGame() {
         Game.points = new Points();
         Game.map = new Map();
         Game.base = Game.map.base;
-        Game.timer = new GameTimer(6);
+        Game.timer = new GameTimer("GameTimer", 600);
+        Game.timer.isShouldContinue = true;
+        EnemySpawner.init();
+        Game.mainMenu = new Menu();
+        Game.escapeMenu = new EscapeMenu();
+        await fetch('./src/level/levelDescription.json')
+            .then(response => {
+                console.log(response.status);
+                return response.json();
+            })
+            .then(data => {
+                console.log(data);
+                Game.levelManager = new LevelManager(data);
+            })
+
     }
 
     static pause = {
@@ -26,9 +44,6 @@ export class Game {
     };
 
     static pauseGame() {
-        Map.towers.forEach((tower) => {
-            if (!tower.gun.canFire) tower.gun.pauseReload();
-        })
         Timer.timers.forEach((timer) => {
             timer.pause();
         })
@@ -36,34 +51,40 @@ export class Game {
 
     static resumeGame() {
         if (!Game.pause.buttonPause) {
-            Map.towers.forEach((tower) => {
-                if (!tower.gun.canFire) tower.gun.resumeReload();
-            })
             Game.checkAndStart();
         }
     };
 
     static checkAndStart() {
         Timer.timers.forEach((timer) => {
-            if (timer.timerId === null) {
+            if (timer.isShouldContinue && timer.timerId === null) {
                 timer.resume();
             }
         });
-        if (Enemy.spawnTimer === -1) {
-            Enemy.initTimer({seconds:1});
+        if (!this.levelStarted) {
+            this.levelManager.startNextLevel();
+            this.levelStarted = true;
         }
         Game.draw();
     };
 
     static draw() {
+        console.log(Game.pause.buttonPause, Game.pause.windowPause, Game.mainMenu.isActive, Game.escapeMenu.isActive);
+        if (Game.pause.buttonPause || Game.pause.windowPause || Game.mainMenu.isActive || Game.escapeMenu.isActive) return;
+
         Canvas.ctx.clearRect(0, 0, Canvas.width, Canvas.height);
         Game.map.draw({collision: true});
         Game.base.draw({collision: true});
         Game.base.gun.draw();
-        Enemy.enemies.forEach((enemy) => {
-            enemy.draw({collision: true});
-            if (!enemy.checkBaseConflict()) {
-                enemy.move();
+        EnemySpawner.enemies.forEach((enemy) => {
+            if (enemy.isAlive) {
+                enemy.draw({collision: true});
+                if (enemy.currentState === "Attack") {
+                    enemy.handleAttack();
+                }
+                else if (enemy.currentState === "Move") {
+                    enemy.move();
+                }
             }
         });
         Map.towers.forEach(tower => {
@@ -72,6 +93,6 @@ export class Game {
             processHit(tower);
         });
         processHit(Game.base);
-        if (!Game.pause.buttonPause && !Game.pause.windowPause) requestAnimationFrame(() => Game.draw());
+        requestAnimationFrame(() => Game.draw());
     };
 }

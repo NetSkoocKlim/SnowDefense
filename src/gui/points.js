@@ -9,7 +9,7 @@ export class Points {
     }
 
     initPointsBlock() {
-        this.block =  createDivElement(document.querySelector('div#game'), {x: 0, y: 0}, null, null, 'points');
+        this.block =  createDivElement(document.querySelector('div#game'), {x:0,y:0}, null, null, 'points');
         this.span = document.createElement("span");
         this.block.appendChild(this.span);
     }

@@ -8,7 +8,7 @@ export class Bullet {
     constructor(x, y, velocity, scale, speed) {
         this.velocity = velocity;
         this.angle = Math.atan2(this.velocity.y, this.velocity.x);
-        this.scale = scale;
+        this.scale = scale * Canvas.scale;
         this.triangleSize = {width: 3 * this.scale, height: 2 * this.scale};
         this.circleRadius = this.scale;
         this.trianglePosition = {
@@ -36,10 +36,10 @@ export class Bullet {
     }
 
     checkHit(enemy) {
-        return Collision.checkPolygonAndCircleCollision(enemy.collisions.headCollision, this.collisions.circleCollision) ||
-            Collision.checkPolygonAndCircleCollision(enemy.collisions.bodyCollision, this.collisions.circleCollision) ||
-            Collision.checkPolygonsCollision(this.collisions.triangleCollision, enemy.collisions.headCollision) ||
-            Collision.checkPolygonsCollision(this.collisions.triangleCollision, enemy.collisions.bodyCollision);
+        return Collision.checkPolygonAndCircleCollision(enemy.collisions.head, this.collisions.circleCollision) ||
+            Collision.checkPolygonAndCircleCollision(enemy.collisions.body, this.collisions.circleCollision) ||
+            Collision.checkPolygonsCollision(this.collisions.triangleCollision, enemy.collisions.head) ||
+            Collision.checkPolygonsCollision(this.collisions.triangleCollision, enemy.collisions.body);
     }
 
 
