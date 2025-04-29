@@ -95,25 +95,14 @@ export const addTowerInteractionListeners = () => {
             if (Game.pause.buttonPause || Game.pause.windowPause) return ;
             place.isSelected = true;
         })
+
         place.towerPlaceDiv.addEventListener('mouseout', (event) => {
             if (Game.pause.buttonPause || Game.pause.windowPause) return ;
             place.isSelected = false;
         })
-        place.towerPlaceDiv.addEventListener('click', (event) => {
-            if (Game.pause.buttonPause || Game.pause.windowPause) return ;
-            place.setTower();
-        })
-    })
 
-    window.addEventListener('click', (event) => {
-        if (event.target.classList.contains('tower')) {
-            event.stopPropagation();
-        }
-        if (event.target.classList.contains('towerPlace')) {
-            Map.towerPlaces.forEach(place => {
-                if (place.isSelected) place.setTower();
-            });
-        }
+        place.towerPlaceDiv.addEventListener('click', () => {
+            place.handleTowerPlaceClick();
+        });
     })
-
 }

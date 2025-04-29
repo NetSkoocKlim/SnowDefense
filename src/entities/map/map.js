@@ -1,9 +1,8 @@
-import {createDivElement, getRectangleBorders} from "../../utilities.js";
+import {getRectangleBorders} from "../../utilities.js";
 import {Collision, PolygonCollision} from "../../collision.js";
 import {Base} from "../base/";
 import {Canvas} from "../canvas/";
-import {Tower} from "../tower";
-import {Game} from "../../game.js";
+import {TowerPlace} from "../tower/towerPlace.js";
 
 class Way {
     constructor(position, width, height) {
@@ -21,44 +20,9 @@ class Way {
     }
 }
 
-class TowerPlace {
-    constructor(position, size) {
-        this.position = position;
-        this.size = size;
-        this.towerIsPlaced = false;
-        this.collision = new PolygonCollision({x: this.position.x - 5,
-            y: this.position.y - 5}, getRectangleBorders(this.size + 10, this.size + 10), 0);
-        this.towerPlaceDiv = createDivElement(document.querySelector('#game'), this.collision.position, this.size, this.size, 'towerPlace');
-        this.isSelected = false;
-    }
-
-    draw() {
-        if (!this.isSelected && ! this.towerIsPlaced)
-            Canvas.ctx.fillStyle = '#ff0000';
-        else
-            Canvas.ctx.fillStyle =  'rgba(255, 0, 0, 0.5)';
-        Canvas.ctx.fillRect(this.position.x, this.position.y, this.size, this.size);
-        this.collision.draw();
-    }
-
-    get center() {
-        return {
-            x: this.position.x + this.size / 2,
-            y: this.position.y + this.size / 2
-        }
-    }
-
-    setTower() {
-        if (!this.towerIsPlaced && Game.points.currentPoints >= Tower.cost) {
-            Tower.buyTower(this);
-        }
-    }
-}
-
 export class Map {
     static ways = [];
     static towerPlaces = [];
-    static towers = [];
 
     constructor() {
         this.sceneSize = Canvas.width;

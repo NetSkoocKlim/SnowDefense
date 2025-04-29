@@ -4,19 +4,30 @@ import {Gun} from "./gun.js";
 import {CooldownTimer} from "../timer/timer.js";
 
 import {EnemySpawner} from "../enemy/enemySpawner.js";
+import {TowerUpgrade} from "../upgrade";
 
 export class TowerGun extends Gun {
     constructor(center, width, height) {
         super(center, width, height);
+        this.stats = {...TowerUpgrade.startUpgrades};
         this.attackRadius = 175;
-        this.attackRadiusShow = new CircleCollision(this.center, this.attackRadius);
-        this.canFire = true;
-        this.reloadTime = 0.5;
+
         this.reloadTimer = new CooldownTimer("TowerGunReload", this.reloadTime, {shouldReset: false});
+        this.attackRadiusShow = new CircleCollision(this.center, this.attackRadius);
         this.reloadTimer.onComplete = () => {
             this.reload();
         };
+
+        this.canFire = true;
         this.reloadTimer.isShouldContinue = true;
+    }
+
+    get reloadTime() {
+        return this.stats.reloadTime.value;
+    }
+
+    get attackDamage() {
+        return this.stats.attack.value.value;
     }
 
     updateRotation(mouseX, mouseY) {

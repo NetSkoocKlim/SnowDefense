@@ -101,7 +101,7 @@ export function processHit(source) {
             let enemy = EnemySpawner.enemies[j];
             if (enemy.isAlive && bullet.checkHit(enemy)) {
                 source.gun.bullets.splice(i, 1);
-                enemy.handleDamage(source.attack);
+                enemy.handleDamage(source.gun.attackDamage);
                 wasHit = true;
                 break;
             }

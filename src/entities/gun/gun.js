@@ -1,6 +1,7 @@
 import {Canvas} from "../canvas/";
 
 export class Gun {
+
     constructor(center, width, height)
     {
         this.center = center;
@@ -10,6 +11,7 @@ export class Gun {
         this.bullets = [];
         this.currentAngle = 0;
     }
+
 
     updateRotation(mouseX, mouseY) {
         this.rotation.x = mouseX - this.center.x;

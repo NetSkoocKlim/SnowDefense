@@ -1,5 +1,5 @@
 import {Upgrade} from "./upgrade.js";
-import {baseUpgrade} from "./baseUpgrade.js";
-import {towerUpgrade} from "./towerUpgrade.js";
+import {BaseUpgrade} from "./baseUpgrade.js";
+import {TowerUpgrade} from "./towerUpgrade.js";
 
-export {Upgrade, towerUpgrade, baseUpgrade};
+export {Upgrade, TowerUpgrade, BaseUpgrade};

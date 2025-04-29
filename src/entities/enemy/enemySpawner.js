@@ -1,6 +1,6 @@
 import {CooldownTimer} from "../timer/timer.js";
 import {DefaultEnemy} from "./enemyKind/defaultEnemy.js";
-import {createDivElement} from "../../utilities.js";
+
 
 export class EnemySpawner {
     static enemies = [];

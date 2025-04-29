@@ -1,11 +1,21 @@
 import {BaseGunBullet} from "../bullet";
 import {Gun} from "./gun.js";
+import {BaseUpgrade} from "../upgrade";
 
 export class BaseGun extends Gun {
     constructor(center, width, height) {
         super(center, width, height);
         this.currentAngle = 0;
-        this.smoothing = 0.015;
+        this.stats = {...BaseUpgrade.startUpgrades};
+        console.log(this.stats);
+    }
+
+    get smoothing() {
+        return this.stats.smoothing.value.value;
+    }
+
+    get attackDamage() {
+        return this.stats.attack.value.value;
     }
 
     lerpAngle(target) {
