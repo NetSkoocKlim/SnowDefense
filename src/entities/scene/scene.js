@@ -1,24 +1,9 @@
-import {getRectangleBorders} from "../../utilities.js";
 import {Collision, PolygonCollision} from "../../collision.js";
 import {Base} from "../base/";
 import {Canvas} from "../canvas/";
 import {TowerPlace} from "../tower/towerPlace.js";
+import {Way} from "./way";
 
-class Way {
-    constructor(position, width, height) {
-        this.position = position;
-        this.width = width;
-        this.height = height;
-        this.collision = new PolygonCollision(this.position, getRectangleBorders(this.width, this.height),
-            0);
-        Collision.pathCollisions.push(this.collision);
-    }
-
-    draw() {
-        Canvas.ctx.fillStyle = '#fff';
-        Canvas.ctx.fillRect(this.position.x, this.position.y, this.width, this.height);
-    }
-}
 
 export class Map {
     static ways = [];
