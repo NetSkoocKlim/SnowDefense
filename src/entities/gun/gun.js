@@ -1,5 +1,3 @@
-import {Canvas} from "../canvas/";
-
 export class Gun {
 
     constructor(center, width, height)
@@ -18,14 +16,6 @@ export class Gun {
         this.rotation.y = mouseY - this.center.y;
     }
 
-    draw() {
-        Canvas.ctx.fillStyle = 'black';
-        Canvas.ctx.save();
-        Canvas.ctx.translate(this.center.x, this.center.y);
-        Canvas.ctx.rotate(this.currentAngle);
-        Canvas.ctx.fillRect(-this.height/2, -this.height/2,  this.width,  this.height );
-        Canvas.ctx.restore();
-    }
 }
 
 

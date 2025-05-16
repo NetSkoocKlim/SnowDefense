@@ -1,22 +1,28 @@
-import {Map} from "./entities/map/";
+import {Scene} from "./entities/scene/";
 import {Canvas} from "./entities/canvas/";
 import {Game} from "./game.js";
 
 export const addInteractionEscapeMenu = () => {
     window.addEventListener("keydown", event =>{
-        if (!Game.escapeMenu.isActive) {
-            if (event.code === "Escape" && document.querySelector(".mainMenu").style.display === "none") {
-                document.querySelector(".escapeMenu").style.display = "block";
-                Game.pauseGame();
-                Game.escapeMenu.isActive = true;
-
+        if (event.code === "Escape") {
+            if (document.querySelector(".mainMenu").style.display !== "none") {
+                //Находимся в главном меню, предлагаем выйти из игры
+            }
+            else {
+                if (!Game.escapeMenu.isActive) {
+                    document.querySelector(".escapeMenu").style.display = "block";
+                    Game.pauseGame();
+                    Game.escapeMenu.isActive = true;
+                    Game.base.basePanel.upgradePanel.hide();
+                }
+                else {
+                    document.querySelector(".escapeMenu").style.display = "none";
+                    Game.escapeMenu.isActive = false;
+                    Game.resumeGame();
+                }
             }
         }
-        else {
-            document.querySelector(".escapeMenu").style.display = "none";
-            Game.escapeMenu.isActie = false;
-            Game.resumeGame();
-        }
+
     });
 
     Game.escapeMenu.continueButton.addEventListener("click", () => {
@@ -45,42 +51,16 @@ export const addInteractionMainMenu = ()=> {
 }
 
 export const addPauseListeners = () => {
-    let key_pressed = false;
-    window.addEventListener('keydown', (event) => {
-        if (!key_pressed) {
-            if (event.code === 'KeyP') {
-                if (!Game.pause.buttonPause) {
-                    Game.pause.buttonPause = true;
-                    Game.pauseGame();
-                } else {
-                    Game.pause.buttonPause = false;
-                    Game.resumeGame();
-                }
-                key_pressed = true;
-            }
-        }
-    });
-
-    window.addEventListener('keyup', (event) => {
-        key_pressed = false;
-    });
-
     window.addEventListener('blur', () => {
-        Game.pause.windowPause = true;
+        Game.escapeMenu.isActive = true;
+        document.querySelector(".escapeMenu").style.display = "block";
         Game.pauseGame();
-    });
-
-    window.addEventListener('focus', () => {
-        Game.pause.windowPause = false;
-        if (document.hasFocus() && !Game.mainMenu.isActive) {
-            Game.resumeGame();
-        }
     });
 }
 
 export const addGunInteractionListeners = () => {
     Canvas.canvas.addEventListener('click', () => {
-        if (!Game.pause.buttonPause && !Game.pause.windowPause) Game.base.gun.fire();
+        Game.base.gun.fire();
     })
 
     Canvas.canvas.addEventListener('mousemove', (event) => {
@@ -90,14 +70,12 @@ export const addGunInteractionListeners = () => {
 }
 
 export const addTowerInteractionListeners = () => {
-    Map.towerPlaces.forEach(place => {
+    Scene.towerPlaces.forEach(place => {
         place.towerPlaceDiv.addEventListener('mouseover', (event) => {
-            if (Game.pause.buttonPause || Game.pause.windowPause) return ;
             place.isSelected = true;
         })
 
         place.towerPlaceDiv.addEventListener('mouseout', (event) => {
-            if (Game.pause.buttonPause || Game.pause.windowPause) return ;
             place.isSelected = false;
         })
 
@@ -106,3 +84,41 @@ export const addTowerInteractionListeners = () => {
         });
     })
 }
+
+export const addBasePanelListeners = () => {
+    Game.base.basePanel.upgradeBtn.addEventListener('click', () => {
+        Game.base.basePanel.hide();
+        Game.base.basePanel.upgradePanel.show();
+    });
+
+    Game.base.basePanel.upgradePanel.onBackClick(() => {
+        Game.base.basePanel.upgradePanel.hide();
+        Game.base.basePanel.show();
+    });
+
+    Object.keys(Game.base.gun.stats).forEach(key => {
+        Game.base.basePanel.upgradePanel.onUpgrade(key, (upgradeKey) => {
+            const upgrade = Game.base.gun.stats[upgradeKey];
+            const currentLevel = upgrade.currentLevel;
+            const next = upgrade.levels[currentLevel];
+            if (!next || next.nextUpgradeCost === 0) return;
+            const cost = next.nextUpgradeCost;
+            if (Game.points.currentPoints >= cost) {
+                Game.points.currentPoints -= cost;
+                upgrade.upgrade();
+                if (upgrade.name === "Время перезарядки") {
+                    Game.base.gun.reloadTimer.reset({startTime: upgrade.value.value});
+                }
+                Game.base.basePanel.upgradePanel.updateAll();
+                Game.panel.update({ gold: Game.points.currentPoints });
+            } else {
+                console.warn('Недостаточно золота для прокачки базы');
+            }
+        });
+    });
+
+    Game.base.basePanel.onExtraClick(() => {
+        console.log('Extra upgrades clicked');
+        // TODO: open extra-upgrades dialogue
+    });
+};

@@ -1,2 +1,2 @@
-import {Map} from "./map.js";
-export {Map};
+import {Scene} from "./scene.js";
+export {Scene};

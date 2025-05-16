@@ -1,6 +1,6 @@
-import {Game} from "./game.js";
-
 import {EnemySpawner} from "./entities/enemy/enemySpawner.js";
+import {EliteEnemy} from "./entities/enemy/enemyKind/eliteEnemy.js";
+import {Canvas} from "./entities/canvas";
 
 export class ObjType {
     static Base = Symbol();
@@ -65,26 +65,29 @@ export function createDivElement(parent, position, width, height, className) {
     return div;
 }
 
-export function drawCircle(ctx, x, y, radius, color) {
-    ctx.fillStyle = color;
-    ctx.beginPath();
-    ctx.arc(
+export function drawCircle(x, y, radius, color, stroke) {
+    Canvas.ctx.fillStyle = color;
+    Canvas.ctx.beginPath();
+    Canvas.ctx.arc(
         x,
         y,
         radius,
         0,
         Math.PI * 2
     );
-    ctx.fill();
+    Canvas.ctx.fill();
+    if (stroke) {
+        Canvas.ctx.stroke();
+    }
 }
 
-export function drawPolygon(ctx, points, color) {
-    ctx.fillStyle = color;
-    ctx.beginPath();
-    ctx.moveTo(points[0].x, points[0].y);
-    points.slice(1).forEach(p => ctx.lineTo(p.x, p.y));
-    ctx.closePath();
-    ctx.fill();
+export function drawPolygon(points, color) {
+    Canvas.ctx.fillStyle = color;
+    Canvas.ctx.beginPath();
+    Canvas.ctx.moveTo(points[0].x, points[0].y);
+    points.slice(1).forEach(p => Canvas.ctx.lineTo(p.x, p.y));
+    Canvas.ctx.closePath();
+    Canvas.ctx.fill();
 }
 
 export function processHit(source) {
@@ -106,6 +109,20 @@ export function processHit(source) {
                 break;
             }
         }
+        for (let j = EnemySpawner.eliteEnemies.length - 1; j >= 0; j--) {
+            let enemy = EnemySpawner.eliteEnemies[j];
+            if (enemy.isAlive && enemy.currentState !== "Hidden" && bullet.checkHit(enemy)) {
+                if (Math.random() <= EliteEnemy.disappearChance) {
+                    enemy.setHide();
+                }
+                else {
+                    source.gun.bullets.splice(i, 1);
+                    enemy.handleDamage(source.gun.attackDamage);
+                    wasHit = true;
+                }
+                break;
+            }
+        }
         if (!wasHit) {
             if (source.type === ObjType.Tower && bullet.checkEnd()) {
                 source.gun.bullets.splice(i, 1);
@@ -115,4 +132,22 @@ export function processHit(source) {
             }
         }
     }
+}
+
+
+export const drawRoundRect = (x, y, w, h, r, fill, stroke) => {
+    if (r > h / 2) r = h / 2;
+    Canvas.ctx.beginPath();
+    Canvas.ctx.moveTo(x + r, y);
+    Canvas.ctx.lineTo(x + w - r, y);
+    Canvas.ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    Canvas.ctx.lineTo(x + w, y + h - r);
+    Canvas.ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    Canvas.ctx.lineTo(x + r, y + h);
+    Canvas.ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    Canvas.ctx.lineTo(x, y + r);
+    Canvas.ctx.quadraticCurveTo(x, y, x + r, y);
+    Canvas.ctx.closePath();
+    if (fill) Canvas.ctx.fill();
+    if (stroke) Canvas.ctx.stroke();
 }

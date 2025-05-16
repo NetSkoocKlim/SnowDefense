@@ -27,6 +27,10 @@ export class Timer {
         this.timerId = setTimeout(() => this.runTimer(), 50);
     }
 
+    get seconds() {
+        return Math.floor((this.time+0.9999) % 60);
+    }
+
     toString() {
         const minutes = Math.floor((this.time+0.9999) / 60);
         const seconds = Math.floor((this.time+0.9999) % 60);
@@ -74,6 +78,7 @@ export class CooldownTimer extends Timer {
         this.startTime = startTime;
         this.time = this.startTime;
         this.onComplete = null;
+        this.onTick = null;
         this.shouldReset = shouldReset;
     }
 
@@ -89,6 +94,9 @@ export class CooldownTimer extends Timer {
                 return;
             }
         }
+        if (this.onTick !== null) {
+            this.onTick();
+        }
         super.runTimer();
     }
 
@@ -99,24 +107,7 @@ export class CooldownTimer extends Timer {
         this.time = this.startTime;
     }
 
-
 }
 
-export class GameTimer extends CooldownTimer {
-    constructor(name, startTime) {
-        super(name, startTime, {});
-        this.timerDiv = createDivElement(document.querySelector("#game"), null, null, null, 'timer');
-        this.span = document.createElement("span");
-        this.span.id = "timer";
-        this.span.classList.add("timer");
-        this.timerDiv.appendChild(this.span);
-        this.span.textContent = this.toString();
-    }
-
-    runTimer() {
-        this.span.textContent = this.toString();
-        super.runTimer();
-    }
-}
 
 

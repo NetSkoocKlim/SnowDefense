@@ -18,7 +18,7 @@ export class TowerGunBullet extends Bullet {
             x: x - this.start.x,
             y: y - this.start.y
         }
-        return this.dot(V, D) / this.dot(D, D) >= 1 || Math.sqrt(this.dot(V, V)) >= this.maxDist//Math.abs(x - this.fireSource.x) <= 3 * this.speed && Math.abs(y - this.fireSource.y) <= 3*this.spe ed;
+        return this.dot(V, D) / this.dot(D, D) >= 1 || Math.sqrt(this.dot(V, V)) >= this.maxDist;
     }
 
     dot(v1, v2) {

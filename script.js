@@ -1,19 +1,20 @@
 import {Game} from "./src/game.js";
-import {addGunInteractionListeners,
+import {
+    addGunInteractionListeners,
     addPauseListeners,
     addTowerInteractionListeners,
     addInteractionMainMenu,
-    addInteractionEscapeMenu,} from "./src/listeners.js";
-import {Canvas} from "./src/entities/canvas/";
+    addInteractionEscapeMenu, addBasePanelListeners,
+} from "./src/listeners.js";
 
 const start = async () => {
-    Canvas.initCanvas();
     await Game.initGame()
     addPauseListeners();
     addGunInteractionListeners();
     addTowerInteractionListeners();
     addInteractionMainMenu();
     addInteractionEscapeMenu();
+    addBasePanelListeners();
 }
 
 document.addEventListener("DOMContentLoaded", start);

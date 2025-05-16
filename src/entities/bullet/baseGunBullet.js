@@ -6,14 +6,7 @@ export class BaseGunBullet extends Bullet {
         super(x, y, velocity, 6, 1);
     }
 
-    checkWallConflict(base, sceneSize) {
-        let {x, y} = this.collisions.circleCollision.position;
-        if (x >= base.position.x && x <= (base.position.x + base.size) &&
-            y >= base.position.y && y <= (base.position.y + base.size)) {
-            return false;
-        }
-        let {x: xt, y: yt} = this.collisions.triangleCollision.position;
-        if (xt < 0 || x > sceneSize || yt < 0 || yt > sceneSize) return true;
+    checkWallConflict() {
         for (let i = 0; i < Collision.pathCollisions.length; i++) {
             let path = Collision.pathCollisions[i];
             if (Collision.checkPolygonAndCircleCollision(path, this.collisions.circleCollision)) return true;

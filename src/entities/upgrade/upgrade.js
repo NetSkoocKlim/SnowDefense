@@ -1,9 +1,13 @@
 export class  Upgrade {
-    constructor(name, levels, upgradeDescription) {
+    constructor(name, levels, upgradeDescription, ...kwargs) {
         this.maxLevel = levels.length;
         this.currentLevel = 0;
         this.name = name;
         this.levels = levels;
+        this.upgradeDescription = upgradeDescription;
+        if (kwargs !== undefined) {
+            this.upgradeIcon = kwargs.upgradeIcon;
+        }
     }
 
     get value() {
@@ -12,7 +16,10 @@ export class  Upgrade {
 
     upgrade() {
         this.currentLevel++;
-        console.log("Текущий", this.name, "равен", this.value);
+    }
+
+    reset() {
+        this.currentLevel = 0;
     }
 
 }

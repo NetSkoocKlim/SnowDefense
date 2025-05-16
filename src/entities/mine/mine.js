@@ -9,16 +9,29 @@ export class Mine {
 
     constructor() {
         this.isExplode = true;
-        this.size = 10;
+        this.size = 20;
 
         this.explosionCollision = new CircleCollision(this.position, MineSpawner.explosionRadius);
         this.mineCollision = new CircleCollision(this.position, this.size/2);
+
+        this.mineImg = new Image();
+        this.mineImg.src = "./assets/mine/mine.png";
     }
 
     isEnemyInRadius() {
         for (let i = 0;i<EnemySpawner.enemies.length;i++) {
             let enemy = EnemySpawner.enemies[i];
             if (enemy.isAlive) {
+                if (Collision.checkPolygonAndCircleCollision(enemy.collisions.head, this.mineCollision ) ||
+                    Collision.checkPolygonAndCircleCollision(enemy.collisions.body, this.mineCollision)
+                ) {
+                    return true;
+                }
+            }
+        }
+        for (let i = 0;i<EnemySpawner.eliteEnemies.length;i++) {
+            let enemy = EnemySpawner.eliteEnemies[i];
+            if (enemy.isAlive && enemy.currentState !== "Hidden") {
                 if (Collision.checkPolygonAndCircleCollision(enemy.collisions.head, this.mineCollision ) ||
                     Collision.checkPolygonAndCircleCollision(enemy.collisions.body, this.mineCollision)
                 ) {
@@ -73,14 +86,23 @@ export class Mine {
                 }
             }
         })
+        EnemySpawner.eliteEnemies.forEach((enemy) => {
+            if (enemy.isAlive && enemy.currentState !== "Hidden") {
+                if (Collision.checkPolygonAndCircleCollision(enemy.collisions.head, this.explosionCollision) ||
+                    Collision.checkPolygonAndCircleCollision(enemy.collisions.body, this.explosionCollision)
+                ) {
+                    enemy.handleDamage(MineSpawner.explosionDamage);
+                }
+            }
+        })
     }
 
     draw({collision= false}) {
-        Canvas.ctx.fillRect(this.position.x, this.position.y, this.size, this.size);
-        if (collision) {
-            this.explosionCollision.draw();
-            this.mineCollision.draw();
-        }
+        Canvas.ctx.drawImage(this.mineImg, 0, 0, 893, 957, this.position.x, this.position.y, this.size, this.size);
+        // if (collision) {
+        //     this.explosionCollision.draw();
+        //     this.mineCollision.draw();
+        // }
     }
 
 }

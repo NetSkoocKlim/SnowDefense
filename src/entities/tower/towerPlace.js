@@ -1,9 +1,7 @@
-import {PolygonCollision} from "../../collision.js";
-import {createDivElement, getRectangleBorders} from "../../utilities.js";
+import {createDivElement, drawCircle} from "../../utilities.js";
 import {Canvas} from "../canvas";
 import {Game} from "../../game.js";
 import {UpgradeMenu} from "../../gui/upgradeMenu.js";
-import {TowerUpgrade} from "../upgrade";
 
 
 export class TowerPlace {
@@ -12,14 +10,14 @@ export class TowerPlace {
 
     constructor(position, size) {
         this.position = position;
-        this.size = size;
+        this.size = size * 1.5;
         this.towerIsPlaced = false;
-        this.collision = new PolygonCollision({
-            x: this.position.x - 5,
-            y: this.position.y - 5
-        }, getRectangleBorders(this.size + 10, this.size + 10), 0);
-        this.towerPlaceDiv = createDivElement(document.querySelector('#game'), this.collision.position, this.size, this.size, 'towerPlace');
+
+        this.towerPlaceDiv = createDivElement(document.querySelector('#game'), this.position, this.size, this.size, 'towerPlace');
         this.isSelected = false;
+        this.towerPlaceImg = new Image();
+        this.towerPlaceImg.src = "./assets/map/towerPlace.png";
+        this.towerPlaceImg.classList.add("towerPlace");
 
         //this.buyMenu = new BuyMenu();
         this.upgradeMenu = new UpgradeMenu();
@@ -39,6 +37,7 @@ export class TowerPlace {
 
     handleTowerPlaceClick() {
         if (!this.towerIsPlaced) {
+            this.setTower()
             //if (!buyMenuIsActive){
             //buyMenuIsActive=true;
             //this.buyMenu.show();
@@ -92,11 +91,13 @@ export class TowerPlace {
     }
 
     draw() {
-        if (!this.isSelected && !this.towerIsPlaced)
-            Canvas.ctx.fillStyle = '#ff0000';
-        else
-            Canvas.ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
-        Canvas.ctx.fillRect(this.position.x, this.position.y, this.size, this.size);
-        this.collision.draw();
+
+        if (!this.isSelected && !this.towerIsPlaced) {
+            drawCircle(this.center.x, this.center.y, this.size / 2, 'rgba(166,202,240, 0.3)', true);
+        }
+        else {
+            drawCircle(this.center.x, this.center.y, this.size / 2,'rgba(157,177,204, 0.6)', true);
+        }
+        //Canvas.ctx.drawImage(this.towerPlaceImg, 0, 0, 616, 617, this.position.x, this.position.y, 1.5 * this.size, 1.5*this.size);
     }
 }

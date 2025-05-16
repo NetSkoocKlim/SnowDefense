@@ -1,7 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
 body {
     margin: 0;
     background-color: black;
 }
+
 #game {
     position: absolute;
     left: 50%;
@@ -9,26 +12,8 @@ body {
     transform: translate(-50%, -50%);
 }
 
-.points {
-    border: 1px solid black;
-    position: absolute;
-    margin-left: 2%;
-    margin-top: 2%;
-    padding: 1%;
-}
-
-div.timer {
-    border: 1px solid black;
-    position: absolute;
-    margin-right: 2%;
-    margin-top: 2%;
-    right: 0;
-    padding: 1%
-}
-
-
 .mainMenu {
-    background-color: RGB(0,0,0);
+    background-color: RGB(0, 0, 0);
     width: 100%;
     height: 100%;
     position: absolute;
@@ -38,13 +23,16 @@ div.timer {
     transform: translate(-50%, -50%);
     animation: appearFromNothing 2s ease-out forwards;
 }
-.escapeMenu{
+
+.escapeMenu {
     position: absolute;
     width: 100%;
     height: 100%;
     display: none;
-    background-color: RGB(128,128,128,0.7);
+    background-color: RGB(128, 128, 128, 0.7);
+    z-index: 15; /*должен быть максиамльно большим, чтобы всё остальное скрывало*/
 }
+
 .wrapper {
     position: absolute;
     left: 50%;
@@ -56,27 +44,410 @@ div.timer {
     align-items: center;
 }
 
-button{
+button {
     margin-bottom: 5px;
     transition: transform 0.3s;
     height: 50px;
     width: 100px;
     border: green solid;
 }
-@keyframes appearFromNothing {
-    from{
-        opacity: 0;
-    }
-    to{
-        opacity: 1;
-    }
-}
-.img{
+
+.img {
     width: 100%;
     height: 100%;
 }
 
+.game-panel {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 225px;
+
+    background: /*linear-gradient(
+             to bottom,*/ rgba(20, 50, 100, 0.8) /*,
+             rgba(80, 180, 200, 0.6)
+     )*/;
+
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+    color: #fff;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 15px;
+    border-radius: 8px;
+    overflow: hidden;
+    max-height: 35px;
+    text-align: center;
+    transition: max-height 0.4s ease;
+    z-index: 5;
+}
+
+.game-panel:not(.collapsed) {
+    max-height: 300px;
+}
+
+@keyframes highlight-text {
+    0% {
+        color: #ff0;
+        text-shadow: 0 0 4px rgba(255, 255, 0, 0.8),
+        0 0 8px rgba(255, 255, 0, 0.6);
+    }
+    100% {
+        color: #fff;
+        text-shadow: none;
+    }
+}
+
+.game-panel .highlight {
+    animation: highlight-text 0.5s ease-out;
+}
+
+.game-panel .summary .row {
+    display: grid;
+    grid-template-columns: auto min-content;
+    column-gap: 8px;
+    align-items: center;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+    padding: 6px 0;
+}
+
+.game-panel .summary .row:last-child {
+    border-bottom: none;
+}
+
+.game-panel .summary .label {
+    justify-self: start;
+    font-size: 0.9em;
+    opacity: 0.8;
+}
+
+.game-panel .summary .value {
+    justify-self: end;
+    font-size: 1em;
+    font-weight: bold;
+}
+
+.game-panel .panel-header {
+    padding: 8px;
+    cursor: pointer;
+    user-select: none;
+    background: rgba(255, 255, 255, 0.1);
+    font-weight: bold;
+}
+
+.game-panel .panel-content {
+    padding: 8px;
+    line-height: 1.4;
+}
+
+.game-panel .value {
+    display: inline-flex;
+    align-items: center;
+}
+
+.icon-ice {
+    margin-left: 4px;
+    vertical-align: middle;
+}
 
 
+.next-wave-popup {
+    position: fixed;
+    top: 2%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+
+    background: rgba(10, 25, 50, 0.9);
+    padding: 4px;
+    border: 2px solid #7fbfff;
+    box-shadow: 0 0 0 2px #204060 inset;
+
+    opacity: 0; /* по умолчанию невидим */
+    visibility: hidden; /* убираем из потока кликов  */
+    transition: /* анимация opacity + задержка visibility */ opacity 0.4s ease-in-out,
+    visibility 0.4s ease-in-out;
+    pointer-events: none;
+
+}
+
+.next-wave-popup._visible {
+    opacity: 1;
+    visibility: visible;
+}
 
 
+.next-wave-popup .popup-content {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 10px;
+    line-height: 1.2;
+    color: #e0f8ff;
+    text-shadow: 1px 1px 0 #103040,
+    -1px -1px 0 #103040;
+    white-space: nowrap;
+    text-align: center
+}
+
+.next-wave-popup .time {
+    display: inline-block;
+    min-width: 20px;
+    text-align: right;
+}
+
+@keyframes blink-border {
+    0% {
+        border-color: #7fbfff;
+        box-shadow: 0 0 0 2px #204060 inset;
+    }
+    50% {
+        border-color: #ff7f7f;
+        box-shadow: 0 0 8px 2px #ff4f4f inset;
+    }
+    100% {
+        border-color: #7fbfff;
+        box-shadow: 0 0 0 2px #204060 inset;
+    }
+}
+
+.next-wave-popup.final-warning {
+    animation: blink-border 1s infinite;
+}
+
+
+#base-panel {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    width: 280px;
+    padding: 12px;
+    background: rgba(20, 20, 30, 0.7);
+    border: 2px solid #7799aa;
+    border-radius: 2px;
+    color: #eef;
+    font-family: 'Press Start 2P', sans-serif;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 10;
+}
+
+.hidden {
+    display: none !important;
+}
+
+#base-panel .hp-bar-container,
+#base-panel .reload-bar-container {
+    position: relative;
+    width: 100%;
+    height: 20px;
+    background: #333;
+    border: 1px solid #556;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+#base-panel .hp-bar-fill {
+    height: 100%;
+    width: 100%; /* updated via JS */
+    background: #a22;
+    transition: width 0.3s ease;
+}
+
+#base-panel .reload-bar-fill {
+    height: 100%;
+    width: 0; /* updated via JS */
+    background: #2a2;
+    transition: width 0.05s linear;
+}
+
+#base-panel .bar-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 0.8rem;
+    font-weight: bold;
+    pointer-events: none;
+    color: #fff;
+    text-shadow: 1px 1px 0 #000;
+}
+
+#base-panel .button-row {
+    display: flex;
+    gap: 6px;
+}
+
+#base-panel button {
+    flex: 1;
+    background: #335577;
+    border: 1px solid #5577aa;
+    padding: 3px;
+    border-radius: 4px;
+    color: #eef;
+    font-size: 12px;
+    cursor: pointer;
+    text-align: center;
+    font-family: 'Press Start 2P', sans-serif;
+    text-shadow: 1px 1px 0 #000;
+}
+
+#base-panel button:hover {
+    background: #5577aa;
+}
+
+#upgrade-panel {
+    background-color: rgba(5, 25, 50, 0.85);
+    padding: 12px;
+    border: 2px solid #6ea8ff;
+    border-radius: 6px;
+    color: #d0e7ff;
+    font-family: 'Press Start 2P', sans-serif;
+}
+
+#upgrade-panel .upgrade-title {
+    margin: 0 0 8px;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    padding-bottom: 4px;
+    border-bottom: 2px solid #6ea8ff;
+    color: #ffffff;
+}
+
+.upgrade-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 55vh;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.upgrade-entry {
+    background-color: rgba(10, 40, 70, 0.8);
+    padding: 8px;
+    border: 1px solid #4f7ab3;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.entry-title {
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #a8cdfd;
+}
+
+.entry-info-row {
+    display: grid;
+    grid-template-columns: 65% 35%; /* описание 65%, кнопка и кружки 35% */
+    align-items: center;
+    gap: 6px;
+}
+
+.entry-control-col {
+    width: 100%; /* занять всю вторую половину */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+}
+
+.entry-control-col .upgrade-button {
+    display: flex;
+    justify-content: center; /* центровка содержимого кнопки */
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    font-size: 10px;
+    font-family: 'Press Start 2P', sans-serif;
+    border: 1px solid #6ea8ff;
+    background-color: #4f7ab3;
+    color: #ffffff;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+    max-width: 100%;
+    margin-right: 6px;
+}
+
+.upgrade-name {
+    font-size: 10px;
+    line-height: 1.3;
+    color: #d0e7ff;
+    word-wrap: break-word;
+}
+
+.entry-control-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.level-circles {
+    display: flex;
+    gap: 3px;
+    margin-bottom: 4px;
+}
+
+.level-circle {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: transparent;
+    border: 1px solid #a8cdfd;
+}
+
+.level-circle.filled {
+    background-color: #6ea8ff;
+    border-color: #6ea8ff;
+}
+
+.upgrade-button {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    font-size: 10px;
+    font-family: 'Press Start 2P', sans-serif;
+    border: 1px solid #6ea8ff;
+    background-color: #4f7ab3;
+    color: #ffffff;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.upgrade-button:hover:not(:disabled) {
+    background-color: #6ea8ff;
+}
+
+.upgrade-button:disabled {
+    background-color: #2d4a6a;
+    border-color: #3e5b7d;
+    cursor: not-allowed;
+}
+
+.currency-icon {
+    width: 12px;
+    height: 12px;
+    image-rendering: pixelated;
+}
+
+.back-button {
+    width: 100%;
+    padding: 6px 0;
+    font-size: 12px;
+    border: 1px solid #6ea8ff;
+    background-color: #3e5b7d;
+    color: #ffffff;
+    cursor: pointer;
+    margin-top: 10px;
+    font-family: 'Press Start 2P', sans-serif;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.back-button:hover:not(:disabled) {
+    background-color: #6ea8ff;
+}

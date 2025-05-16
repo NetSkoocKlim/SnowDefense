@@ -1,8 +1,8 @@
 import {CooldownTimer, IncrementTimer} from "../../../entities/timer/timer.js";
 
 import {EnemySpawner} from "../../../entities/enemy/enemySpawner.js";
-import {LevelManager} from "../levelManager.js";
 import {Game} from "../../../game.js";
+import {NextWavePopup} from "../../../gui/nextWavePopup.js";
 
 export class WaveManager {
 
@@ -11,11 +11,20 @@ export class WaveManager {
         this.currentWave = 0;
         this.waveDelay = 5;
         this.waveEndTimer = new CooldownTimer("WaveEndTimer", this.waveDelay, {shouldReset: false});
+        this.waveComplete = false;
+        this.nextWavePopup = new NextWavePopup();
+
+        this.waveEndTimer.onComplete = () => {
+            this.nextWavePopup.hide();
+            this.currentWave += 1;
+            this.startNextWave();
+        }
     }
 
     setLevelDescription(levelDescription) {
         this.levelDescription = levelDescription;
         this.waveCount = this.levelDescription.waves.length;
+        this.currentWave = 0;
     }
 
     getWaveDescription() {
@@ -26,6 +35,7 @@ export class WaveManager {
     }
 
     startNextWave() {
+        this.waveComplete = false;
         this.waveTimer.reset();
         this.waveTimer.resume();
         this.waveTimer.isShouldContinue = true;
@@ -42,12 +52,12 @@ export class WaveManager {
             this.waveTimer.scheduleEvent(spawnDetails.timerValue, () => {
                 if (spawnDetails.enemies.common) {
                     spawnDetails.enemies.common.forEach((enemyDescription) => {
-                        EnemySpawner.spawnEnemy({side: enemyDescription.side, count: enemyDescription.count});
+                        EnemySpawner.spawnEnemy({side: enemyDescription.side, count: enemyDescription.count, isElite: false});
                     });
                 }
                 if (spawnDetails.enemies.elite) {
                     spawnDetails.enemies.elite.forEach((enemyDescription) => {
-                        EnemySpawner.spawnEnemy({side: enemyDescription.side, count: enemyDescription.count});
+                        EnemySpawner.spawnEnemy({side: enemyDescription.side, count: enemyDescription.count, isElite: true});
                     });
                 }
             });
@@ -68,7 +78,8 @@ export class WaveManager {
     }
 
     endWave() {
-
+        console.log("Wave complete");
+        this.waveComplete = true;
         this.waveTimer.clearEvents();
         this.waveTimer.pause();
         this.waveTimer.isShouldContinue = false;
@@ -76,10 +87,8 @@ export class WaveManager {
         EnemySpawner.spawnTimer.pause();
         EnemySpawner.spawnTimer.isShouldContinue = false;
 
-        this.currentWave += 1;
-        if (this.currentWave >= this.waveCount) {
-            console.log("this was last wave ;(")
-            Game.levelManager.startNextLevel();
+        if (this.currentWave + 1 >= this.waveCount) {
+            this.nextWavePopup.showEndWaveWarning();
             this.waveTimer.pause();
             return;
         }
@@ -87,9 +96,7 @@ export class WaveManager {
 
         this.waveEndTimer.reset({startTime: this.waveDelay});
         this.waveEndTimer.isShouldContinue = true;
-        this.waveEndTimer.onComplete = () => {
-            this.startNextWave();
-        }
         this.waveEndTimer.resume();
+        this.nextWavePopup.showNextWaveTimer();
     }
 }

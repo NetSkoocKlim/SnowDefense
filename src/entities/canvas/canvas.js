@@ -4,13 +4,13 @@ export class Canvas {
     static height;
     static canvas;
 
-    static initCanvas() {
+    static async initCanvas() {
         Canvas.canvas = document.querySelector('#canvas');
         Canvas.ctx = Canvas.canvas.getContext('2d');
-        Canvas.setCanvasSize();
+        await Canvas.setCanvasSize();
     }
 
-    static setCanvasSize() {
+    static async setCanvasSize() {
         const canvasSize = Math.min(document.documentElement.clientHeight, document.documentElement.clientWidth);
         const gameDiv = document.querySelector('#game');
         gameDiv.style.width = canvasSize + 'px';

@@ -1,47 +1,49 @@
-import {Collision, PolygonCollision} from "../../collision.js";
-import {Base} from "../base/";
+import {Collision} from "../../collision.js";
 import {Canvas} from "../canvas/";
 import {TowerPlace} from "../tower/towerPlace.js";
-import {Way} from "./way";
+import {Way} from "./way.js";
+import {Game} from "../../game.js";
 
 
-export class Map {
+export class Scene {
     static ways = [];
     static towerPlaces = [];
 
     constructor() {
         this.sceneSize = Canvas.width;
-        this.base = new Base();
+        this.sceneImg = new Image();
+        this.sceneImg.src = "./assets/map/map.jpg";
         this.createPathes();
         this.createTowerPlaces();
     }
 
     createPathes() {
-        let pathSize =  (this.sceneSize - this.base.size) / 2;
-        Map.ways.push(
+        let pathWidth =  Game.base.size * 0.85;
+        let pathLength = this.sceneSize / 2 - Game.base.size / 2 + Game.base.size * 0.1;
+        Scene.ways.push(
             new Way({
                 x: 0,
+                y: this.sceneSize / 2 - Game.base.size / 2 + Game.base.size * 0.1
+            }, pathLength, pathWidth, 1),
+            new Way( {
+                x: this.sceneSize / 2 - Game.base.size / 2 + Game.base.size * 0.1,
+                y: this.sceneSize / 2 + Game.base.size / 2 - Game.base.size * 0.1,
+            }, pathWidth, pathLength, 2),
+            new Way( {
+                x: this.sceneSize / 2 + Game.base.size / 2 - Game.base.size * 0.1,
+                y: this.sceneSize / 2 - Game.base.size / 2 + Game.base.size * 0.1
+            }, pathLength, pathWidth, 3),
+            new Way( {
+                x: this.sceneSize / 2 - Game.base.size / 2 + Game.base.size * 0.1,
                 y: 0
-            }, pathSize, pathSize),
-            new Way( {
-                x: pathSize + this.base.size,
-                y: 0
-            }, pathSize, pathSize),
-            new Way( {
-                x: pathSize + this.base.size,
-                y: pathSize + this.base.size
-            }, pathSize, pathSize),
-            new Way( {
-                x: 0,
-                y: pathSize + this.base.size
-            }, pathSize, pathSize),
+            }, pathWidth, pathLength, 4),
         );
     }
 
     createTowerPlaces() {
-        const baseSize = this.base.size;
-        const towerSize = baseSize / 3;
-        const {x, y} = this.base.position;
+        const baseSize = Game.base.size;
+        const towerSize = baseSize / 4;
+        const {x, y} = Game.base.position;
         const towerPosition1 = {
             x: x - towerSize*1.5,
             y: y - towerSize*1.5
@@ -58,7 +60,7 @@ export class Map {
             x: x + baseSize + towerSize/2,
             y: y + baseSize + towerSize/2
         };
-        Map.towerPlaces.push(
+        Scene.towerPlaces.push(
             new TowerPlace(towerPosition1, towerSize),
             new TowerPlace(towerPosition2, towerSize),
             new TowerPlace(towerPosition3, towerSize),
@@ -67,14 +69,16 @@ export class Map {
     }
 
     draw({collision=false}) {
-        Canvas.ctx.fillStyle = '#ad5f3e';
-        Canvas.ctx.fillRect(0, 0, this.sceneSize, this.sceneSize);
+        // Canvas.ctx.fillStyle = '#ad5f3e';
+        // Canvas.ctx.fillRect(0, 0, this.sceneSize, this.sceneSize);
+        Canvas.ctx.drawImage(this.sceneImg, 0,0, 1024, 1024, 0,0, this.sceneSize, this.sceneSize);
 
-        Map.ways.forEach(way => {
+        Scene.ways.forEach(way => {
             way.draw();
         });
 
-        Map.towerPlaces.forEach((towerPlace) => {
+        Scene.towerPlaces.forEach((towerPlace) => {
+            if (!towerPlace.towerIsPlaced)
             towerPlace.draw();
         });
 

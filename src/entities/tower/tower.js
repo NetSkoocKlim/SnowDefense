@@ -8,6 +8,8 @@ export class Tower {
     constructor() {
         this.type = ObjType.Tower;
         this.isActive = false;
+        this.towerImg = new Image();
+        this.towerImg.src = "./assets/tower/tower.png";
     }
 
     static initTowers() {
@@ -26,14 +28,14 @@ export class Tower {
 
     setPosition(center, size) {
         this.center = center;
-        this.size = size + 10;
-        this.gun = new TowerGun(this.center, this.size * 0.4, this.size * 0.2);
+        this.size = size;
+        this.gun = new TowerGun(this.center, this.size * 0.4 , this.size * 0.9);
     }
 
 
     draw({collision=false}) {
-        Canvas.ctx.fillStyle = 'blue';
-        Canvas.ctx.fillRect(this.position.x, this.position.y, this.size, this.size);
+        //Canvas.ctx.fillRect(this.position.x, this.position.y, this.size, this.size);
+        Canvas.ctx.drawImage(this.towerImg, 0, 0, 781, 886, this.position.x, this.position.y, this.size, this.size * 1.134)
         this.gun.draw({collision: collision});
     }
 
