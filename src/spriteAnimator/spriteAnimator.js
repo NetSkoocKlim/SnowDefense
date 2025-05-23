@@ -1,4 +1,4 @@
-import {CooldownTimer} from "../entities/timer/timer.js";
+import {CooldownTimer} from "../timer/timer.js";
 import {Canvas} from "../entities/canvas";
 
 class SpriteAnimator {
@@ -75,6 +75,7 @@ export class EnemyAnimator extends SpriteAnimator {
 
 
     toggleMoveAnimation() {
+        this.frameDelayTimer.reset({startTime: 0.2});
         this.changeAnimation(this.moveSpriteImg, this.moveSprite.width, this.moveSprite.height, this.moveSprite.frameCount);
     }
 

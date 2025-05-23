@@ -36,6 +36,7 @@ export class Bullet {
         this.imgHeight = this.triangleSize.height + this.circleRadius * 2;
     }
 
+
     checkHit(enemy) {
         return Collision.checkPolygonAndCircleCollision(enemy.collisions.head, this.collisions.circleCollision) ||
             Collision.checkPolygonAndCircleCollision(enemy.collisions.body, this.collisions.circleCollision) ||

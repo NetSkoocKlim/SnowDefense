@@ -2,16 +2,14 @@ import {getRectangleBorders} from "../../utilities.js";
 import {Collision, PolygonCollision} from "../../collision.js";
 import {Canvas} from "../canvas/";
 import {Game} from "../../game.js";
-import {CooldownTimer} from "../timer/timer.js";
+import {CooldownTimer} from "../../timer/timer.js";
 import {EnemySpawner} from "./enemySpawner.js";
+import {LevelManager} from "../../level/levelManager/levelManager.js";
 
 
 export class Enemy {
-
     reward;
-
     headCollisionScales;
-
     bodyCollisionScales;
 
     constructor(width, height, speed, animator, kind) {
@@ -31,6 +29,18 @@ export class Enemy {
         this.currentHP = this.maxHP;
         this.healthBarHeight = 5 * Canvas.scale;
         this.healthBarOffset = 5 * Canvas.scale;
+    }
+
+    reset() {
+        this.isAlive = false;
+        this.position = {x: null, y: null};
+        this.headCenter = {x: null, y: null};
+        this.attackCooldownTimer.isShouldContinue = false;
+        this.attackCooldownTimer.pause();
+        this.attackCooldownTimer.reset({});
+        this.currentHP = this.maxHP;
+
+
     }
 
     spawn({side = null}) {
@@ -128,7 +138,7 @@ export class Enemy {
     }
 
     getHealthColor() {
-        const percentage = this.currentHP / this.maxHP;
+        const percentage = (this.maxHP - this.currentHP) / this.maxHP;
         if (percentage <= 0.25) return '#ff0000';
         if (percentage <= 0.5) return '#ffa500';
         return '#4CAF50';
@@ -137,7 +147,9 @@ export class Enemy {
     handleDamage(damage) {
         if (this.currentHP - damage <= 0) {
             this.setDeath();
+
             Game.points.increase(this.reward);
+            LevelManager.enemiesFeed += 1;
             EnemySpawner.enemiesAlive = EnemySpawner.enemiesAlive - 1;
         }
         else {
@@ -154,7 +166,7 @@ export class Enemy {
         }
         Canvas.ctx.fillStyle = '#555';
         Canvas.ctx.fillRect(x, y, barWidth, this.healthBarHeight);
-        let healthWidth = (this.currentHP / this.maxHP) * barWidth;
+        let healthWidth = ((this.maxHP - this.currentHP) / this.maxHP) * barWidth;
         Canvas.ctx.fillStyle = this.getHealthColor();
         Canvas.ctx.fillRect(x, y, healthWidth, this.healthBarHeight);
     }
@@ -186,10 +198,10 @@ export class Enemy {
         this.currentState = "Death";
         this.enemyAnimator.stopAnimation();
         this.attackCooldownTimer.pause();
+        this.attackCooldownTimer.isShouldContinue = false;
         this.isAlive = false;
         this.currentHP = this.maxHP;
     }
-
 
 
     handleAttack() {
@@ -212,8 +224,14 @@ export class Enemy {
 
     attack() {
         this.enemyAnimator.currentFrame = 0;
+        if (Game.base.healthPoints - this.damage < 0) {
+            Game.base.healthPoints = 0;
+            Game.pauseGame();
+            console.log("Вы проиграли. Игра окончена");
+            Game.end = true;
+            return;
+        }
         Game.base.healthPoints -= this.damage;
-        console.log(Game.base.healthPoints);
     }
 
     move() {

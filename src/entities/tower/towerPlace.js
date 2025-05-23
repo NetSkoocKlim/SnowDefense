@@ -24,6 +24,11 @@ export class TowerPlace {
 
     }
 
+    reset() {
+        this.towerIsPlaced = false;
+        this.isSelected = false;
+    }
+
     static get towerCost() {
         return TowerPlace.towerCosts[TowerPlace.towerPlacedCount];
     }
@@ -91,13 +96,11 @@ export class TowerPlace {
     }
 
     draw() {
-
         if (!this.isSelected && !this.towerIsPlaced) {
             drawCircle(this.center.x, this.center.y, this.size / 2, 'rgba(166,202,240, 0.3)', true);
         }
         else {
             drawCircle(this.center.x, this.center.y, this.size / 2,'rgba(157,177,204, 0.6)', true);
         }
-        //Canvas.ctx.drawImage(this.towerPlaceImg, 0, 0, 616, 617, this.position.x, this.position.y, 1.5 * this.size, 1.5*this.size);
     }
 }

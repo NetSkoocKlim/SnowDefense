@@ -41,8 +41,6 @@ export class Way {
     }
 
     draw() {
-        // Canvas.ctx.fillStyle = '#fff';
-        // Canvas.ctx.fillRect(this.position.x, this.position.y, this.width, this.height);
         Canvas.ctx.save();
         Canvas.ctx.translate(this.position.x, this.position.y);
         if (this.side % 2 === 1) {

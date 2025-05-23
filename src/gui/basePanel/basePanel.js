@@ -1,11 +1,22 @@
-import {Game} from "../game.js";
-import {Canvas} from "../entities/canvas";
+import {Game} from "../../game.js";
+import {Canvas} from "../../entities/canvas";
 import {BaseUpgradePanel} from "./baseUpgradePanel.js";
+import {ShopPanel} from "./shopPanel.js";
 
 export class BasePanel {
+    static panelHasBeenInited = false;
+
     constructor() {
-        this.initPanel();
+        if (BasePanel.panelHasBeenInited === false) {
+            this.initPanel();
+        }
         this.upgradePanel = new BaseUpgradePanel();
+        this.shopPanel = new ShopPanel();
+    }
+
+
+    reset() {
+        this.upgradePanel.reset();
     }
 
     initPanel() {
@@ -13,7 +24,8 @@ export class BasePanel {
         this.panel.classList.add('hidden');
         this.panel.style.left = 5 * Canvas.scale + 'px';
         this.panel.style.top = 5 * Canvas.scale + 'px';
-        this.panel.style.width = 210 * Canvas.scale + 'px';
+        this.panel.style.width = 205 * Canvas.scale + 'px';
+
 
         const hpWrapper = document.createElement('div');
         hpWrapper.className = 'hp-bar-container';
@@ -43,9 +55,12 @@ export class BasePanel {
         this.panel.append(hpWrapper, reloadWrapper, btnRow);
 
         this.visible = false;
+        BasePanel.panelHasBeenInited = true;
     }
 
     show() {
+        Game.base.basePanel.upgradePanel.hide();
+        Game.base.basePanel.shopPanel.hide();
         this.panel.classList.remove('hidden');
         this.visible = true;
     }
@@ -78,7 +93,6 @@ export class BasePanel {
             this.reloadText.textContent = timeLeft.toFixed(1) + 'с';
         }
     }
-
 
     onUpgradeClick(callback) {
         this.upgradeBtn.addEventListener('click', callback);

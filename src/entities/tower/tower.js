@@ -10,14 +10,20 @@ export class Tower {
         this.isActive = false;
         this.towerImg = new Image();
         this.towerImg.src = "./assets/tower/tower.png";
+        this.gun = new TowerGun();
     }
 
     static initTowers() {
         for (let i = 0;i<4;i++) {
-            let tower = new Tower();
-            Game.towers.push(tower);
+            Game.towers[i] = new Tower();
         }
     }
+
+    reset() {
+        this.isActive = false;
+        this.gun.reset();
+    }
+
 
     get position() {
         return {
@@ -29,12 +35,11 @@ export class Tower {
     setPosition(center, size) {
         this.center = center;
         this.size = size;
-        this.gun = new TowerGun(this.center, this.size * 0.4 , this.size * 0.9);
+        this.gun.set(this.center, this.size * 0.4 , this.size * 0.9);
     }
 
 
     draw({collision=false}) {
-        //Canvas.ctx.fillRect(this.position.x, this.position.y, this.size, this.size);
         Canvas.ctx.drawImage(this.towerImg, 0, 0, 781, 886, this.position.x, this.position.y, this.size, this.size * 1.134)
         this.gun.draw({collision: collision});
     }

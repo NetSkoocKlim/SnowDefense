@@ -1,7 +1,7 @@
 import {Enemy} from "../enemy.js";
 import {EnemyAnimator} from "../../../spriteAnimator/spriteAnimator.js";
 import {Canvas} from "../../canvas";
-import {CooldownTimer} from "../../timer/timer.js";
+import {CooldownTimer} from "../../../timer/timer.js";
 
 export class EliteEnemy extends Enemy {
     static width = 32 * 8 * 0.1;
@@ -34,7 +34,7 @@ export class EliteEnemy extends Enemy {
 
     constructor() {
         super( EliteEnemy.width * Canvas.scale, EliteEnemy.height* Canvas.scale, EliteEnemy.speed * Canvas.scale, EliteEnemy.createAnimator(), "elite");
-        this.reward = 35;
+        this.reward = 5;
         this.hideTimer = new CooldownTimer("elite hide", 4, {shouldReset:false});
     }
 

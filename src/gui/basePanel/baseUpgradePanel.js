@@ -1,5 +1,5 @@
-import { BaseUpgrade } from "../entities/upgrade/baseUpgrade.js";
-import { Canvas } from "../entities/canvas";
+import {Canvas} from "../../entities/canvas";
+import {Game} from "../../game.js";
 
 export class BaseUpgradePanel {
     constructor() {
@@ -12,8 +12,6 @@ export class BaseUpgradePanel {
         this.panel.style.left = 5 * Canvas.scale + 'px';
         this.panel.style.width = 210 * Canvas.scale + 'px';
         this.panel.style.fontSize = 12 * Canvas.scale + 'px';
-
-
         const title = document.createElement('h3');
         title.textContent = 'Улучшение базы';
         title.className = 'upgrade-title';
@@ -24,8 +22,8 @@ export class BaseUpgradePanel {
         this.list.className = 'upgrade-list';
 
         this.upgradeEntries = {};
-        Object.keys(BaseUpgrade.startUpgrades).forEach(key => {
-            const upgrade = BaseUpgrade.startUpgrades[key];
+        Object.keys(Game.base.gun.stats).forEach(key => {
+            const upgrade = Game.base.gun.stats[key];
             const entry = this.createEntry(upgrade, key);
             this.list.appendChild(entry.container);
             this.upgradeEntries[key] = entry;
@@ -42,17 +40,21 @@ export class BaseUpgradePanel {
         this.active = false;
     }
 
+    reset() {
+        Object.keys(Game.base.gun.stats).forEach(key => {
+            this.upgradeEntries[key].upgrade = Game.base.gun.stats[key];
+        });
+    }
+
     createEntry(upgrade, key) {
         const wrapper = document.createElement('div');
         wrapper.className = 'upgrade-entry';
 
-        // Title of this upgrade
         const entryTitle = document.createElement('div');
         entryTitle.className = 'entry-title';
         entryTitle.textContent = upgrade.name;
         wrapper.appendChild(entryTitle);
 
-        // Info row with icon and description
         const infoRow = document.createElement('div');
         infoRow.className = 'entry-info-row';
 
@@ -61,11 +63,9 @@ export class BaseUpgradePanel {
         infoText.textContent = upgrade.upgradeDescription;
         infoRow.appendChild(infoText);
 
-        // Control column with circles, button
         const controlCol = document.createElement('div');
         controlCol.className = 'entry-control-col';
 
-        // Circles for levels
         const circlesContainer = document.createElement('div');
         circlesContainer.className = 'level-circles';
         const circles = [];
@@ -77,7 +77,6 @@ export class BaseUpgradePanel {
         }
         controlCol.appendChild(circlesContainer);
 
-        // Upgrade button with cost and currency icon
         const button = document.createElement('button');
         button.className = 'upgrade-button';
         controlCol.appendChild(button);
@@ -104,13 +103,11 @@ export class BaseUpgradePanel {
             const { upgrade, circles, button } = entry;
             const lvl = upgrade.currentLevel;
 
-            // Update circles fill
             circles.forEach((circle, idx) => {
                 circle.classList.toggle('filled', idx < lvl);
                 circle.classList.toggle('empty', idx >= lvl);
             });
 
-            // Update button content
             const next = upgrade.levels[lvl];
             if (!next || next.nextUpgradeCost === 0) {
                 button.disabled = true;
@@ -118,7 +115,7 @@ export class BaseUpgradePanel {
             } else {
                 const cost = next.nextUpgradeCost;
                 const iconSrc = "./assets/ice-coins/gold.svg";
-                button.disabled = false;
+                button.disabled = Game.points.currentPoints < cost;
                 button.innerHTML = `<img src='${iconSrc}' class='currency-icon' alt='currency'/>${cost}`;
             }
         });

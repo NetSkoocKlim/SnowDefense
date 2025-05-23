@@ -1,4 +1,4 @@
-import {CooldownTimer} from "../timer/timer.js";
+import {CooldownTimer} from "../../timer/timer.js";
 import {Mine} from "./mine.js";
 import {MineUpgrade} from "../upgrade/mineUpgrade.js";
 import {Canvas} from "../canvas";
@@ -6,7 +6,7 @@ import {Canvas} from "../canvas";
 
 export class MineSpawner {
 
-    static mineSpawnCost = 100;
+    static mineUnlockCost = 70;
 
     static mines = [];
     static spawnTimer = -1;
@@ -24,10 +24,25 @@ export class MineSpawner {
         return MineSpawner.mineStats.explosionRadius.value.value * Canvas.scale;
     }
 
+    static get spawnRate() {
+        return MineSpawner.mineStats.spawnRate.value.value;
+    }
+
+    static get grades() {
+        return MineSpawner.mineStats.grades;
+    }
 
     static init() {
         MineSpawner.initTimer();
         MineSpawner.initMines();
+    }
+
+    static reset() {
+        MineSpawner.unsetSpawnRate();
+
+        MineSpawner.mines.forEach(mine => {
+            mine.reset();
+        })
     }
 
     static initTimer() {
@@ -51,13 +66,21 @@ export class MineSpawner {
         }
     }
 
-    static setSpawnRate(spawnCount, seconds) {
+    static setSpawnRate(seconds) {
         MineSpawner.spawnTimer.isShouldContinue = true;
         MineSpawner.spawnTimer.pause();
         MineSpawner.spawnTimer.reset({startTime: seconds});
         MineSpawner.spawnTimer.resume();
         MineSpawner.spawnTimer.onComplete = () => {
-            MineSpawner.spawnMine({side: null, count: spawnCount});
+            MineSpawner.spawnMine({side: null, count: 1});
         }
     }
+
+    static unsetSpawnRate() {
+        MineSpawner.spawnTimer.pause();
+        MineSpawner.spawnTimer.reset({});
+        MineSpawner.spawnTimer.onComplete = null;
+        MineSpawner.isShouldContinue = false;
+    }
+
 }

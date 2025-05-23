@@ -1,13 +1,10 @@
 export class  Upgrade {
-    constructor(name, levels, upgradeDescription, ...kwargs) {
+    constructor(name, levels, upgradeDescription) {
         this.maxLevel = levels.length;
         this.currentLevel = 0;
         this.name = name;
         this.levels = levels;
         this.upgradeDescription = upgradeDescription;
-        if (kwargs !== undefined) {
-            this.upgradeIcon = kwargs.upgradeIcon;
-        }
     }
 
     get value() {
@@ -20,6 +17,12 @@ export class  Upgrade {
 
     reset() {
         this.currentLevel = 0;
+    }
+
+    clone() {
+        const copy = new Upgrade(this.name, this.levels, this.upgradeDescription);
+        copy.currentLevel = this.currentLevel;
+        return copy;
     }
 
 }

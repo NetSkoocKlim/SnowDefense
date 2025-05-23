@@ -1,12 +1,12 @@
 import {PolygonCollision} from "../../collision.js";
-import {drawRoundRect, getRectangleBorders, ObjType} from '../../utilities.js'
+import {getRectangleBorders, ObjType} from '../../utilities.js'
 import {Canvas} from "../canvas/";
 import {BaseGun} from "../gun/";
-import {Game} from "../../game.js";
-import {BasePanel} from "../../gui/basePanel.js";
 
 
 export class Base {
+    basePanel;
+
     constructor() {
         this.type = ObjType.Base;
         this.size = Canvas.width*0.2;
@@ -20,12 +20,16 @@ export class Base {
         this.baseImg.src = "./assets/base/base.png"
         this.maxHealthPoints = 150;
         this.healthPoints = this.maxHealthPoints;
-        this.attack = 60;
 
         this.collision = new PolygonCollision({x: this.center.x - this.size / 2 * 0.9, y: this.center.y - this.size / 2 * 0.8}, getRectangleBorders(this.size * 0.9, this.size * 0.85), 0);
         this.gun = new BaseGun(this.center, this.size * 0.2, this.size * 0.45);
 
-        this.basePanel = new BasePanel();
+    }
+
+    reset() {
+        this.healthPoints = this.maxHealthPoints;
+        this.gun.reset();
+        this.basePanel.reset();
     }
 
     get center() {

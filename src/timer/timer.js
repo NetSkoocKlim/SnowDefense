@@ -1,4 +1,3 @@
-import {createDivElement} from "../../utilities.js";
 
 export class Timer {
 

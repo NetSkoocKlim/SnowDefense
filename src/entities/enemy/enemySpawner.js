@@ -1,4 +1,4 @@
-import {CooldownTimer} from "../timer/timer.js";
+import {CooldownTimer} from "../../timer/timer.js";
 import {DefaultEnemy} from "./enemyKind/defaultEnemy.js";
 import {EliteEnemy} from "./enemyKind/eliteEnemy.js";
 import {Game} from "../../game.js";
@@ -7,7 +7,7 @@ import {Game} from "../../game.js";
 export class EnemySpawner {
     static enemies = [];
     static eliteEnemies = [];
-    static spawnTimer = -1;
+    static spawnTimer;
     static maxEnemyCount = 100;
     static _enemiesAlive = 0;
 
@@ -23,10 +23,26 @@ export class EnemySpawner {
 
     static initEnemies() {
         for (let i = 0; i < EnemySpawner.maxEnemyCount; i++) {
-            EnemySpawner.enemies.push(new DefaultEnemy());
-            EnemySpawner.eliteEnemies.push(new EliteEnemy());
+            EnemySpawner.enemies[i] = new DefaultEnemy();
+            EnemySpawner.eliteEnemies[i] = new EliteEnemy();
         }
     }
+
+    static reset() {
+        EnemySpawner.unsetSpawnRate();
+
+        EnemySpawner.enemies.forEach(enemy => {
+            enemy.reset();
+        })
+
+        EnemySpawner.eliteEnemies.forEach(enemy => {
+            enemy.reset();
+        })
+
+        EnemySpawner.enemiesAlive = 0;
+    }
+
+
 
     static spawnEnemy({side = null, count = 1, isElite=false}) {
         for (let i = 0; i < count; i++) {
@@ -59,6 +75,14 @@ export class EnemySpawner {
             EnemySpawner.spawnEnemy({side: null, count: spawnCount});
         }
     }
+
+    static unsetSpawnRate() {
+        EnemySpawner.spawnTimer.pause();
+        EnemySpawner.spawnTimer.reset({});
+        EnemySpawner.spawnTimer.onComplete = null;
+        EnemySpawner.isShouldContinue = false;
+    }
+
 }
 
 Object.defineProperty(EnemySpawner, 'enemiesAlive', {
@@ -67,7 +91,8 @@ Object.defineProperty(EnemySpawner, 'enemiesAlive', {
     },
     set(newVal){
         EnemySpawner._enemiesAlive = newVal;
-        if (EnemySpawner._enemiesAlive === 0 && Game.levelManager.waveManager.waveComplete === true && Game.levelManager.waveManager.currentWave === Game.levelManager.waveManager.waveCount - 1) {
+        if (!Game.mainMenu.isActive && EnemySpawner._enemiesAlive === 0 && Game.levelManager.waveManager.waveComplete === true && Game.levelManager.waveManager.currentWave === Game.levelManager.waveManager.waveCount - 1) {
+            console.log("error");
             Game.levelManager.endLevel();
         }
     },

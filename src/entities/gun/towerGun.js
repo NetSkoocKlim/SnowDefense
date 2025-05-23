@@ -1,19 +1,21 @@
 import {CircleCollision, Collision} from "../../collision.js";
 import {TowerGunBullet} from "../bullet/";
 import {Gun} from "./gun.js";
-import {CooldownTimer} from "../timer/timer.js";
+import {CooldownTimer} from "../../timer/timer.js";
 
 import {EnemySpawner} from "../enemy/enemySpawner.js";
 import {TowerUpgrade} from "../upgrade";
 import {Canvas} from "../canvas";
+import {deepClone} from "../../utilities.js";
+
 
 export class TowerGun extends Gun {
-    constructor(center, width, height) {
-        super(center, width, height);
-        this.stats = {...TowerUpgrade.startUpgrades};
+    constructor() {
+        super(null, null, null);
+        this.stats = deepClone(TowerUpgrade.startUpgrades);
         this.attackRadius = 175 * Canvas.scale;
         this.reloadTimer = new CooldownTimer("TowerGunReload", this.reloadTime, {shouldReset: false});
-        this.attackRadiusShow = new CircleCollision(this.center, this.attackRadius);
+        this.attackRadiusShow = new CircleCollision(null, this.attackRadius);
         this.reloadTimer.onComplete = () => {
             this.reload();
         };
@@ -23,6 +25,21 @@ export class TowerGun extends Gun {
 
         this.gunImg = new Image();
         this.gunImg.src = "./assets/tower/towerGun.png"
+    }
+
+    set(center, width, height) {
+        this.center = center;
+        this.width = width;
+        this.height = height;
+        this.attackRadiusShow.position = this.center;
+    }
+
+    reset() {
+        super.reset();
+        this.stats = deepClone(TowerUpgrade.startUpgrades);
+        this.reloadTimer.reset({startTime: this.reloadTime});
+        this.canFire = true;
+        this.reloadTimer.isShouldContinue = true;
     }
 
     get reloadTime() {

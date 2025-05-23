@@ -5,20 +5,25 @@ import {Game} from "./game.js";
 export const addInteractionEscapeMenu = () => {
     window.addEventListener("keydown", event =>{
         if (event.code === "Escape") {
-            if (document.querySelector(".mainMenu").style.display !== "none") {
-                //Находимся в главном меню, предлагаем выйти из игры
+            if (Game.mainMenu.isActive === true) {
+
+            }
+            else if (Game.endLevelPanel.isActive === true) {
+
             }
             else {
                 if (!Game.escapeMenu.isActive) {
                     document.querySelector(".escapeMenu").style.display = "block";
                     Game.pauseGame();
                     Game.escapeMenu.isActive = true;
-                    Game.base.basePanel.upgradePanel.hide();
+
+                    Game.base.basePanel.show();
+                    Game.countDown.stop();
                 }
                 else {
                     document.querySelector(".escapeMenu").style.display = "none";
                     Game.escapeMenu.isActive = false;
-                    Game.resumeGame();
+                    if (!Game.end && !Game.hintManager.current) Game.countDown.start();
                 }
             }
         }
@@ -28,33 +33,32 @@ export const addInteractionEscapeMenu = () => {
     Game.escapeMenu.continueButton.addEventListener("click", () => {
         document.querySelector(".escapeMenu").style.display = "none";
         Game.escapeMenu.isActive = false;
-        Game.resumeGame();
+        if (!Game.end && !Game.hintManager.current) Game.countDown.start();
     });
 
     Game.escapeMenu.exitButton.addEventListener("click", () => {
         document.querySelector(".escapeMenu").style.display = "none";
-        document.querySelector(".mainMenu").style.display = "block";
-        Game.escapeMenu.isActive = false;
-        Game.mainMenu.isActive = true;
-});
+        Game.mainMenu.show();
+    });
 }
+
 
 export const addInteractionMainMenu = ()=> {
     Game.mainMenu.button.addEventListener("click", (event)=>{
-        event.stopPropagation();
-        if (Game.mainMenu.isActive){
-            Game.mainMenu.isActive = false;
-            document.querySelector(".mainMenu").style.display = "none";
-            Game.resumeGame();
-        }
+        Game.mainMenu.hideAndRestartGame();
     })
 }
 
 export const addPauseListeners = () => {
     window.addEventListener('blur', () => {
+        if (Game.mainMenu.isActive || Game.endLevelPanel.isActive) {return}
         Game.escapeMenu.isActive = true;
         document.querySelector(".escapeMenu").style.display = "block";
         Game.pauseGame();
+        Game.base.basePanel.upgradePanel.hide();
+        Game.base.basePanel.shopPanel.hide();
+        Game.base.basePanel.show();
+        Game?.countDown.stop();
     });
 }
 
@@ -103,22 +107,24 @@ export const addBasePanelListeners = () => {
             const next = upgrade.levels[currentLevel];
             if (!next || next.nextUpgradeCost === 0) return;
             const cost = next.nextUpgradeCost;
-            if (Game.points.currentPoints >= cost) {
-                Game.points.currentPoints -= cost;
-                upgrade.upgrade();
-                if (upgrade.name === "Время перезарядки") {
-                    Game.base.gun.reloadTimer.reset({startTime: upgrade.value.value});
-                }
-                Game.base.basePanel.upgradePanel.updateAll();
-                Game.panel.update({ gold: Game.points.currentPoints });
-            } else {
-                console.warn('Недостаточно золота для прокачки базы');
+            Game.points.currentPoints -= cost;
+            upgrade.upgrade();
+            if (upgrade.name === "Время перезарядки") {
+                Game.base.gun.reloadTimer.reset({startTime: upgrade.value.value});
             }
+            Game.base.basePanel.upgradePanel.updateAll();
+            Game.panel.update({ gold: Game.points.currentPoints });
         });
     });
 
     Game.base.basePanel.onExtraClick(() => {
-        console.log('Extra upgrades clicked');
-        // TODO: open extra-upgrades dialogue
+        Game.base.basePanel.hide();
+        Game.base.basePanel.shopPanel.show();
+    });
+
+
+    Game.base.basePanel.shopPanel.onBackClick(() => {
+        Game.base.basePanel.shopPanel.hide();
+        Game.base.basePanel.show();
     });
 };

@@ -5,7 +5,7 @@
     {
       "waves": [
         {
-          "endWaveTime": 10,
+          "endWaveTime": 2,
           "spawnsCount": 5,
           "randomSpawnsCount": 3,
           "spawns": [
@@ -104,7 +104,7 @@
           "enemyModification": null
         },
         {
-          "endWaveTime": 10,
+          "endWaveTime": 2,
           "spawnsCount": 5,
           "randomSpawnsCount": 3,
           "spawns": [

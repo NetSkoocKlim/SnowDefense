@@ -9,13 +9,18 @@ export class Mine {
 
     constructor() {
         this.isExplode = true;
-        this.size = 20;
+        this.size = 20 * Canvas.scale;
 
         this.explosionCollision = new CircleCollision(this.position, MineSpawner.explosionRadius);
         this.mineCollision = new CircleCollision(this.position, this.size/2);
 
         this.mineImg = new Image();
         this.mineImg.src = "./assets/mine/mine.png";
+    }
+
+    reset() {
+        this.isExplode = true;
+
     }
 
     isEnemyInRadius() {

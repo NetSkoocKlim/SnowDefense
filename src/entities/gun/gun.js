@@ -16,6 +16,10 @@ export class Gun {
         this.rotation.y = mouseY - this.center.y;
     }
 
+    reset() {
+        this.bullets = [];
+    }
+
 }
 
 

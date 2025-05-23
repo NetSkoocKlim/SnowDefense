@@ -3,6 +3,9 @@ import {Game} from "../../game.js";
 
 export class LevelManager {
 
+    static moneySpend = 0;
+    static enemiesFeed = 0;
+
     constructor(levelsDescription) {
         this.currentLevel = 0;
         this.levelsDescription = levelsDescription;
@@ -10,8 +13,16 @@ export class LevelManager {
         this.waveManager = new WaveManager();
     }
 
+    reset() {
+        this.currentLevel = 0;
+
+        LevelManager.moneySpend = 0;
+        LevelManager.enemiesFeed = 0;
+
+        this.waveManager.reset();
+    }
+
     startNextLevel() {
-        this.levelComplete = false;
         this.currentLevel += 1;
         this.waveManager.currentWave = -1;
         this.waveManager.waveCount = 0;
@@ -19,15 +30,22 @@ export class LevelManager {
             console.log("This was last level ;(");
             return;
         }
-
-        console.log("Level", this.currentLevel, "started");
+        this.waveManager.waveTimer.isShouldContinue = true;
         this.waveManager.setLevelDescription(this.levelsDescription.levels[this.currentLevel]);
         this.waveManager.startNextWave();
     }
 
     endLevel() {
+        console.log("end");
         this.waveManager.nextWavePopup.hide();
-        console.log("Level Complete");
+        setTimeout(() => Game.pauseGame(), 150);
+        Game.end = true;
+        Game.endLevelPanel.setStats({
+            "Уровень": this.currentLevel,
+            "Потрачено времемни:": Game.timer.toString(),
+            "Потрачено ресурсов:": LevelManager.moneySpend,
+            "Песцов накормлено:": LevelManager.enemiesFeed
+        })
+        Game.endLevelPanel.show();
     }
-
 }

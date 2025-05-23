@@ -5,6 +5,7 @@ export class GamePanel {
         this.container = document.getElementById(containerId);
         this._createPanel();
         this._bindEvents();
+        this.hide();
     }
 
     _createPanel() {
@@ -14,24 +15,24 @@ export class GamePanel {
             <div class="panel-header">Статистика &#9662;</div>
             <div class="panel-content">
                 <div class="summary">
-                    <div class="row">
+                    <div class="row time-row">
                         <div class="label">Время:</div>
                         <div class="value"><span id="ui-time">0:00</span></div>
                     </div>
-                    <div class="row">
+                    <div class="row gold-row">
                         <div class="label">Ледышки:</div>
                         <div class="value"><span id="ui-gold">0</span></div>
                     </div>
-                    <div class="row">
+                    <div class="row level-row">
                         <div class="label">Уровень:</div>
                         <div class="value"><span id="ui-level">1</span></div>
                     </div>
-                    <div class="row">
+                    <div class="row wave-row">
                         <div class="label">Волна:</div>
                         <div class="value"><span id="ui-wave">1/${Game.levelManager.waveManager.waveCount}</span></div>
                     </div>
-                    <div class="row">
-                        <div class="label">Живые враги:</div>
+                    <div class="row enemies-row">
+                        <div class="label">Голодные враги:</div>
                         <div class="value"><span id="ui-enemies">0</span></div>
                     </div>
             
@@ -66,7 +67,6 @@ export class GamePanel {
     }
 
 
-
     toggle() {
         this.el.classList.toggle('collapsed');
         if (this.el.classList.contains('collapsed')) {
@@ -99,5 +99,15 @@ export class GamePanel {
         const m = Math.floor(totalSec / 60);
         const s= totalSec % 60;
         return m + ':' + (s < 10 ? '0' + s : s);
+    }
+
+    show() {
+        this.el.style.display = 'block';
+        this.isActive = true;
+    }
+
+    hide() {
+        this.el.style.display = 'hide';
+        this.isActive = false;
     }
 }

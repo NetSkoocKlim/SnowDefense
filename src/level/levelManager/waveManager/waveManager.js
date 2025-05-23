@@ -1,15 +1,15 @@
-import {CooldownTimer, IncrementTimer} from "../../../entities/timer/timer.js";
+import {CooldownTimer, IncrementTimer} from "../../../timer/timer.js";
 
 import {EnemySpawner} from "../../../entities/enemy/enemySpawner.js";
-import {Game} from "../../../game.js";
 import {NextWavePopup} from "../../../gui/nextWavePopup.js";
+import {Game} from "../../../game.js";
 
 export class WaveManager {
 
     constructor() {
         this.waveTimer = new IncrementTimer("Wave timer");
         this.currentWave = 0;
-        this.waveDelay = 5;
+        this.waveDelay = 1;
         this.waveEndTimer = new CooldownTimer("WaveEndTimer", this.waveDelay, {shouldReset: false});
         this.waveComplete = false;
         this.nextWavePopup = new NextWavePopup();
@@ -19,6 +19,18 @@ export class WaveManager {
             this.currentWave += 1;
             this.startNextWave();
         }
+    }
+
+    reset() {
+        console.log("reset");
+        this.waveTimer.pause();
+        this.waveTimer.reset();
+        this.waveTimer.isShouldContinue = true;
+        this.waveTimer.clearEvents();
+        this.waveEndTimer.pause();
+        this.waveEndTimer.reset({});
+        this.waveComplete = false;
+        this.currentWave = 0;
     }
 
     setLevelDescription(levelDescription) {
@@ -88,7 +100,12 @@ export class WaveManager {
         EnemySpawner.spawnTimer.isShouldContinue = false;
 
         if (this.currentWave + 1 >= this.waveCount) {
-            this.nextWavePopup.showEndWaveWarning();
+            if (EnemySpawner.enemiesAlive === 0) {
+                Game.levelManager.endLevel();
+            }
+            else {
+                this.nextWavePopup.showEndWaveWarning();
+            }
             this.waveTimer.pause();
             return;
         }

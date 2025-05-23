@@ -17,7 +17,10 @@ const start = async () => {
     addBasePanelListeners();
 }
 
-document.addEventListener("DOMContentLoaded", start);
+document.addEventListener("DOMContentLoaded", async () => {
+    window.scrollTo(0, 0);
+    await start();
+});
 
 window.addEventListener("mousedown", (event) => {
     event.preventDefault();

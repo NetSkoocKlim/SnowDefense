@@ -40,6 +40,12 @@ export class Scene {
         );
     }
 
+    reset() {
+        Scene.towerPlaces.forEach((towerPlace) => {
+            towerPlace.reset();
+        })
+    }
+
     createTowerPlaces() {
         const baseSize = Game.base.size;
         const towerSize = baseSize / 4;
@@ -69,8 +75,6 @@ export class Scene {
     }
 
     draw({collision=false}) {
-        // Canvas.ctx.fillStyle = '#ad5f3e';
-        // Canvas.ctx.fillRect(0, 0, this.sceneSize, this.sceneSize);
         Canvas.ctx.drawImage(this.sceneImg, 0,0, 1024, 1024, 0,0, this.sceneSize, this.sceneSize);
 
         Scene.ways.forEach(way => {

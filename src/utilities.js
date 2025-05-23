@@ -2,11 +2,11 @@ import {EnemySpawner} from "./entities/enemy/enemySpawner.js";
 import {EliteEnemy} from "./entities/enemy/enemyKind/eliteEnemy.js";
 import {Canvas} from "./entities/canvas";
 
+
 export class ObjType {
     static Base = Symbol();
     static Tower = Symbol();
 }
-
 
 export function createImg(src, parent, className){
     const img = document.createElement("img");
@@ -134,20 +134,28 @@ export function processHit(source) {
     }
 }
 
+export function deepClone(obj, hash = new WeakMap()) {
+    if (Object(obj) !== obj) return obj;
 
-export const drawRoundRect = (x, y, w, h, r, fill, stroke) => {
-    if (r > h / 2) r = h / 2;
-    Canvas.ctx.beginPath();
-    Canvas.ctx.moveTo(x + r, y);
-    Canvas.ctx.lineTo(x + w - r, y);
-    Canvas.ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-    Canvas.ctx.lineTo(x + w, y + h - r);
-    Canvas.ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-    Canvas.ctx.lineTo(x + r, y + h);
-    Canvas.ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-    Canvas.ctx.lineTo(x, y + r);
-    Canvas.ctx.quadraticCurveTo(x, y, x + r, y);
-    Canvas.ctx.closePath();
-    if (fill) Canvas.ctx.fill();
-    if (stroke) Canvas.ctx.stroke();
+    if (hash.has(obj)) return hash.get(obj);
+
+    if (typeof obj.clone === 'function') {
+        const cloned = obj.clone();
+        hash.set(obj, cloned);
+        return cloned;
+    }
+
+    const result = Array.isArray(obj)
+        ? []
+        : obj.constructor
+            ? new obj.constructor()
+            : {};
+
+    hash.set(obj, result);
+
+    for (const key of Reflect.ownKeys(obj)) {
+        result[key] = deepClone(obj[key], hash);
+    }
+    return result;
 }
+
