@@ -1,7 +1,7 @@
 import {BaseGunBullet} from "../bullet";
 import {Gun} from "./gun.js";
 import {BaseUpgrade} from "../upgrade";
-import {Canvas} from "../canvas";
+import {Canvas} from "../../canvas";
 import {CooldownTimer} from "../../timer/timer.js";
 import {deepClone} from "../../utilities.js";
 
@@ -14,6 +14,10 @@ export class BaseGun extends Gun {
         this.canFire = true;
         this.gunImg = new Image();
         this.gunImg.src = "./assets/base/baseGun.png";
+
+        this.reloadTimer.onComplete = () => {
+            this.canFire = true;
+        };
     }
 
     reset() {
@@ -21,12 +25,10 @@ export class BaseGun extends Gun {
         this.currentAngle = 0;
         this.stats = deepClone(BaseUpgrade.startUpgrades);
         this.canFire = true;
+
         this.reloadTimer.pause();
-        this.reloadTimer.isShouldContinue = true;
         this.reloadTimer.reset({startTime: this.reloadTime});
-        this.reloadTimer.onComplete = () => {
-            this.reload();
-        };
+        this.reloadTimer.isShouldContinue = false;
     }
 
     get reloadTime() {
@@ -46,30 +48,27 @@ export class BaseGun extends Gun {
         this.currentAngle += shortAngle * this.smoothing;
     }
 
-    reload() {
-        this.canFire = true;
-    }
-
     fire() {
         if (this.canFire) {
+            this.canFire = false;
             let bullet = new BaseGunBullet(
                 this.center.x + Math.cos(this.currentAngle) * (this.width * 0.75),
                 this.center.y + Math.sin(this.currentAngle) * (this.width * 0.75),
                 {x: Math.cos(this.currentAngle), y: Math.sin(this.currentAngle)},
             )
             this.reloadTimer.resume();
-            this.canFire = false;
+            this.reloadTimer.isShouldContinue = true;
             this.bullets.push(bullet);
         }
     }
 
     draw() {
-        this.lerpAngle(Math.atan2(this.rotation.y,this.rotation.x));
+        this.lerpAngle(Math.atan2(this.rotation.y, this.rotation.x));
 
         Canvas.ctx.save();
-        Canvas.ctx.translate(this.center.x , this.center.y);
-        Canvas.ctx.rotate(Math.PI/2 + this.currentAngle);
-        Canvas.ctx.drawImage(this.gunImg, 0, 0, 369, 724, -this.width/2, -this.height/2, this.width, this.height);
+        Canvas.ctx.translate(this.center.x, this.center.y);
+        Canvas.ctx.rotate(Math.PI / 2 + this.currentAngle);
+        Canvas.ctx.drawImage(this.gunImg, 0, 0, 369, 724, -this.width / 2, -this.height / 2, this.width, this.height);
         Canvas.ctx.restore();
 
     }

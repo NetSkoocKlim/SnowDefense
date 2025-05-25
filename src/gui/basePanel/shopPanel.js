@@ -1,4 +1,4 @@
-import {Canvas} from "../../entities/canvas";
+import {Canvas} from "../../canvas";
 import {MineSpawner} from "../../entities/mine/mineSpawner.js";
 import {Game} from "../../game.js";
 

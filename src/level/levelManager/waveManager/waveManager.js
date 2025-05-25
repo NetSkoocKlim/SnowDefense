@@ -9,7 +9,7 @@ export class WaveManager {
     constructor() {
         this.waveTimer = new IncrementTimer("Wave timer");
         this.currentWave = 0;
-        this.waveDelay = 1;
+        this.waveDelay = 5;
         this.waveEndTimer = new CooldownTimer("WaveEndTimer", this.waveDelay, {shouldReset: false});
         this.waveComplete = false;
         this.nextWavePopup = new NextWavePopup();
@@ -17,48 +17,34 @@ export class WaveManager {
         this.waveEndTimer.onComplete = () => {
             this.nextWavePopup.hide();
             this.currentWave += 1;
+            this.setWaveDescription();
             this.startNextWave();
         }
     }
 
     reset() {
-        console.log("reset");
-        this.waveTimer.pause();
-        this.waveTimer.reset();
-        this.waveTimer.isShouldContinue = true;
         this.waveTimer.clearEvents();
+        this.waveTimer.pause();
+        this.waveTimer.reset({});
+        this.waveTimer.isShouldContinue = false;
+
         this.waveEndTimer.pause();
         this.waveEndTimer.reset({});
+        this.waveEndTimer.isShouldContinue = false;
+
         this.waveComplete = false;
         this.currentWave = 0;
     }
 
     setLevelDescription(levelDescription) {
         this.levelDescription = levelDescription;
-        this.waveCount = this.levelDescription.waves.length;
+        this.waveCount = this.levelDescription.waveCount;
         this.currentWave = 0;
+        this.setWaveDescription();
     }
 
-    getWaveDescription() {
+    setWaveDescription() {
         this.waveDescription = this.levelDescription.waves[this.currentWave];
-        this.spawnsCount = this.waveDescription.spawnsCount;
-        this.randomSpawnsCount = this.waveDescription.randomSpawnsCount;
-        this.endWaveTime = this.waveDescription.endWaveTime;
-    }
-
-    startNextWave() {
-        this.waveComplete = false;
-        this.waveTimer.reset();
-        this.waveTimer.resume();
-        this.waveTimer.isShouldContinue = true;
-
-        this.waveEndTimer.pause();
-        this.waveEndTimer.reset({});
-        this.waveEndTimer.isShouldContinue = false;
-
-        this.getWaveDescription();
-        console.log("New wave started. Duration: ", this.waveDescription.endWaveTime, "seconds");
-
         for (let i = 0; i < this.waveDescription.spawnsCount; i++) {
             let spawnDetails = this.waveDescription.spawns[i];
             this.waveTimer.scheduleEvent(spawnDetails.timerValue, () => {
@@ -74,24 +60,38 @@ export class WaveManager {
                 }
             });
         }
-
         for (let i = 0; i < this.waveDescription.randomSpawnsCount; i++) {
             let spawnDetails = this.waveDescription.randomSpawns[i];
-            let timerValue = spawnDetails.timerValue;
+            let timerValue = spawnDetails.startTimerValue;
             this.waveTimer.scheduleEvent(timerValue, () => {
-                EnemySpawner.setSpawnRate(spawnDetails.enemyCount, spawnDetails.delay);
+                EnemySpawner.setSpawnRate(spawnDetails.enemiesPerSpawn, spawnDetails.delay);
             });
+            if (spawnDetails.endTimerValue) {
+                this.waveTimer.scheduleEvent(spawnDetails.endTimerValue, () => {
+                    EnemySpawner.unsetSpawnRate();
+                })
+            }
         }
-
-        this.waveTimer.scheduleEvent(this.endWaveTime, () => {
+        this.waveTimer.scheduleEvent(this.waveDescription.endWaveTime, () => {
             this.endWave();
         });
+    }
 
+    startNextWave() {
+        this.waveComplete = false;
+
+        this.waveEndTimer.reset({});
+        this.waveEndTimer.pause();
+        this.waveEndTimer.isShouldContinue = false;
+
+        this.waveTimer.isShouldContinue = true;
+        this.waveTimer.resume();
     }
 
     endWave() {
-        console.log("Wave complete");
         this.waveComplete = true;
+
+        this.waveTimer.reset({});
         this.waveTimer.clearEvents();
         this.waveTimer.pause();
         this.waveTimer.isShouldContinue = false;

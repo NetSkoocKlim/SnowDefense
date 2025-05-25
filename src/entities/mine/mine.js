@@ -1,7 +1,7 @@
 import {EnemySpawner} from "../enemy/enemySpawner.js";
 import {CircleCollision, Collision} from "../../collision.js";
 import {Game} from "../../game.js";
-import {Canvas} from "../canvas";
+import {Canvas} from "../../canvas";
 import {MineSpawner} from "./mineSpawner.js";
 
 export class Mine {

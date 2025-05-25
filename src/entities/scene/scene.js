@@ -1,5 +1,5 @@
 import {Collision} from "../../collision.js";
-import {Canvas} from "../canvas/";
+import {Canvas} from "../../canvas/";
 import {TowerPlace} from "../tower/towerPlace.js";
 import {Way} from "./way.js";
 import {Game} from "../../game.js";

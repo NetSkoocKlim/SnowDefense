@@ -1,11 +1,11 @@
 import {Game} from "../game.js";
+import {wait} from "../utilities.js";
 
 export class  EndLevelPanel {
 
-    constructor({ parent, stats = {},  onContinue }) {
+    constructor({ parent, stats = {} }) {
         this.parent = parent;
         this.stats = { ...stats };
-        this.onContinue = onContinue;
         this._render();
     }
 
@@ -31,15 +31,21 @@ export class  EndLevelPanel {
 
         this.btnMain = document.createElement('button');
         this.btnMain.className = 'elp-btn';
-        this.btnMain.textContent = 'В главное меню';
+        this.btnMain.textContent = 'В главное     меню';
         this.btnMain.onclick = () => this.toMainMenu();
 
         this.btnCont = document.createElement('button');
         this.btnCont.className = 'elp-btn';
-        this.btnCont.textContent = 'Продолжить';
-        this.btnCont.onclick = () => this.onContinue && this.onContinue();
+        this.btnCont.textContent = 'Следующий уровень';
+        this.btnCont.onclick = () => {
+            this.hide();
+            Game.continueGame();
+            wait(500).then(() => {
+                Game.startLevelPanel.show();
+            })
+        }
 
-        btnWrapper.append(this.btnMain, this.btnCont);
+        btnWrapper.append(this.btnCont, this.btnMain);
         this.panel.appendChild(btnWrapper);
 
         this.overlay.appendChild(this.panel);
@@ -79,14 +85,28 @@ export class  EndLevelPanel {
         this._updateStats();
     }
 
-    toMainMenu() {
+    async toMainMenu() {
         this.hide();
-        Game.mainMenu.show();
+        await Game.mainMenu.show();
     }
 
     show() {
+        this.btnCont.style.display = 'block';
+        Game.panel.el.classList.add('collapsed');
         this.overlay.style.display = 'flex';
         this.isActive = true;
+        requestAnimationFrame(() => this.panel.classList.add('elp-panel--show'));
+    }
+
+    showLast() {
+        Game.panel.el.classList.add('collapsed');
+        Game.endLevelPanel.statsContainer.innerHTML = '';
+        Game.endLevelPanel.title = "Последний уровень пройден! Поздравляем!";
+        document.querySelector(".elp-title").innerHTML = Game.endLevelPanel.title;
+        this.btnCont.style.display = 'none';
+        this.overlay.style.display = 'flex';
+        this.isActive = true;
+        Game.gameIsNotStarted = true;
         requestAnimationFrame(() => this.panel.classList.add('elp-panel--show'));
     }
 

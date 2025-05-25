@@ -1,6 +1,6 @@
 import {getRectangleBorders} from "../../utilities.js";
 import {Collision, PolygonCollision} from "../../collision.js";
-import {Canvas} from "../canvas/";
+import {Canvas} from "../../canvas/";
 import {Game} from "../../game.js";
 import {CooldownTimer} from "../../timer/timer.js";
 import {EnemySpawner} from "./enemySpawner.js";
@@ -19,7 +19,7 @@ export class Enemy {
         this.position = {x: null, y: null};
         this.headCenter = {x: null, y: null};
         this.width = width;
-        this.damage = 1;
+        this.damage = 6;
         this.height = height;
         this.speed = speed;
         this.attackCooldown = 0.2;
@@ -38,12 +38,29 @@ export class Enemy {
         this.attackCooldownTimer.isShouldContinue = false;
         this.attackCooldownTimer.pause();
         this.attackCooldownTimer.reset({});
+
+        this.enemyAnimator.frameDelayTimer.isShouldContinue = false;
+        this.enemyAnimator.frameDelayTimer.pause();
+        this.enemyAnimator.frameDelayTimer.reset({});
+
         this.currentHP = this.maxHP;
-
-
     }
 
     spawn({side = null}) {
+
+        if (this.kind === 'common') {
+            this.reward = EnemySpawner.enemyReward.common;
+            this.damage = EnemySpawner.enemyAttack.common;
+            this.maxHP = EnemySpawner.enemyHp.common;
+            this.currentHP = this.maxHP;
+        }
+        else {
+            this.reward = EnemySpawner.enemyReward.elite;
+            this.damage = EnemySpawner.enemyAttack.elite;
+            this.maxHP = EnemySpawner.enemyHp.elite;
+        }
+
+
         if (side === null) {
             this.side = Math.floor(1 + Math.random() * 4);
         } else {
@@ -227,8 +244,8 @@ export class Enemy {
         if (Game.base.healthPoints - this.damage < 0) {
             Game.base.healthPoints = 0;
             Game.pauseGame();
-            console.log("Вы проиграли. Игра окончена");
-            Game.end = true;
+            if (!Game.gameOverPanel.isActive)
+            Game.gameOverPanel.show();
             return;
         }
         Game.base.healthPoints -= this.damage;

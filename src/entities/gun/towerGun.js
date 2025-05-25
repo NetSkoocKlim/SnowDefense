@@ -5,7 +5,7 @@ import {CooldownTimer} from "../../timer/timer.js";
 
 import {EnemySpawner} from "../enemy/enemySpawner.js";
 import {TowerUpgrade} from "../upgrade";
-import {Canvas} from "../canvas";
+import {Canvas} from "../../canvas";
 import {deepClone} from "../../utilities.js";
 
 

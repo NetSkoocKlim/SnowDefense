@@ -1,6 +1,6 @@
 import {PolygonCollision} from "../../collision.js";
 import {getRectangleBorders, ObjType} from '../../utilities.js'
-import {Canvas} from "../canvas/";
+import {Canvas} from "../../canvas/";
 import {BaseGun} from "../gun/";
 
 

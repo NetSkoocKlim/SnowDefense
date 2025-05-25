@@ -1,11 +1,11 @@
 import {Scene} from "./entities/scene/";
-import {Canvas} from "./entities/canvas/";
+import {Canvas} from "./canvas/";
 import {Points} from "./entities/points.js";
 import {processHit} from "./utilities.js";
 import {IncrementTimer, Timer} from "./timer/timer.js";
 import {EnemySpawner} from "./entities/enemy/enemySpawner.js";
 import {LevelManager} from "./level/levelManager/levelManager.js";
-import {mainMenu, EscapeMenu} from "./gui/mainMenu/mainMenu.js";
+import {MainMenu} from "./gui/menu/mainMenu.js";
 import {Tower} from "./entities/tower";
 import {MineSpawner} from "./entities/mine/mineSpawner.js";
 import {Base} from "./entities/base";
@@ -14,6 +14,10 @@ import {HintManager} from "./gui/hints/hintManager.js";
 import {BasePanel} from "./gui/basePanel/basePanel.js";
 import {CountdownDisplay} from "./gui/countDown.js";
 import {EndLevelPanel} from "./gui/endLevelPanel.js";
+import {EscapeMenu} from "./gui/menu/escapeMenu.js";
+import {GameOverPanel} from "./gui/gameOverPanel.js";
+import {LevelInitializer} from "./level/levelInitializer.js";
+import {LevelStartPanel} from "./gui/startLevelPanel.js";
 
 
 export class Game {
@@ -21,7 +25,6 @@ export class Game {
     static scene;
     static base;
     static timer;
-    static levelStarted = false;
     static levelManager;
     static towers = [];
     static panel;
@@ -30,14 +33,18 @@ export class Game {
     static drawIsActive = false;
     static levelData;
     static countDown;
-    static end = false;
+    static gameIsNotStarted = true;
 
     static async initGame() {
-        Canvas.initCanvas();
         Game.initBorder();
-        Game.mainMenu = new mainMenu();
+        this.gameDiv = document.querySelector("#game");
+        Game.mainMenu = new MainMenu();
         Game.escapeMenu = new EscapeMenu();
-        this.levelData = await fetch('./src/level/levelDescription.json').then(res => res.json());
+        Game.levelData = LevelInitializer.initLevels();
+        Game.levelManager = new LevelManager();
+        Game.panel = new GamePanel('statistic-container', {
+            totalWaves: Game.levelManager.levelCount
+        });
         Game.points = new Points();
         Game.base = new Base();
         Game.base.basePanel = new BasePanel();
@@ -46,10 +53,6 @@ export class Game {
         Game.timer = new IncrementTimer("GameTimer");
         Game.timer.isShouldContinue = true;
         EnemySpawner.init();
-        Game.levelManager = new LevelManager(this.levelData);
-        Game.panel = new GamePanel('statistic-container', {
-            totalWaves: Game.levelManager.levelCount
-        });
         MineSpawner.init();
         Game.hintManager = new HintManager();
         Game.countDown = new CountdownDisplay({
@@ -60,14 +63,25 @@ export class Game {
         Game.endLevelPanel = new EndLevelPanel({
             parent: document.querySelector("#game"),
             stats: {},
-            onContinue: Game.levelManager.startNextLevel
-        });
-        await Game.mainMenu.show();
+            });
+        Game.gameOverPanel = new GameOverPanel();
+        Game.startLevelPanel = new LevelStartPanel();
     }
 
+    static startNewGame() {
+        Game.gameIsNotStarted = false;
+        Game.levelManager.reset();
+        Game.continueGame();
+    }
+
+    static continueGame() {
+        Game.restartGame();
+        Game.levelManager.initLevel();
+    }
 
     static restartGame() {
-        Game.end = false;
+        Game.levelManager.waveManager.nextWavePopup.hide();
+        Game.levelManager.waveManager.reset();
         Game.points.reset();
         Game.base.reset();
         Game.scene.reset();
@@ -77,12 +91,9 @@ export class Game {
         Game.timer.reset();
         Game.timer.isShouldContinue = true;
         EnemySpawner.reset();
-        Game.levelManager.reset();
-        Game.levelStarted = false;
         MineSpawner.reset();
         Game.hintManager.reset();
     }
-
 
     static initBorder() {
         const border = document.querySelector(".frame");
@@ -93,13 +104,18 @@ export class Game {
     }
 
     static pauseGame() {
-        Timer.timers.forEach(timer => timer.pause());
+        Timer.timers.forEach(timer => {
+            if (timer.timerId !== null) {
+                timer.pause();
+            }
+        });
         Game.gamePause = true;
         Game.drawIsActive = false;
     }
 
     static resumeGame() {
         if (Game.hintManager.current !== null) return;
+        if (Game.mainMenu.isActive || Game.escapeMenu.isActive || Game.endLevelPanel.isActive || Game.gameOverPanel.isActive) return;
         Game.gamePause = false;
         Game.checkAndContinue();
     }
@@ -108,14 +124,12 @@ export class Game {
         Timer.timers.forEach(timer => {
             if (timer.isShouldContinue && timer.timerId === null) timer.resume();
         });
-        if (!this.levelStarted) {
-            this.levelManager.startNextLevel();
-            this.levelStarted = true;
+        if (!Game.levelManager.levelIsStarted) {
+            Game.startLevelPanel.show();
         }
         if (!Game.base.basePanel.upgradePanel.active && !Game.base.basePanel.visible) {
             Game.base.basePanel.show();
         }
-
         if (!Game.panel.isActive) {
             Game.panel.show();
         }
@@ -123,6 +137,17 @@ export class Game {
             Game.drawIsActive = true;
             Game.draw({});
         }
+
+    }
+
+    static renderStart() {
+        if (!Game.base.basePanel.upgradePanel.active && !Game.base.basePanel.visible) {
+            Game.base.basePanel.show();
+        }
+        if (!Game.panel.isActive) {
+            Game.panel.show();
+        }
+        Game.draw({once: true});
     }
 
     static draw({once= false}) {
@@ -178,19 +203,20 @@ export class Game {
         Game.panel.update({
             elapsedMs: Game.timer.time,
             gold: Game.points.currentPoints,
-            level: Game.levelManager.currentLevel,
+            level: Game.levelManager.currentLevel + 1,
             wave: Game.levelManager.waveManager.currentWave + 1,
-            enemies: EnemySpawner.enemiesAlive
+            enemies: EnemySpawner.enemiesAlive,
+            income: Game.levelManager.income
         });
 
         Game.base.basePanel.update();
 
-        if (once === true || Game.mainMenu.isActive || Game.escapeMenu.isActive || Game.gamePause) {
+        if (Game.mainMenu.isActive || Game.escapeMenu.isActive || Game.gamePause) {
             Game.drawIsActive = false;
             return;
         }
 
-        requestAnimationFrame(() => {
+        if (once!==true) requestAnimationFrame(() => {
             Game.draw({})
         });
     }

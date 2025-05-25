@@ -6,12 +6,13 @@ export class HintManager {
     eventHandler;
 
     constructor() {
-        this.hints = [];          // сюда загрузим нашу цепочку
-        this.current = null;      // текущая подсказка
-        this.overlay = this._createOverlay();
+        this.hints = [];
+        this.current = null;
+        this.overlay = this.createOverlay();
         this.overlay.style.display = 'none';
+
         this.finalHintByGroup = {
-            intro: 'intro_15'
+            intro: 'intro_16'
         }
 
         this.registerHints([
@@ -20,7 +21,7 @@ export class HintManager {
                 group: 'intro',
                 text: `Здравствуй, бесстрашный защитник Зимнего Полюса!<br>
 Перед тобой расстилаются бескрайние льдины, пронизывающий мороз и… наша крошечная, но очень важная база производства мороженого. Здесь, в самом центре этой ледяной пустоши, ты будешь стоять на страже сладости, которую так жаждут голодные песцы.`,
-                target: {type: 'auto'},
+                target: {type: 'none'},
                 trigger: {type: 'auto'},
                 nextId: 'intro_2',
                 modal: true,
@@ -31,7 +32,7 @@ export class HintManager {
                 id: 'intro_2',
                 group: 'intro',
                 text: `Всё начинается прямо сейчас: ты берёшь на себя роль коменданта базы и единственного стрелка из пушки, заряженной порцией освежающего мороженого. Цель проста — отбить все волны пушистых вечно голодных хищников и не дать им разрушить стены твоего убежища.`,
-                target: {type: 'auto'},
+                target: {type: 'none'},
                 trigger: {type: 'next'},
                 nextId: 'intro_3',
                 modal: true,
@@ -41,7 +42,7 @@ export class HintManager {
                 id: 'intro_3',
                 group: 'intro',
                 text: `Прошу обратить внимание, что у вашей базы есть некоторые характеристики.`,
-                target: {type: 'auto'},
+                target: {type: 'none'},
                 trigger: {type: 'next'},
                 nextId: 'intro_4',
                 modal: true,
@@ -70,8 +71,8 @@ export class HintManager {
             {
                 id: 'intro_6',
                 group: 'intro',
-                text: `На этом описание характеристик базы завершено. <br>Давай теперь заглянем в системный раздел — «Статистика».`,
-                target: {type: 'auto'},
+                text: `На этом описание характеристик базы завершено. <br>Давай теперь заглянем в следующий раздел — «Статистика».`,
+                target: {type: 'none'},
                 trigger: {type: 'next'},
                 nextId: 'intro_7',
                 modal: true,
@@ -100,7 +101,10 @@ export class HintManager {
             {
                 id: 'intro_9',
                 group: 'intro',
-                text: `Ледышки — твоя основная валюта, с их помощью ты сможешь покупать новые предметы, строить защитные башни и улучшать базу.`,
+                text: `Ледышки — твоя основная валюта, с их помощью ты сможешь покупать новые предметы, 
+                строить защитные башни и улучшать базу. C каждым новым уровнем 
+                начальное количество Ледышек будет увеличиваться. Покормив каждого нового песца ты будешь зарабатывать 
+                определённое количество Ледышек.`,
                 target: {type: 'dom', selector: '.gold-row'},
                 trigger: {type: 'next'},
                 nextId: 'intro_10',
@@ -140,9 +144,9 @@ export class HintManager {
             {
                 id: 'intro_13',
                 group: 'intro',
-                text: `Чтобы скрыть раздел статистики, необходимо ещё раз килкнуть по мигающей области"`,
-                target: {type: 'dom', selector: '.panel-header'},
-                trigger: {type: 'click', selector: '.panel-header'},
+                text: `Доход показывает, сколько Ледышек ты будешь получать каждые ${Game.levelManager.incomeDelay} секунд игрового времени. Данное значение будет увеличиваться с каждым пройденным вами уровнем`,
+                target: {type: 'dom', selector: '.income-row'},
+                trigger: {type: 'next'},
                 nextId: 'intro_14',
                 modal: true,
                 shown: false
@@ -150,19 +154,29 @@ export class HintManager {
             {
                 id: 'intro_14',
                 group: 'intro',
-                text: `И напоследок, необходимо рассказать о том, как вы будете взаимодействовать с пушкой базы. 
-                Для того, чтобы стрелять необходимо навестить курсором мыши на место, куда необходимо будет произвести выстрел. Однако обрати внимание, что пушка не может моментально развернуться, так что придётся немного подождать!`,
-                target: {type: 'auto'},
-                trigger: {type: 'next'},
+                text: `Чтобы скрыть раздел статистики, необходимо ещё раз кликнуть по мигающей области."`,
+                target: {type: 'dom', selector: '.panel-header'},
+                trigger: {type: 'click', selector: '.panel-header'},
                 nextId: 'intro_15',
                 modal: true,
                 shown: false
             },
             {
-                id: "intro_15",
+                id: 'intro_15',
+                group: 'intro',
+                text: `Напоследок необходимо рассказать о том, как вы будете взаимодействовать с пушкой базы. 
+                Для того, чтобы стрелять необходимо навестить курсором мыши на место, куда необходимо будет произвести выстрел. Однако стоит обратить внимание на то, что пушка не может моментально развернуться, так что придётся немного подождать!`,
+                target: {type: 'none'},
+                trigger: {type: 'next'},
+                nextId: 'intro_16',
+                modal: true,
+                shown: false
+            },
+            {
+                id: "intro_16",
                 group: 'intro',
                 text: `На этом вступительная часть окончена, нажми далее, когда будешь готов приступать к игре!`,
-                target: {type: 'auto'},
+                target: {type: 'none'},
                 trigger: {type: 'next'},
                 nextId: null,
                 modal: true,
@@ -178,7 +192,10 @@ export class HintManager {
             this.eventEl = null;
             this.eventHandler = null;
         }
+    }
 
+    isGroupShown(groupId) {
+        return this.hints[groupId + '_1'].shown;
     }
 
     resetGroup(groupId) {
@@ -195,7 +212,7 @@ export class HintManager {
                 hint.shown = true;
             }
         })
-        this._endTutorial();
+        this.endTutorial();
     }
 
     isCompleteGroup(groupId) {
@@ -211,35 +228,27 @@ export class HintManager {
     }
 
     start(id) {
-        this._pauseGame();
-        this._showHint(id);
+        Game.pauseGame();
+        this.showHint(id);
     }
 
-    _showHint(id) {
-        console.log(this.hints);
+    showHint(id) {
         const hint = this.hints[id];
-        if (!hint) {
-            return;
-        }
-
-        if (hint.shown) {
-            return;
-        }
 
         hint.shown = true;
         this.current = hint;
 
-        this._highlightTarget(hint.target);
+        this.highlightTarget(hint.target);
 
         const isFinal = hint.group
             && this.finalHintByGroup[hint.group] === hint.id;
         const showNextBtn = (hint.trigger.type !== 'click' && Boolean(hint.nextId)) || isFinal;
 
-        this._renderTooltip(hint.text, showNextBtn);
-        this._attachTrigger(hint);
+        this.renderTooltip(hint.text, showNextBtn);
+        this.attachTrigger(hint);
     }
 
-    _attachTrigger(hint) {
+    attachTrigger(hint) {
         if (hint.trigger.type === 'click') {
             const el = document.querySelector(hint.trigger.selector);
             this.eventEl = el;
@@ -250,58 +259,51 @@ export class HintManager {
                     this.eventEl = null;
                     this.eventHandler = null;
                     this.overlay.style.display = 'block';
-                    this._onTrigger();
+                    this.onTrigger();
                 }, 50);
             }
 
             this.eventHandler = handler;
 
-            el.addEventListener('click', handler, { once: true });
+            el.addEventListener('click', handler, {once: true});
         }
 
         const nextBtn = this.tooltip.querySelector('.btn-next');
         if (nextBtn) {
-            nextBtn.addEventListener('click', () => this._onTrigger(), { once: true });
+            nextBtn.addEventListener('click', () => this.onTrigger(), {once: true});
         }
         const skipBtn = this.tooltip.querySelector('.btn-skip');
         if (skipBtn) {
-            skipBtn.addEventListener('click', () => this.skipGroup(this.current.group), { once: true });
+            skipBtn.addEventListener('click', () => this.skipGroup(this.current.group), {once: true});
         }
     }
 
-    _onTrigger() {
-        this._cleanupCurrent();
+    onTrigger() {
+        this.cleanupCurrent();
 
         if (this.current?.nextId) {
-            this._showHint(this.current.nextId);
+            this.showHint(this.current.nextId);
         } else {
-            this._endTutorial();
+            this.endTutorial();
         }
     }
 
-    _pauseGame() {
-        Game.pauseGame();
-    }
 
-    _resumeGame() {
-        Game.resumeGame();
-    }
-
-    _renderTooltip(htmlText, hasNext) {
+    renderTooltip(htmlText, hasNext) {
         if (this.tooltip) this.tooltip.remove();
         const tip = document.createElement('div');
         tip.classList.add('tooltip');
         tip.innerHTML = `
         <div class="tooltip-text">${htmlText}</div>
         ${hasNext ? '<button class="btn-next">Далее</button>' : ''}
-        ${this.current.start !== undefined ? '<button style="z-index: 250" class="btn-skip">Пропустить</button>': ''}`;
+        ${this.current.start !== undefined ? '<button style="z-index: 250" class="btn-skip">Пропустить</button>' : ''}`;
 
         document.querySelector("#game").appendChild(tip);
         this.tooltip = tip;
     }
 
 
-    _highlightTarget(target) {
+    highlightTarget(target) {
         this.overlay.style.display = 'block';
 
         if (target.type === 'dom') {
@@ -310,18 +312,20 @@ export class HintManager {
             const rect = el.getBoundingClientRect();
             const gameRect = document.querySelector("#game").getBoundingClientRect();
             const box = document.createElement('div');
+
             Object.assign(box.style, {
                 position: 'fixed',
-                top:    `${rect.top - gameRect.top}px`,
-                left:   `${rect.left - gameRect.left}px`,
-                width:  `${rect.width}px`,
+                top: `${rect.top - gameRect.top}px`,
+                left: `${rect.left - gameRect.left}px`,
+                width: `${rect.width}px`,
                 height: `${rect.height}px`,
-                boxSizing:    'border-box',
-                border:       '4px solid #FFD700',
+                boxSizing: 'border-box',
+                border: '4px solid #FFD700',
                 borderRadius: '4px',
-                pointerEvents:'none',
-                zIndex:       75
+                pointerEvents: 'none',
+                zIndex: 15
             });
+
             box.classList.add('hint-blink');
             document.querySelector("#game").appendChild(box);
             this.highlightBox = box;
@@ -329,28 +333,29 @@ export class HintManager {
 
     }
 
-    _cleanupCurrent() {
+    cleanupCurrent() {
         if (this.tooltip) this.tooltip.remove();
         if (this.highlightBox) this.highlightBox.remove();
     }
 
     hideTutorial() {
-        this._cleanupCurrent();
+        this.cleanupCurrent();
         if (this.overlay) {
             this.overlay.style.display = 'none';
         }
     }
 
-    _endTutorial() {
+    endTutorial() {
         this.hideTutorial();
         this.current = null;
-        this._resumeGame();
+        Game.resumeGame();
     }
 
 
-    _createOverlay() {
+    createOverlay() {
         const ov = document.createElement('div');
         ov.classList.add('hint-overlay');
+
         document.querySelector("#game").appendChild(ov);
         return ov;
     }

@@ -1,51 +1,116 @@
 import {WaveManager} from "./waveManager/waveManager.js"
 import {Game} from "../../game.js";
+import {CooldownTimer} from "../../timer/timer.js";
+import {EnemySpawner} from "../../entities/enemy/enemySpawner.js";
 
 export class LevelManager {
 
     static moneySpend = 0;
     static enemiesFeed = 0;
+    levelIsFinished = false;
+    levelIsStarted = false;
+    income;
 
-    constructor(levelsDescription) {
+    constructor() {
         this.currentLevel = 0;
-        this.levelsDescription = levelsDescription;
+        this.levelsDescription = Game.levelData;
         this.levelCount = this.levelsDescription.levelCount;
         this.waveManager = new WaveManager();
+
+        this.incomeDelay = 10;
+        this.incomeTimer = new CooldownTimer("Income timer", this.incomeDelay, {});
+
+        this.incomeTimer.onComplete = () => {
+            Game.points.increase(this.income);
+        }
+
     }
 
     reset() {
         this.currentLevel = 0;
-
         LevelManager.moneySpend = 0;
         LevelManager.enemiesFeed = 0;
-
-        this.waveManager.reset();
+        this.levelIsFinished = false;
+        this.levelIsStarted = false;
     }
 
-    startNextLevel() {
-        this.currentLevel += 1;
-        this.waveManager.currentWave = -1;
-        this.waveManager.waveCount = 0;
-        if (this.currentLevel > this.levelCount) {
-            console.log("This was last level ;(");
-            return;
+    initLevel() {
+        this.levelIsFinished = false;
+        this.levelIsStarted = false;
+
+        this.incomeTimer.pause();
+        this.incomeTimer.reset({});
+        this.incomeTimer.isShouldContinue = false;
+
+        this.income = this.levelsDescription.levels[this.currentLevel].income;
+        Game.points.currentPoints = this.levelsDescription.levels[this.currentLevel].startGold;
+        EnemySpawner.enemyHp = this.levelsDescription.levels[this.currentLevel].enemyHp;
+        EnemySpawner.enemyAttack = this.levelsDescription.levels[this.currentLevel].enemyAttack;
+        EnemySpawner.enemyReward = this.levelsDescription.levels[this.currentLevel].enemyReward;
+        EnemySpawner.eliteSpawnChance = this.levelsDescription.levels[this.currentLevel].eliteSpawnChance;
+
+        if (EnemySpawner.eliteSpawnChance !== 0) {
+            Game.startLevelPanel.setData({
+                level: this.currentLevel + 1,
+                money: Game.points.currentPoints,
+                income: this.income,
+                hp: EnemySpawner.enemyHp.common,
+                attack: EnemySpawner.enemyAttack.common,
+                reward: EnemySpawner.enemyReward.common,
+                elite: {
+                    chance:  EnemySpawner.eliteSpawnChance * 100,
+                    hp: EnemySpawner.enemyHp.elite,
+                    attack: EnemySpawner.enemyAttack.elite,
+                    reward: EnemySpawner.enemyReward.elite,
+                }
+            });
         }
-        this.waveManager.waveTimer.isShouldContinue = true;
+        else {
+            Game.startLevelPanel.setData({
+                level: this.currentLevel + 1,
+                money: Game.points.currentPoints,
+                income: this.income,
+                hp: EnemySpawner.enemyHp.common,
+                attack: EnemySpawner.enemyAttack.common,
+                reward: EnemySpawner.enemyReward.common,
+            });
+        }
+
+        this.waveManager.reset();
         this.waveManager.setLevelDescription(this.levelsDescription.levels[this.currentLevel]);
+        Game.renderStart();
+    }
+
+    startLevel() {
+        this.levelIsStarted = true;
+        this.levelIsFinished = false;
+        this.incomeTimer.isShouldContinue = true;
+        this.incomeTimer.resume();
         this.waveManager.startNextWave();
+
+        if (!Game.hintManager.isGroupShown("intro")) {
+            Game.hintManager.start('intro_1');
+        }
     }
 
     endLevel() {
-        console.log("end");
+        this.levelIsFinished = true;
+        this.levelIsStarted = false;
+        this.currentLevel += 1;
+        this.waveManager.currentWave = -1;
+        this.waveManager.waveCount = 0;
         this.waveManager.nextWavePopup.hide();
         setTimeout(() => Game.pauseGame(), 150);
-        Game.end = true;
-        Game.endLevelPanel.setStats({
-            "Уровень": this.currentLevel,
-            "Потрачено времемни:": Game.timer.toString(),
-            "Потрачено ресурсов:": LevelManager.moneySpend,
-            "Песцов накормлено:": LevelManager.enemiesFeed
-        })
-        Game.endLevelPanel.show();
+        if (this.currentLevel === this.levelCount) {
+            Game.endLevelPanel.showLast();
+        } else {
+            Game.endLevelPanel.setStats({
+                "Уровень": this.currentLevel,
+                "Потрачено времемни:": Game.timer.toString(),
+                "Потрачено ресурсов:": LevelManager.moneySpend,
+                "Песцов накормлено:": LevelManager.enemiesFeed
+            })
+            Game.endLevelPanel.show();
+        }
     }
 }

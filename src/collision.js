@@ -1,5 +1,5 @@
 import {rotatePoint} from "./utilities.js";
-import {Canvas} from "./entities/canvas/";
+import {Canvas} from "./canvas/";
 
 
 export class Collision {

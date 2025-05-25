@@ -2,7 +2,6 @@ import {Game} from "../game.js";
 
 export class GamePanel {
     constructor(containerId) {
-        this.container = document.getElementById(containerId);
         this._createPanel();
         this._bindEvents();
         this.hide();
@@ -35,11 +34,15 @@ export class GamePanel {
                         <div class="label">Голодные враги:</div>
                         <div class="value"><span id="ui-enemies">0</span></div>
                     </div>
+                    <div class="row income-row">
+                        <div class="label">Доход:</div>
+                        <div class="value"><span id="ui-income">0</span></div>
+                    </div>
             
                 </div>
             </div>
         `;
-        this.container.appendChild(this.el);
+        Game.gameDiv.appendChild(this.el);
 
         this.header = this.el.querySelector('.panel-header');
         this.uiTime = this.el.querySelector('#ui-time');
@@ -47,8 +50,10 @@ export class GamePanel {
         this.uiLevel = this.el.querySelector('#ui-level');
         this.uiWave = this.el.querySelector('#ui-wave');
         this.uiEnemies = this.el.querySelector('#ui-enemies');
+        this.uiIncome = this.el.querySelector('#ui-income');
 
         this._addIceIcon(this.uiGold);
+        this._addIceIcon(this.uiIncome);
     }
 
     _addIceIcon(valueSpan) {
@@ -77,7 +82,7 @@ export class GamePanel {
     }
 
     update(state) {
-        const { elapsedMs, gold, level, wave, enemies } = state;
+        const { elapsedMs, gold, level, wave, enemies, income } = state;
 
         const flash = (el, newValue) => {
             if (el.textContent !== String(newValue)) {
@@ -92,6 +97,7 @@ export class GamePanel {
         flash(this.uiLevel, level);
         flash(this.uiWave, `${wave}/${Game.levelManager.waveManager.waveCount}`);
         flash(this.uiEnemies, enemies);
+        flash(this.uiIncome, income);
     }
 
     _formatTime(secs) {
@@ -107,7 +113,7 @@ export class GamePanel {
     }
 
     hide() {
-        this.el.style.display = 'hide';
+        this.el.style.display = 'none';
         this.isActive = false;
     }
 }

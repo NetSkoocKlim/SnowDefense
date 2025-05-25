@@ -1,6 +1,7 @@
 import {Enemy} from "../enemy.js";
 import {EnemyAnimator} from "../../../spriteAnimator/spriteAnimator.js";
-import {Canvas} from "../../canvas";
+import {Canvas} from "../../../canvas";
+import {EnemySpawner} from "../enemySpawner.js";
 
 export class DefaultEnemy extends Enemy {
     static width = 28 * 8 * 0.1;
@@ -30,8 +31,10 @@ export class DefaultEnemy extends Enemy {
     }
 
     constructor() {
-        super(DefaultEnemy.width * Canvas.scale, DefaultEnemy.height * Canvas.scale, DefaultEnemy.speed * Canvas.scale, DefaultEnemy.createAnimator(), "default");
-        this.reward = 5;
+        super(DefaultEnemy.width * Canvas.scale, DefaultEnemy.height * Canvas.scale, DefaultEnemy.speed * Canvas.scale, DefaultEnemy.createAnimator(), "common");
+        this.reward = null;
+        this.damage = null;
+        this.maxHP = null;
     }
 
     static createAnimator() {

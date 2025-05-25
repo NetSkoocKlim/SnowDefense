@@ -1,5 +1,5 @@
 import {createDivElement, drawCircle} from "../../utilities.js";
-import {Canvas} from "../canvas";
+import {Canvas} from "../../canvas";
 import {Game} from "../../game.js";
 import {UpgradeMenu} from "../../gui/upgradeMenu.js";
 

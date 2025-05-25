@@ -1,20 +1,35 @@
 import {Game} from "./src/game.js";
+import {GameLoader} from "./src/gameLoader.js";
 import {
     addGunInteractionListeners,
     addPauseListeners,
     addTowerInteractionListeners,
     addInteractionMainMenu,
     addInteractionEscapeMenu, addBasePanelListeners,
+
 } from "./src/listeners.js";
+import {wait} from "./src/utilities.js";
+import {Canvas} from "./src/canvas";
 
 const start = async () => {
-    await Game.initGame()
-    addPauseListeners();
-    addGunInteractionListeners();
-    addTowerInteractionListeners();
-    addInteractionMainMenu();
-    addInteractionEscapeMenu();
-    addBasePanelListeners();
+    Canvas.initCanvas();
+    const loader = new GameLoader();
+    loader.show();
+
+    Promise.all([
+        await Game.initGame(),
+    ]).then(() => {
+        loader.hide();
+        addPauseListeners();
+        addGunInteractionListeners();
+        addTowerInteractionListeners();
+        addInteractionMainMenu();
+        addInteractionEscapeMenu();
+        addBasePanelListeners();
+        Game.mainMenu.show();
+    });
+
+
 }
 
 document.addEventListener("DOMContentLoaded", async () => {

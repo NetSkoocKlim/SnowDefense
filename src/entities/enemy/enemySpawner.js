@@ -11,6 +11,11 @@ export class EnemySpawner {
     static maxEnemyCount = 100;
     static _enemiesAlive = 0;
 
+    static eliteSpawnChance = 0;
+    static enemyHp;
+    static enemyAttack;
+    static enemyReward;
+
 
     static init() {
         EnemySpawner.initTimer();
@@ -39,14 +44,13 @@ export class EnemySpawner {
             enemy.reset();
         })
 
-        EnemySpawner.enemiesAlive = 0;
+        EnemySpawner.enemiesAlive = undefined;
     }
 
 
-
-    static spawnEnemy({side = null, count = 1, isElite=false}) {
+    static spawnEnemy({side = null, count = 1, isElite = false}) {
         for (let i = 0; i < count; i++) {
-            if (isElite || Math.random() < EliteEnemy.spawnChance) {
+            if (isElite || Math.random() < EnemySpawner.eliteSpawnChance) {
                 for (let j = 0; j < EnemySpawner.maxEnemyCount; j++) {
                     if (!EnemySpawner.eliteEnemies[j].isAlive) {
                         EnemySpawner.eliteEnemies[j].spawn({side});
@@ -67,19 +71,20 @@ export class EnemySpawner {
     }
 
     static setSpawnRate(spawnCount, seconds) {
-        EnemySpawner.spawnTimer.isShouldContinue = true;
-        EnemySpawner.spawnTimer.pause();
-        EnemySpawner.spawnTimer.reset({startTime: seconds});
-        EnemySpawner.spawnTimer.resume();
+        EnemySpawner.unsetSpawnRate();
+
         EnemySpawner.spawnTimer.onComplete = () => {
             EnemySpawner.spawnEnemy({side: null, count: spawnCount});
         }
+        EnemySpawner.spawnTimer.isShouldContinue = true;
+        EnemySpawner.spawnTimer.reset({startTime:seconds});
+        EnemySpawner.spawnTimer.resume();
     }
 
     static unsetSpawnRate() {
+        EnemySpawner.spawnTimer.onComplete = null;
         EnemySpawner.spawnTimer.pause();
         EnemySpawner.spawnTimer.reset({});
-        EnemySpawner.spawnTimer.onComplete = null;
         EnemySpawner.isShouldContinue = false;
     }
 
@@ -89,12 +94,18 @@ Object.defineProperty(EnemySpawner, 'enemiesAlive', {
     get() {
         return EnemySpawner._enemiesAlive;
     },
-    set(newVal){
-        EnemySpawner._enemiesAlive = newVal;
-        if (!Game.mainMenu.isActive && EnemySpawner._enemiesAlive === 0 && Game.levelManager.waveManager.waveComplete === true && Game.levelManager.waveManager.currentWave === Game.levelManager.waveManager.waveCount - 1) {
-            console.log("error");
-            Game.levelManager.endLevel();
+    set(newVal) {
+        if (newVal === undefined) {
+            EnemySpawner._enemiesAlive = 0;
         }
+        else {
+            EnemySpawner._enemiesAlive = newVal;
+            if (EnemySpawner._enemiesAlive === 0 && Game.levelManager.waveManager.waveComplete === true
+                && Game.levelManager.waveManager.currentWave === Game.levelManager.waveManager.waveCount - 1) {
+                Game.levelManager.endLevel();
+            }
+        }
+
     },
     configurable: true,
 })

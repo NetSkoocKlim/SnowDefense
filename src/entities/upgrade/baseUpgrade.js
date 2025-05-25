@@ -6,19 +6,19 @@ export class BaseUpgrade {
         value: 30,
     }, {
         nextUpgradeCost: 40,
-        value: 70
+        value: 50
     }, {
         nextUpgradeCost: 60,
-        value: 150,
+        value: 60,
     }, {
         nextUpgradeCost: 0,
-        value: 300
+        value: 95
     }
     ];
 
     static smoothingUpgradeLevels = [{
         nextUpgradeCost: 60,
-        value: 0.015,
+        value: 0.01,
     }, {
         nextUpgradeCost: 0,
         value: 0.03

@@ -1,11 +1,51 @@
 import {EnemySpawner} from "./entities/enemy/enemySpawner.js";
 import {EliteEnemy} from "./entities/enemy/enemyKind/eliteEnemy.js";
-import {Canvas} from "./entities/canvas";
+import {Canvas} from "./canvas";
 
 
 export class ObjType {
     static Base = Symbol();
     static Tower = Symbol();
+}
+
+export function wait(ms) {
+    const overlay = document.createElement('div');
+    Object.assign(overlay.style, {
+        position: 'fixed',
+        top: '0',
+        left: '0',
+        width: '100%',
+        height: '100%',
+        zIndex: '9999',
+        backgroundColor: 'transparent',
+    });
+    document.body.appendChild(overlay);
+
+    const blockEvent = e => {
+        e.stopPropagation();
+        e.preventDefault();
+        return false;
+    };
+
+    const events = [
+        'click', 'dblclick', 'mousedown', 'mouseup', 'mousemove',
+        'touchstart', 'touchmove', 'touchend',
+        'keydown', 'keyup', 'keypress',
+    ];
+
+    events.forEach(evt =>
+        document.addEventListener(evt, blockEvent, { capture: true })
+    );
+
+    return new Promise(resolve => {
+        setTimeout(() => {
+            document.body.removeChild(overlay);
+            events.forEach(evt =>
+                document.removeEventListener(evt, blockEvent, { capture: true })
+            );
+            resolve();
+        }, ms);
+    });
 }
 
 export function createImg(src, parent, className){
@@ -97,6 +137,12 @@ export function processHit(source) {
         if (source.type === ObjType.Base) {
             if (bullet.checkWallConflict(source)) {
                source.gun.bullets.splice(i, 1);
+            }
+            if (bullet.trianglePosition.x < 0 || bullet.trianglePosition.x > Canvas.width) {
+                source.gun.bullets.splice(i, 1);
+            }
+            if (bullet.trianglePosition.y < 0 || bullet.trianglePosition.y > Canvas.height) {
+                source.gun.bullets.splice(i, 1);
             }
         }
         let wasHit = false;

@@ -1,9 +1,9 @@
 import {Scene} from "./entities/scene/";
-import {Canvas} from "./entities/canvas/";
+import {Canvas} from "./canvas/";
 import {Game} from "./game.js";
 
 export const addInteractionEscapeMenu = () => {
-    window.addEventListener("keydown", event =>{
+    window.addEventListener("keydown", event => {
         if (event.code === "Escape") {
             if (Game.mainMenu.isActive === true) {
 
@@ -11,19 +11,17 @@ export const addInteractionEscapeMenu = () => {
             else if (Game.endLevelPanel.isActive === true) {
 
             }
+            else if (Game.gameOverPanel.isActive === true) {
+
+            }
             else {
                 if (!Game.escapeMenu.isActive) {
-                    document.querySelector(".escapeMenu").style.display = "block";
+                    Game.escapeMenu.show();
                     Game.pauseGame();
-                    Game.escapeMenu.isActive = true;
-
-                    Game.base.basePanel.show();
-                    Game.countDown.stop();
-                }
-                else {
-                    document.querySelector(".escapeMenu").style.display = "none";
-                    Game.escapeMenu.isActive = false;
-                    if (!Game.end && !Game.hintManager.current) Game.countDown.start();
+                } else {
+                    Game.escapeMenu.hideConfirmation();
+                    Game.escapeMenu.hide();
+                    if (!Game.levelManager.levelIsFinished && !Game.hintManager.current && Game.levelManager.levelIsStarted) Game.countDown.start();
                 }
             }
         }
@@ -31,34 +29,37 @@ export const addInteractionEscapeMenu = () => {
     });
 
     Game.escapeMenu.continueButton.addEventListener("click", () => {
-        document.querySelector(".escapeMenu").style.display = "none";
-        Game.escapeMenu.isActive = false;
-        if (!Game.end && !Game.hintManager.current) Game.countDown.start();
+        Game.escapeMenu.hide();
+        if (!Game.levelManager.levelIsFinished && !Game.hintManager.current && Game.levelManager.levelIsStarted) Game.countDown.start();
     });
 
     Game.escapeMenu.exitButton.addEventListener("click", () => {
-        document.querySelector(".escapeMenu").style.display = "none";
-        Game.mainMenu.show();
+        Game.escapeMenu.showConfirmation();
     });
 }
 
+export const addInteractionMainMenu = () => {
+    Game.mainMenu.newGameButton.addEventListener("click", async () => {
+        if (Game.mainMenu.isActive === true) {
+            await Game.mainMenu.hideAndRestartGame();
+        }
+    })
 
-export const addInteractionMainMenu = ()=> {
-    Game.mainMenu.button.addEventListener("click", (event)=>{
-        Game.mainMenu.hideAndRestartGame();
+    Game.mainMenu.continueButton.addEventListener("click", async () => {
+        if (Game.mainMenu.isActive === true) {
+            if (!Game.gameIsNotStarted) await Game.mainMenu.hideAndContinueGame();
+        }
+
     })
 }
 
 export const addPauseListeners = () => {
     window.addEventListener('blur', () => {
-        if (Game.mainMenu.isActive || Game.endLevelPanel.isActive) {return}
-        Game.escapeMenu.isActive = true;
-        document.querySelector(".escapeMenu").style.display = "block";
+        if (Game.mainMenu.isActive || Game.escapeMenu.isActive || Game.endLevelPanel.isActive || Game.gameOverPanel.isActive || Game.startLevelPanel.isActive) {
+            return
+        }
+        Game.escapeMenu.show();
         Game.pauseGame();
-        Game.base.basePanel.upgradePanel.hide();
-        Game.base.basePanel.shopPanel.hide();
-        Game.base.basePanel.show();
-        Game?.countDown.stop();
     });
 }
 
@@ -113,7 +114,7 @@ export const addBasePanelListeners = () => {
                 Game.base.gun.reloadTimer.reset({startTime: upgrade.value.value});
             }
             Game.base.basePanel.upgradePanel.updateAll();
-            Game.panel.update({ gold: Game.points.currentPoints });
+            Game.panel.update({gold: Game.points.currentPoints});
         });
     });
 

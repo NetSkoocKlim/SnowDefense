@@ -1,4 +1,4 @@
-import {Canvas} from "../../entities/canvas";
+import {Canvas} from "../../canvas";
 import {Game} from "../../game.js";
 
 export class BaseUpgradePanel {

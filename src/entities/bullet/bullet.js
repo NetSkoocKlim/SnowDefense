@@ -1,6 +1,6 @@
 import {CircleCollision, Collision, PolygonCollision} from "../../collision.js";
 import {getTriangleBorder} from "../../utilities.js";
-import {Canvas} from "../canvas/";
+import {Canvas} from "../../canvas/";
 
 export class Bullet {
 

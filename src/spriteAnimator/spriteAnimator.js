@@ -1,5 +1,5 @@
 import {CooldownTimer} from "../timer/timer.js";
-import {Canvas} from "../entities/canvas";
+import {Canvas} from "../canvas";
 
 class SpriteAnimator {
     constructor(name) {

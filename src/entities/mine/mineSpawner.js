@@ -1,7 +1,7 @@
 import {CooldownTimer} from "../../timer/timer.js";
 import {Mine} from "./mine.js";
 import {MineUpgrade} from "../upgrade/mineUpgrade.js";
-import {Canvas} from "../canvas";
+import {Canvas} from "../../canvas";
 
 
 export class MineSpawner {

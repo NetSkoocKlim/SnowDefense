@@ -1,6 +1,6 @@
 import {Collision, PolygonCollision} from "../../collision.js";
 import {getRectangleBorders} from "../../utilities.js";
-import {Canvas} from "../canvas";
+import {Canvas} from "../../canvas";
 import {Game} from "../../game.js";
 
 export class Way {

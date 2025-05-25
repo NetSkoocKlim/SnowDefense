@@ -12,7 +12,7 @@ export class NextWavePopup {
     showNextWaveTimer() {
         this.popup.innerHTML = `
       <div class="popup-content">
-        Следующая волна через <span class="time">${Game.levelManager.waveManager.waveEndTimer.seconds}</span> секунд
+        Следующая волна через <span class="time">${Game.levelManager.waveManager.waveEndTimer.seconds}</span>
       </div>
     `;
         this.timeElem = this.popup.querySelector('.time');

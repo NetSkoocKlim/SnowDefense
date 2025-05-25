@@ -3,7 +3,7 @@ import {Upgrade} from "./upgrade.js";
 export class TowerUpgrade {
     static attackUpgradeLevels = [{
         nextUpgradeCost: 15,
-        value: 100,
+        value: 15,
     }, {
         nextUpgradeCost: 25,
         value: 25

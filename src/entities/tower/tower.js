@@ -1,4 +1,4 @@
-import {Canvas} from "../canvas/";
+import {Canvas} from "../../canvas/";
 import {TowerGun} from "../gun/";
 import {ObjType} from "../../utilities.js";
 import {Game} from "../../game.js";

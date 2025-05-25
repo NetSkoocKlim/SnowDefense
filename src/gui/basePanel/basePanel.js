@@ -1,5 +1,5 @@
 import {Game} from "../../game.js";
-import {Canvas} from "../../entities/canvas";
+import {Canvas} from "../../canvas";
 import {BaseUpgradePanel} from "./baseUpgradePanel.js";
 import {ShopPanel} from "./shopPanel.js";
 
@@ -92,10 +92,6 @@ export class BasePanel {
             this.reloadFill.style.width = pct + '%';
             this.reloadText.textContent = timeLeft.toFixed(1) + 'с';
         }
-    }
-
-    onUpgradeClick(callback) {
-        this.upgradeBtn.addEventListener('click', callback);
     }
 
     onExtraClick(callback) {
