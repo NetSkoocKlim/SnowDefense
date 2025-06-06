@@ -1,6 +1,8 @@
 import {CircleCollision, Collision, PolygonCollision} from "../../collision.js";
-import {getTriangleBorder} from "../../utilities.js";
-import {Canvas} from "../../canvas/";
+import {getTriangleBorder, ObjType} from "../../utilities.js";
+import {Canvas} from "../../canvas/canvas.js";
+import {EnemySpawner} from "../enemy/enemySpawner.js";
+import {EliteEnemy} from "../enemy/enemyKind/eliteEnemy.js";
 
 export class Bullet {
 
@@ -51,6 +53,36 @@ export class Bullet {
         this.circlePosition.y   += this.velocity.y * this.speed;
     }
 
+    processHit(gun, bulletInd) {
+        let wasHit = false;
+        for (let j = EnemySpawner.enemies.length - 1; j >= 0; j--) {
+            let enemy = EnemySpawner.enemies[j];
+            if (enemy.isAlive && this.checkHit(enemy)) {
+                gun.bullets.splice(bulletInd, 1);
+                enemy.handleDamage(gun.attackDamage);
+                wasHit = true;
+                break;
+            }
+        }
+        for (let j = EnemySpawner.eliteEnemies.length - 1; j >= 0; j--) {
+            let enemy = EnemySpawner.eliteEnemies[j];
+            if (enemy.isAlive && enemy.currentState !== "Hidden" && this.checkHit(enemy)) {
+                if (Math.random() <= EliteEnemy.disappearChance) {
+                    enemy.setHide();
+                }
+                else {
+                    gun.bullets.splice(bulletInd, 1);
+                    enemy.handleDamage(gun.attackDamage);
+                    wasHit = true;
+                }
+                break;
+            }
+        }
+        if (!wasHit) {
+            this.update(gun, bulletInd);
+        }
+    }
+
     draw({ collision = false } = {}) {
         Canvas.ctx.save();
         Canvas.ctx.translate(this.circlePosition.x, this.circlePosition.y);
@@ -63,9 +95,9 @@ export class Bullet {
             this.imgHeight
         );
         Canvas.ctx.restore();
-        // if (collision) {
-        //     this.collisions.triangleCollision.draw();
-        //     this.collisions.circleCollision.draw();
-        // }
+        if (collision) {
+            this.collisions.triangleCollision.draw();
+            this.collisions.circleCollision.draw();
+        }
     }
 }

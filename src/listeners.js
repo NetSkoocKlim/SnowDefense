@@ -1,5 +1,5 @@
-import {Scene} from "./entities/scene/";
-import {Canvas} from "./canvas/";
+import {Scene} from "./entities/scene/scene.js";
+import {Canvas} from "./canvas/canvas.js";
 import {Game} from "./game.js";
 
 export const addInteractionEscapeMenu = () => {
@@ -21,7 +21,7 @@ export const addInteractionEscapeMenu = () => {
                 } else {
                     Game.escapeMenu.hideConfirmation();
                     Game.escapeMenu.hide();
-                    if (!Game.levelManager.levelIsFinished && !Game.hintManager.current && Game.levelManager.levelIsStarted) Game.countDown.start();
+                    if (!Game.levelManager.levelIsFinished && !Game.hintManager.current && !Game.startLevelPanel.isActive) Game.countDown.start();
                 }
             }
         }
@@ -30,7 +30,7 @@ export const addInteractionEscapeMenu = () => {
 
     Game.escapeMenu.continueButton.addEventListener("click", () => {
         Game.escapeMenu.hide();
-        if (!Game.levelManager.levelIsFinished && !Game.hintManager.current && Game.levelManager.levelIsStarted) Game.countDown.start();
+        if (!Game.levelManager.levelIsFinished && !Game.hintManager.current && !Game.startLevelPanel.isActive) Game.countDown.start();
     });
 
     Game.escapeMenu.exitButton.addEventListener("click", () => {
@@ -65,6 +65,9 @@ export const addPauseListeners = () => {
 
 export const addGunInteractionListeners = () => {
     Canvas.canvas.addEventListener('click', () => {
+        Game.towers.forEach((tower) => {
+            tower.towerMenu.hide();
+        })
         Game.base.gun.fire();
     })
 
@@ -85,7 +88,15 @@ export const addTowerInteractionListeners = () => {
         })
 
         place.towerPlaceDiv.addEventListener('click', () => {
-            place.handleTowerPlaceClick();
+            if (place.placedTower.towerMenu.isActive) {
+                place.placedTower.towerMenu.hide();
+            }
+            else {
+                Scene.towerPlaces.forEach(place => {
+                    place.placedTower.towerMenu.hide();
+                })
+                place.placedTower.towerMenu.show();
+            }
         });
     })
 }
@@ -114,7 +125,7 @@ export const addBasePanelListeners = () => {
                 Game.base.gun.reloadTimer.reset({startTime: upgrade.value.value});
             }
             Game.base.basePanel.upgradePanel.updateAll();
-            Game.panel.update({gold: Game.points.currentPoints});
+            Game.statsPanel.update({gold: Game.points.currentPoints});
         });
     });
 

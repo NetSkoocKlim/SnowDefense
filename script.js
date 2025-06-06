@@ -8,8 +8,11 @@ import {
     addInteractionEscapeMenu, addBasePanelListeners,
 
 } from "./src/listeners.js";
-import {wait} from "./src/utilities.js";
-import {Canvas} from "./src/canvas";
+import {Canvas} from "./src/canvas/canvas.js";
+
+import {AudioLoader} from "./src/audio/audioLoader.js";
+import {audioList} from "./src/audio/audioList.js";
+
 
 const start = async () => {
     Canvas.initCanvas();
@@ -17,8 +20,9 @@ const start = async () => {
     loader.show();
 
     Promise.all([
-        await Game.initGame(),
+        await AudioLoader.loadAll(audioList)
     ]).then(() => {
+        Game.initGame();
         loader.hide();
         addPauseListeners();
         addGunInteractionListeners();
@@ -28,7 +32,6 @@ const start = async () => {
         addBasePanelListeners();
         Game.mainMenu.show();
     });
-
 
 }
 
@@ -46,7 +49,6 @@ window.addEventListener("contextmenu", (event) => {
 })
 
 window.addEventListener('keydown', (event) => {
-    console.log(event.code);
     if (event.code !== 'F5' && event.code !== "F12") {
         event.preventDefault();
     }

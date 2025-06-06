@@ -40,7 +40,7 @@ export class BaseUpgrade {
     ];
 
     static startUpgrades = {
-        attack: new Upgrade("Атака", BaseUpgrade.attackUpgradeLevels, "Атаку сильнее!"),
+        attack: new Upgrade("Атака", BaseUpgrade.attackUpgradeLevels, "Увеличь сытность своих снарядов!"),
         smoothing: new Upgrade("Скорость вращения", BaseUpgrade.smoothingUpgradeLevels, "Не позволь врагу подобраться со спины!"),
         reloadTime: new Upgrade("Время перезарядки", BaseUpgrade.reloadUpgradeLevels, "Стреляй быстрее!")
     }

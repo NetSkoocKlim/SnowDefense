@@ -1,6 +1,9 @@
 import {createButton, createDivElement, createImg, wait} from "../../utilities.js";
 import {Game} from "../../game.js";
-import {Canvas} from "../../canvas";
+import {Canvas} from "../../canvas/canvas.js";
+import {Scene} from "../../entities/scene/scene.js";
+import {AudioFader} from "../../audio/audioFader.js";
+import {AudioLoader} from "../../audio/audioLoader.js";
 
 export class MainMenu {
     constructor() {
@@ -13,6 +16,9 @@ export class MainMenu {
         this.initMainMenu();
         this.isActive = true;
         this.hideInstant();
+
+        const menuAudioElement = AudioLoader.items["menuMusic"];
+        this.menuAudio = new AudioFader(menuAudioElement, { volume: 0.7 });
     }
 
     initMainMenu() {
@@ -53,10 +59,15 @@ export class MainMenu {
         Game.hintManager.hideTutorial();
         Game.base.basePanel.hide();
         Game.levelManager.waveManager.nextWavePopup.hide();
-        Game.panel.hide();
+        Game.statsPanel.hide();
         Game.startLevelPanel.hide();
+        Scene.towerPlaces.forEach(place => {
+            place.placedTower.towerMenu.hide();
+        })
 
-        await wait(2500);
+        Game.stopDrawing();
+
+        await wait(2000);
         this.isActive = true;
         Game.escapeMenu.isActive = false;
         this.mainScreen.style.display = "block";
@@ -70,13 +81,32 @@ export class MainMenu {
             Game.hintManager.resetGroup('intro');
         }
 
+
+        this.menuAudio.fadeIn(1000)
+            .then(() => {
+            })
+            .catch(() => {
+                const onUserGesture = () => {
+                    this.menuAudio.fadeIn(1000).catch(() => {});
+                    window.removeEventListener("mousedown", onUserGesture);
+                    window.removeEventListener("keydown", onUserGesture);
+                    window.removeEventListener("touchstart", onUserGesture);
+                };
+                window.addEventListener("mousedown", onUserGesture, { once: true });
+                window.addEventListener("keydown", onUserGesture, { once: true });
+                window.addEventListener("touchstart", onUserGesture, { once: true });
+            });
+
+        this.overlay.classList.remove("active");
+
         this.overlay.classList.remove("active");
     }
 
     async hide() {
         this.isActive = false;
         this.overlay.classList.add("active");
-        await wait(4000);
+        this.menuAudio.fadeOut(800);
+        await wait(3000);
         this.mainScreen.style.display = "none";
         this.overlay.classList.remove("active");
     }
@@ -97,6 +127,8 @@ export class MainMenu {
         this.mainScreen.style.display = "none";
         this.isActive = false;
         this.overlay.classList.remove("active");
+
+        if (this.menuAudio!== undefined) this.menuAudio.stopInstant();
     }
 }
 

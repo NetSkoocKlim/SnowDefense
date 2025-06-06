@@ -50,6 +50,7 @@ export class EscapeMenu {
     show() {
         this.isActive = true;
         this.escapeMenu.style.display = "block";
+        Game.stopDrawing();
 
         Game.base.basePanel.upgradePanel.hide();
         Game.base.basePanel.shopPanel.hide();

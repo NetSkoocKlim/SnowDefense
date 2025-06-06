@@ -1,8 +1,9 @@
 import {EnemySpawner} from "../enemy/enemySpawner.js";
 import {CircleCollision, Collision} from "../../collision.js";
 import {Game} from "../../game.js";
-import {Canvas} from "../../canvas";
+import {Canvas} from "../../canvas/canvas.js";
 import {MineSpawner} from "./mineSpawner.js";
+import {SpriteAnimator} from "../../spriteAnimator/spriteAnimator.js";
 
 export class Mine {
     position;
@@ -13,17 +14,24 @@ export class Mine {
 
         this.explosionCollision = new CircleCollision(this.position, MineSpawner.explosionRadius);
         this.mineCollision = new CircleCollision(this.position, this.size/2);
+        this.explodeAnimator = new SpriteAnimator("Explode");
+        this.explodeAnimator.frameDelay = 0.5;
+        this.explodeAnimator.frameDelayTimer.reset({});
 
         this.mineImg = new Image();
         this.mineImg.src = "./assets/mine/mine.png";
+
+        this.explodeImg = new Image();
+        this.explodeImg.src = "./assets/mine/explosion.png";
+
+        this.explodeAnimator.changeAnimation(this.explodeImg, 1312, 214, 8);
     }
 
     reset() {
         this.isExplode = true;
-
     }
 
-    isEnemyInRadius() {
+    enemyInRadius() {
         for (let i = 0;i<EnemySpawner.enemies.length;i++) {
             let enemy = EnemySpawner.enemies[i];
             if (enemy.isAlive) {
@@ -48,6 +56,7 @@ export class Mine {
     }
 
     spawn() {
+        this.state = "placed";
         let side = Math.floor(Math.random() * 4) + 1;
         switch (side) {
             case 1:
@@ -82,6 +91,7 @@ export class Mine {
 
     explode() {
         this.isExplode = true;
+        this.explodeAnimator.stopAnimation();
         EnemySpawner.enemies.forEach((enemy) => {
             if (enemy.isAlive) {
                 if (Collision.checkPolygonAndCircleCollision(enemy.collisions.head, this.explosionCollision) ||
@@ -102,12 +112,32 @@ export class Mine {
         })
     }
 
+    beginExplosion() {
+        this.explodeAnimator.resumeAnimation();
+        this.state = "Exploding";
+    }
+
     draw({collision= false}) {
-        Canvas.ctx.drawImage(this.mineImg, 0, 0, 893, 957, this.position.x, this.position.y, this.size, this.size);
-        // if (collision) {
-        //     this.explosionCollision.draw();
-        //     this.mineCollision.draw();
-        // }
+        if (this.state === "placed") {
+            Canvas.ctx.drawImage(this.mineImg, 0, 0, 893, 957, this.position.x, this.position.y, this.size, this.size);
+            if (collision) {
+                this.explosionCollision.draw();
+                this.mineCollision.draw();
+            }
+        }
+        else {
+            Canvas.ctx.save();
+            Canvas.ctx.translate(this.position.x, this.position.y);
+            Canvas.ctx.drawImage(
+                this.explodeAnimator.spriteImg,
+                this.explodeAnimator.spriteWidth * this.explodeAnimator.currentFrame, 0, this.explodeAnimator.spriteWidth, this.explodeAnimator.spriteHeight,
+                -MineSpawner.explosionRadius / 2, -(MineSpawner.explosionRadius*1.3) / 2, MineSpawner.explosionRadius, MineSpawner.explosionRadius * 1.3
+            );
+            Canvas.ctx.restore();
+            if (this.explodeAnimator.currentFrame === this.explodeAnimator.framesCount - 1) {
+                this.explode();
+            }
+        }
     }
 
 }

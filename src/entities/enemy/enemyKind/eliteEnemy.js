@@ -1,14 +1,12 @@
 import {Enemy} from "../enemy.js";
 import {EnemyAnimator} from "../../../spriteAnimator/spriteAnimator.js";
-import {Canvas} from "../../../canvas";
+import {Canvas} from "../../../canvas/canvas.js";
 import {CooldownTimer} from "../../../timer/timer.js";
-import {EnemySpawner} from "../enemySpawner.js";
 
 export class EliteEnemy extends Enemy {
     static width = 32 * 8 * 0.1;
     static height = 69 * 8 * 0.1;
     static speed = 0.35;
-    static spawnChance = 0.05;
     static disappearChance = 0.0006;
 
     headCollisionScales = {
@@ -57,10 +55,10 @@ export class EliteEnemy extends Enemy {
             height: 552
         }
         let attackSprite = {
-            path: "move/sprite.png",
-            frameCount: 4,
-            width: 1024,
-            height: 552
+            path: "attack/sprite.png",
+            frameCount: 3,
+            width: 744,
+            height: 563
         }
         let hideSprite = {
             path: "hide/sprite.png",

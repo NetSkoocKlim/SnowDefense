@@ -1,23 +1,22 @@
-import {Scene} from "./entities/scene/";
-import {Canvas} from "./canvas/";
+import {Scene} from "./entities/scene/scene.js";
+import {Canvas} from "./canvas/canvas.js";
 import {Points} from "./entities/points.js";
-import {processHit} from "./utilities.js";
 import {IncrementTimer, Timer} from "./timer/timer.js";
 import {EnemySpawner} from "./entities/enemy/enemySpawner.js";
 import {LevelManager} from "./level/levelManager/levelManager.js";
-import {MainMenu} from "./gui/menu/mainMenu.js";
-import {Tower} from "./entities/tower";
+import {MainMenu} from "./ui/menu/mainMenu.js";
+import {Tower} from "./entities/tower/tower.js";
 import {MineSpawner} from "./entities/mine/mineSpawner.js";
-import {Base} from "./entities/base";
-import {GamePanel} from "./gui/gamePanel.js";
-import {HintManager} from "./gui/hints/hintManager.js";
-import {BasePanel} from "./gui/basePanel/basePanel.js";
-import {CountdownDisplay} from "./gui/countDown.js";
-import {EndLevelPanel} from "./gui/endLevelPanel.js";
-import {EscapeMenu} from "./gui/menu/escapeMenu.js";
-import {GameOverPanel} from "./gui/gameOverPanel.js";
+import {Base} from "./entities/base/base.js";
+import {GamePanel} from "./ui/gamePanel.js";
+import {HintManager} from "./ui/hints/hintManager.js";
+import {BasePanel} from "./ui/basePanel/basePanel.js";
+import {CountdownDisplay} from "./ui/countDown.js";
+import {EndLevelPanel} from "./ui/endLevelPanel.js";
+import {EscapeMenu} from "./ui/menu/escapeMenu.js";
+import {GameOverPanel} from "./ui/gameOverPanel.js";
 import {LevelInitializer} from "./level/levelInitializer.js";
-import {LevelStartPanel} from "./gui/startLevelPanel.js";
+import {LevelStartPanel} from "./ui/startLevelPanel.js";
 
 
 export class Game {
@@ -27,7 +26,7 @@ export class Game {
     static timer;
     static levelManager;
     static towers = [];
-    static panel;
+    static statsPanel;
     static hintManager;
     static gamePause = false;
     static drawIsActive = false;
@@ -35,22 +34,27 @@ export class Game {
     static countDown;
     static gameIsNotStarted = true;
 
-    static async initGame() {
+    static initGame() {
         Game.initBorder();
         this.gameDiv = document.querySelector("#game");
         Game.mainMenu = new MainMenu();
         Game.escapeMenu = new EscapeMenu();
         Game.levelData = LevelInitializer.initLevels();
         Game.levelManager = new LevelManager();
-        Game.panel = new GamePanel('statistic-container', {
-            totalWaves: Game.levelManager.levelCount
-        });
+
         Game.points = new Points();
         Game.base = new Base();
         Game.base.basePanel = new BasePanel();
-        Game.scene = new Scene();
         Tower.initTowers();
+        Game.scene = new Scene();
         Game.timer = new IncrementTimer("GameTimer");
+
+        Game.timer.onTick = () => {
+            Game.statsPanel.update({
+                elapsedMs: Game.timer.time,
+            });
+        }
+
         Game.timer.isShouldContinue = true;
         EnemySpawner.init();
         MineSpawner.init();
@@ -60,6 +64,9 @@ export class Game {
                 animationDuration: 800,
             }
         )
+        Game.statsPanel = new GamePanel('statistic-container', {
+            totalWaves: Game.levelManager.levelCount
+        });
         Game.endLevelPanel = new EndLevelPanel({
             parent: document.querySelector("#game"),
             stats: {},
@@ -110,10 +117,11 @@ export class Game {
             }
         });
         Game.gamePause = true;
-        Game.drawIsActive = false;
+        Game.stopDrawing();
     }
 
     static resumeGame() {
+
         if (Game.hintManager.current !== null) return;
         if (Game.mainMenu.isActive || Game.escapeMenu.isActive || Game.endLevelPanel.isActive || Game.gameOverPanel.isActive) return;
         Game.gamePause = false;
@@ -124,14 +132,14 @@ export class Game {
         Timer.timers.forEach(timer => {
             if (timer.isShouldContinue && timer.timerId === null) timer.resume();
         });
-        if (!Game.levelManager.levelIsStarted) {
-            Game.startLevelPanel.show();
-        }
         if (!Game.base.basePanel.upgradePanel.active && !Game.base.basePanel.visible) {
             Game.base.basePanel.show();
         }
-        if (!Game.panel.isActive) {
-            Game.panel.show();
+        if (!Game.statsPanel.isActive) {
+            Game.statsPanel.show();
+        }
+        if (!Game.levelManager.levelIsStarted) {
+            Game.startLevelPanel.show();
         }
         if (!Game.drawIsActive) {
             Game.drawIsActive = true;
@@ -144,13 +152,21 @@ export class Game {
         if (!Game.base.basePanel.upgradePanel.active && !Game.base.basePanel.visible) {
             Game.base.basePanel.show();
         }
-        if (!Game.panel.isActive) {
-            Game.panel.show();
+        if (!Game.statsPanel.isActive) {
+            Game.statsPanel.show();
         }
         Game.draw({once: true});
     }
 
+    static stopDrawing() {
+        Game.drawIsActive = false;
+        cancelAnimationFrame(Game.animationId);
+    }
+
     static draw({once= false}) {
+        Game.animationId = requestAnimationFrame(() => {
+            Game.draw({})
+        });
 
         Canvas.ctx.clearRect(0, 0, Canvas.width, Canvas.height);
 
@@ -186,38 +202,30 @@ export class Game {
         MineSpawner.mines.forEach(mine => {
             if (!mine.isExplode) {
                 mine.draw({collision: true});
-                mine.isEnemyInRadius() && mine.explode();
+                if (mine.enemyInRadius()) mine.beginExplosion();
             }
         });
+
 
         Game.towers.forEach(tower => {
             if (tower.isActive) {
                 tower.draw({collision: false});
-                tower.gun.isEnemyInRadius();
-                processHit(tower);
+                for (let i = tower.gun.bullets.length - 1; i>=0;i--) {
+                    let bullet = tower.gun.bullets[i];
+                    bullet.draw({});
+                    bullet.processHit(tower.gun, i);
+                }
             }
         });
 
-        processHit(Game.base);
-
-        Game.panel.update({
-            elapsedMs: Game.timer.time,
-            gold: Game.points.currentPoints,
-            level: Game.levelManager.currentLevel + 1,
-            wave: Game.levelManager.waveManager.currentWave + 1,
-            enemies: EnemySpawner.enemiesAlive,
-            income: Game.levelManager.income
-        });
-
-        Game.base.basePanel.update();
-
-        if (Game.mainMenu.isActive || Game.escapeMenu.isActive || Game.gamePause) {
-            Game.drawIsActive = false;
-            return;
+        for (let i = Game.base.gun.bullets.length - 1; i>=0;i--) {
+            let bullet = Game.base.gun.bullets[i];
+            bullet.draw({});
+            bullet.processHit(Game.base.gun, i);
         }
 
-        if (once!==true) requestAnimationFrame(() => {
-            Game.draw({})
-        });
+        if (once) {
+            Game.stopDrawing();
+        }
     }
 }

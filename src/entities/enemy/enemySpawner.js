@@ -8,7 +8,7 @@ export class EnemySpawner {
     static enemies = [];
     static eliteEnemies = [];
     static spawnTimer;
-    static maxEnemyCount = 100;
+    static maxEnemyCount = 40;
     static _enemiesAlive = 0;
 
     static eliteSpawnChance = 0;
@@ -49,8 +49,10 @@ export class EnemySpawner {
 
 
     static spawnEnemy({side = null, count = 1, isElite = false}) {
+        console.log('spawned');
         for (let i = 0; i < count; i++) {
-            if (isElite || Math.random() < EnemySpawner.eliteSpawnChance) {
+            let chance = Math.random();
+            if (chance < EnemySpawner.eliteSpawnChance || isElite) {
                 for (let j = 0; j < EnemySpawner.maxEnemyCount; j++) {
                     if (!EnemySpawner.eliteEnemies[j].isAlive) {
                         EnemySpawner.eliteEnemies[j].spawn({side});
@@ -105,7 +107,9 @@ Object.defineProperty(EnemySpawner, 'enemiesAlive', {
                 Game.levelManager.endLevel();
             }
         }
-
+        Game.statsPanel.update({
+            enemies: EnemySpawner.enemiesAlive,
+        });
     },
     configurable: true,
 })

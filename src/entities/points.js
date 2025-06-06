@@ -1,4 +1,5 @@
 import {LevelManager} from "../level/levelManager/levelManager.js";
+import {Game} from "../game.js";
 
 export class Points {
     constructor() {
@@ -9,18 +10,30 @@ export class Points {
         this.currentPoints = 100;
     }
 
-    setPoints(points) {
-        this.currentPoints = points;
-    }
-
     increase(value) {
         this.currentPoints += value;
+        Game.statsPanel.update({
+            gold: Game.points.currentPoints,
+        });
+        Game.base.basePanel.updateEntries();
+        Game.towers.forEach(
+            (tower) => {
+                tower.towerMenu.updateBuyButton();
+            }
+        )
     }
 
     decrease(value) {
         this.currentPoints -= value;
         LevelManager.moneySpend += value;
-
+        Game.statsPanel.update({
+            gold: Game.points.currentPoints,
+        });
+        Game.base.basePanel.updateEntries();
+        Game.towers.forEach(
+            (tower) => {
+                tower.towerMenu.updateBuyButton();
+            }
+        )
     }
-
 }

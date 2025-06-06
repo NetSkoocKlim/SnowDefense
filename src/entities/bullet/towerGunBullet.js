@@ -21,8 +21,18 @@ export class TowerGunBullet extends Bullet {
         return this.dot(V, D) / this.dot(D, D) >= 1 || Math.sqrt(this.dot(V, V)) >= this.maxDist;
     }
 
+
     dot(v1, v2) {
         return v1.x*v2.x + v1.y*v2.y;
     }
+
+    update(gun, bulletInd) {
+        if (this.checkEnd()) {
+            gun.bullets.splice(bulletInd, 1);
+            return;
+        }
+        super.update();
+    }
+
 
 }

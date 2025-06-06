@@ -1,6 +1,6 @@
 import {getRectangleBorders} from "../../utilities.js";
 import {Collision, PolygonCollision} from "../../collision.js";
-import {Canvas} from "../../canvas/";
+import {Canvas} from "../../canvas/canvas.js";
 import {Game} from "../../game.js";
 import {CooldownTimer} from "../../timer/timer.js";
 import {EnemySpawner} from "./enemySpawner.js";
@@ -194,8 +194,6 @@ export class Enemy {
 
     setMove() {
         this.enemyAnimator.toggleMoveAnimation();
-        this.imgSourceHeight = this.enemyAnimator.spriteHeight;
-        this.imgSourceWidth = this.enemyAnimator.spriteWidth;
         this.imgDestHeight = this.height;
         this.imgDestWidth = this.width;
         if (this.side === 1 || this.side === 3) {
@@ -220,7 +218,6 @@ export class Enemy {
         this.currentHP = this.maxHP;
     }
 
-
     handleAttack() {
         if (this.attackCooldownTimer.timerId === null) {
             if (this.enemyAnimator.currentFrame === this.enemyAnimator.framesCount - 1) {
@@ -241,14 +238,16 @@ export class Enemy {
 
     attack() {
         this.enemyAnimator.currentFrame = 0;
-        if (Game.base.healthPoints - this.damage < 0) {
+        if (Game.base.healthPoints - this.damage <= 0) {
             Game.base.healthPoints = 0;
+            Game.base.basePanel.updateHP();
             Game.pauseGame();
             if (!Game.gameOverPanel.isActive)
             Game.gameOverPanel.show();
             return;
         }
         Game.base.healthPoints -= this.damage;
+        Game.base.basePanel.updateHP();
     }
 
     move() {

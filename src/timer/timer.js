@@ -7,6 +7,7 @@ export class Timer {
         this.name = name;
         this.time = 0;
         this.timerId = null;
+        this.onTick = null;
         this.isShouldContinue = false;
         Timer.timers.push(this);
     }
@@ -63,6 +64,9 @@ export class IncrementTimer extends Timer {
     runTimer() {
         this.time += 0.05;
         this.checkEvents();
+        if (this.onTick !== null) {
+            this.onTick();
+        }
         super.runTimer();
     }
 
@@ -77,11 +81,11 @@ export class CooldownTimer extends Timer {
         this.startTime = startTime;
         this.time = this.startTime;
         this.onComplete = null;
-        this.onTick = null;
         this.shouldReset = shouldReset;
     }
 
     runTimer() {
+
         this.time -= 0.05;
         if (this.time <= 0) {
             if (this.onComplete !== null) {

@@ -3,7 +3,7 @@ import {Upgrade} from "./upgrade.js";
 export class TowerUpgrade {
     static attackUpgradeLevels = [{
         nextUpgradeCost: 15,
-        value: 15,
+        value: 30,
     }, {
         nextUpgradeCost: 25,
         value: 25
@@ -28,8 +28,21 @@ export class TowerUpgrade {
     }
     ];
 
+    static upgradeLevels = [{
+        nextUpgradeCost: 50,
+        value: null,
+    }, {
+        nextUpgradeCost: 80,
+        value: null,
+    }, {
+        nextUpgradeCost: 0,
+        value: null,
+    }
+    ]
+
     static startUpgrades = {
         reloadTime: new Upgrade("reload", TowerUpgrade.reloadUpgradeLevels, "Улучшить скорострельность башни"),
         attack: new Upgrade("attack", TowerUpgrade.attackUpgradeLevels, "Улучшить атаку башни"),
+        grades: new Upgrade("grades", TowerUpgrade.upgradeLevels, "Улучшить характеристики башни")
     }
 }

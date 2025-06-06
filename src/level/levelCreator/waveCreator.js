@@ -18,8 +18,8 @@ export class WaveCreator {
         return this;
     }
 
-    addRandomSpawn(startTimerValue, delay, enemiesPerSpawn, {endTimerValue=null, eliteSpawnChance=0}={}) {
-        this.randomSpawns.push(new RandomSpawn(startTimerValue, delay, enemiesPerSpawn, endTimerValue, eliteSpawnChance));
+    addRandomSpawn(startTimerValue, delay, enemiesPerSpawn, {endTimerValue=null}={}) {
+        this.randomSpawns.push(new RandomSpawn(startTimerValue, delay, enemiesPerSpawn, endTimerValue));
         return this;
     }
 

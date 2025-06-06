@@ -1,9 +1,10 @@
-import {BaseGunBullet} from "../bullet";
+import {BaseGunBullet} from "../bullet/baseGunBullet.js";
 import {Gun} from "./gun.js";
-import {BaseUpgrade} from "../upgrade";
-import {Canvas} from "../../canvas";
+import {BaseUpgrade} from "../upgrade/baseUpgrade.js";
+import {Canvas} from "../../canvas/canvas.js";
 import {CooldownTimer} from "../../timer/timer.js";
 import {deepClone} from "../../utilities.js";
+import {Game} from "../../game.js";
 
 export class BaseGun extends Gun {
     constructor(center, width, height) {
@@ -15,8 +16,13 @@ export class BaseGun extends Gun {
         this.gunImg = new Image();
         this.gunImg.src = "./assets/base/baseGun.png";
 
+        this.reloadTimer.onTick = () => {
+            Game.base.basePanel.updateReload();
+        }
+
         this.reloadTimer.onComplete = () => {
             this.canFire = true;
+            Game.base.basePanel.updateReload();
         };
     }
 
@@ -29,6 +35,7 @@ export class BaseGun extends Gun {
         this.reloadTimer.pause();
         this.reloadTimer.reset({startTime: this.reloadTime});
         this.reloadTimer.isShouldContinue = false;
+        Game.base.basePanel.updateReload();
     }
 
     get reloadTime() {

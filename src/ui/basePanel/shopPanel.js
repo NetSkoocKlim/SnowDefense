@@ -1,4 +1,4 @@
-import {Canvas} from "../../canvas";
+import {Canvas} from "../../canvas/canvas.js";
 import {MineSpawner} from "../../entities/mine/mineSpawner.js";
 import {Game} from "../../game.js";
 
@@ -38,6 +38,14 @@ export class ShopPanel {
         this.panel.appendChild(this.backBtn);
 
         this.container.appendChild(this.panel);
+    }
+
+    reset() {
+        Object.keys(this.entries).forEach((key) => {
+            let entry = this.entries[key];
+            entry.config.type = 'purchase';
+            entry.button.onclick = () => this.buySpawnUnlock();
+        })
     }
 
     addEntry(key, config) {
@@ -124,23 +132,9 @@ export class ShopPanel {
         ['explosionDamage', 'explosionRadius', 'spawnRate'].forEach(statKey => {
             const stat = stats[statKey];
             entry[`text_${statKey}`].nodeValue = `${stat.upgradeDescription}: ${stat.value.value}`;
-            entry[`arrow_${statKey}`].style.display = 'none';
         });
     }
 
-    showNextValues(key) {
-        const entry = this.entries[key];
-        const stats = MineSpawner.mineStats;
-        ['explosionDamage', 'explosionRadius', 'spawnRate'].forEach(statKey => {
-            const stat = stats[statKey];
-            const nextVal = stat.levels[stat.currentLevel + 1]?.value;
-            entry[`text_${statKey}`].nodeValue = `${stat.upgradeDescription}: ${stat.value.value}`;
-            if (nextVal !== undefined) {
-                entry[`arrow_${statKey}`].textContent = ` → ${nextVal}`;
-                entry[`arrow_${statKey}`].style.display = 'inline';
-            }
-        });
-    }
 
     buySpawnUnlock() {
         const cost = MineSpawner.mineUnlockCost;
@@ -148,7 +142,7 @@ export class ShopPanel {
             Game.points.currentPoints -= cost;
             MineSpawner.spawnTimer.isShouldContinue = true;
             MineSpawner.setSpawnRate(MineSpawner.spawnRate);
-            Game.panel.update({ gold: Game.points.currentPoints });
+            Game.statsPanel.update({ gold: Game.points.currentPoints });
 
             const entry = this.entries['mine'];
             entry.config.type = 'upgrade';
@@ -161,16 +155,10 @@ export class ShopPanel {
                 const line = document.createElement('div');
                 entry[`text_${statKey}`] = document.createTextNode('');
                 line.appendChild(entry[`text_${statKey}`]);
-                const arrow = document.createElement('span');
-                arrow.style.display = 'none';
-                entry[`arrow_${statKey}`] = arrow;
-                line.appendChild(arrow);
                 entry.desc.appendChild(line);
                 return line;
             });
 
-            entry.button.onmouseenter = () => this.showNextValues('mine');
-            entry.button.onmouseleave = () => this.showCurrentValues('mine');
             entry.button.onclick = () => this.buyGradesUpgrade();
 
             this.updateEntry('mine');
@@ -185,7 +173,7 @@ export class ShopPanel {
             Game.points.currentPoints -= next.nextUpgradeCost;
             Object.values(MineSpawner.mineStats).forEach(u => u.upgrade());
             MineSpawner.setSpawnRate(MineSpawner.spawnRate);
-            Game.panel.update({ gold: Game.points.currentPoints });
+            Game.statsPanel.update({ gold: Game.points.currentPoints });
             this.updateEntry('mine');
         }
     }

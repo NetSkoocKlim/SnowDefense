@@ -1,5 +1,5 @@
 import {Game} from "../../game.js";
-import {Canvas} from "../../canvas";
+import {Canvas} from "../../canvas/canvas.js";
 import {BaseUpgradePanel} from "./baseUpgradePanel.js";
 import {ShopPanel} from "./shopPanel.js";
 
@@ -17,6 +17,13 @@ export class BasePanel {
 
     reset() {
         this.upgradePanel.reset();
+        this.shopPanel.reset();
+        Game.base.basePanel.update();
+    }
+
+    updateEntries() {
+        this.upgradePanel.updateAll();
+        this.shopPanel.updateAll();
     }
 
     initPanel() {

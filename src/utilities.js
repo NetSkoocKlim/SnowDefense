@@ -1,6 +1,5 @@
-import {EnemySpawner} from "./entities/enemy/enemySpawner.js";
-import {EliteEnemy} from "./entities/enemy/enemyKind/eliteEnemy.js";
-import {Canvas} from "./canvas";
+
+import {Canvas} from "./canvas/canvas.js";
 
 
 export class ObjType {
@@ -16,7 +15,7 @@ export function wait(ms) {
         left: '0',
         width: '100%',
         height: '100%',
-        zIndex: '9999',
+        zIndex: '800',
         backgroundColor: 'transparent',
     });
     document.body.appendChild(overlay);
@@ -48,23 +47,6 @@ export function wait(ms) {
     });
 }
 
-export function createImg(src, parent, className){
-    const img = document.createElement("img");
-    img.src = src;
-    img.classList.add(className);
-    parent.appendChild(img);
-
-    return img;
-}
-
-export function createButton(text, parent, className){
-    const Button = document.createElement("button");
-    Button.innerText = text;
-    Button.classList.add(className);
-    parent.appendChild(Button);
-    return Button;
-}
-
 export function rotatePoint(point, angle) {
     const cos = Math.cos(angle);
     const sin = Math.sin(angle);
@@ -89,6 +71,23 @@ export function getTriangleBorder(width, height) {
         {x: width, y: height / 2},
         {x: 0, y: 0}
     ];
+}
+
+export function createImg(src, parent, className){
+    const img = document.createElement("img");
+    img.src = src;
+    img.classList.add(className);
+    parent.appendChild(img);
+
+    return img;
+}
+
+export function createButton(text, parent, className){
+    const Button = document.createElement("button");
+    Button.innerText = text;
+    Button.classList.add(className);
+    parent.appendChild(Button);
+    return Button;
 }
 
 export function createDivElement(parent, position, width, height, className) {
@@ -130,55 +129,6 @@ export function drawPolygon(points, color) {
     Canvas.ctx.fill();
 }
 
-export function processHit(source) {
-    for (let i = source.gun.bullets.length - 1; i >= 0; i--) {
-        let bullet = source.gun.bullets[i];
-        bullet.draw({collision: true});
-        if (source.type === ObjType.Base) {
-            if (bullet.checkWallConflict(source)) {
-               source.gun.bullets.splice(i, 1);
-            }
-            if (bullet.trianglePosition.x < 0 || bullet.trianglePosition.x > Canvas.width) {
-                source.gun.bullets.splice(i, 1);
-            }
-            if (bullet.trianglePosition.y < 0 || bullet.trianglePosition.y > Canvas.height) {
-                source.gun.bullets.splice(i, 1);
-            }
-        }
-        let wasHit = false;
-        for (let j = EnemySpawner.enemies.length - 1; j >= 0; j--) {
-            let enemy = EnemySpawner.enemies[j];
-            if (enemy.isAlive && bullet.checkHit(enemy)) {
-                source.gun.bullets.splice(i, 1);
-                enemy.handleDamage(source.gun.attackDamage);
-                wasHit = true;
-                break;
-            }
-        }
-        for (let j = EnemySpawner.eliteEnemies.length - 1; j >= 0; j--) {
-            let enemy = EnemySpawner.eliteEnemies[j];
-            if (enemy.isAlive && enemy.currentState !== "Hidden" && bullet.checkHit(enemy)) {
-                if (Math.random() <= EliteEnemy.disappearChance) {
-                    enemy.setHide();
-                }
-                else {
-                    source.gun.bullets.splice(i, 1);
-                    enemy.handleDamage(source.gun.attackDamage);
-                    wasHit = true;
-                }
-                break;
-            }
-        }
-        if (!wasHit) {
-            if (source.type === ObjType.Tower && bullet.checkEnd()) {
-                source.gun.bullets.splice(i, 1);
-            }
-            else {
-                bullet.update();
-            }
-        }
-    }
-}
 
 export function deepClone(obj, hash = new WeakMap()) {
     if (Object(obj) !== obj) return obj;

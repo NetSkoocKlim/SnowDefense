@@ -1,7 +1,7 @@
 import { createDivElement } from "../utilities.js";
 import { CooldownTimer } from "../timer/timer.js";
 import {Game} from "../game.js";
-import {Canvas} from "../canvas";
+import {Canvas} from "../canvas/canvas.js";
 
 
 export class CountdownDisplay {

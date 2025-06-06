@@ -1,7 +1,7 @@
 import {CooldownTimer, IncrementTimer} from "../../../timer/timer.js";
 
 import {EnemySpawner} from "../../../entities/enemy/enemySpawner.js";
-import {NextWavePopup} from "../../../gui/nextWavePopup.js";
+import {NextWavePopup} from "../../../ui/nextWavePopup.js";
 import {Game} from "../../../game.js";
 
 export class WaveManager {
@@ -34,6 +34,9 @@ export class WaveManager {
 
         this.waveComplete = false;
         this.currentWave = 0;
+        Game.statsPanel.update({
+            wave: Game.levelManager.waveManager.currentWave + 1,
+        });
     }
 
     setLevelDescription(levelDescription) {
@@ -45,6 +48,9 @@ export class WaveManager {
 
     setWaveDescription() {
         this.waveDescription = this.levelDescription.waves[this.currentWave];
+        Game.statsPanel.update({
+            wave: Game.levelManager.waveManager.currentWave + 1,
+        });
         for (let i = 0; i < this.waveDescription.spawnsCount; i++) {
             let spawnDetails = this.waveDescription.spawns[i];
             this.waveTimer.scheduleEvent(spawnDetails.timerValue, () => {
@@ -68,6 +74,7 @@ export class WaveManager {
             });
             if (spawnDetails.endTimerValue) {
                 this.waveTimer.scheduleEvent(spawnDetails.endTimerValue, () => {
+                    console.log('unsetted');
                     EnemySpawner.unsetSpawnRate();
                 })
             }
@@ -109,7 +116,6 @@ export class WaveManager {
             this.waveTimer.pause();
             return;
         }
-        console.log("Next wave in:", this.waveDelay, "seconds");
 
         this.waveEndTimer.reset({startTime: this.waveDelay});
         this.waveEndTimer.isShouldContinue = true;

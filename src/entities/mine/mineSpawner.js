@@ -1,7 +1,8 @@
 import {CooldownTimer} from "../../timer/timer.js";
 import {Mine} from "./mine.js";
 import {MineUpgrade} from "../upgrade/mineUpgrade.js";
-import {Canvas} from "../../canvas";
+import {Canvas} from "../../canvas/canvas.js";
+import {deepClone} from "../../utilities.js";
 
 
 export class MineSpawner {
@@ -12,9 +13,7 @@ export class MineSpawner {
     static spawnTimer = -1;
     static maxMinesCount = 100;
 
-    static mineStats = {
-        ...MineUpgrade.startUpgrades
-    }
+    static mineStats = deepClone(MineUpgrade.startUpgrades);
 
     static get explosionDamage() {
         return MineSpawner.mineStats.explosionDamage.value.value;
@@ -39,6 +38,8 @@ export class MineSpawner {
 
     static reset() {
         MineSpawner.unsetSpawnRate();
+
+        MineSpawner.mineStats = deepClone(MineUpgrade.startUpgrades);
 
         MineSpawner.mines.forEach(mine => {
             mine.reset();

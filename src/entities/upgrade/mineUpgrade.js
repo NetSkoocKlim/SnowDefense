@@ -18,10 +18,10 @@ export class MineUpgrade {
         value: 20,
     }, {
         nextUpgradeCost: 0,
-        value: 40
+        value: 80
     }, {
         nextUpgradeCost: 0,
-        value: 55,
+        value: 150,
     }]
 
     static spawnRateUpgradeLevels = [{
@@ -50,8 +50,8 @@ export class MineUpgrade {
 
     static startUpgrades = {
         explosionDamage: new Upgrade("attack", MineUpgrade.explosionDamageUpgradeLevels, "Сытность"),
-        explosionRadius: new Upgrade("radius", MineUpgrade.explosionRadiusUpgradeLevels, "Радиус"),
-        spawnRate: new Upgrade("spawnRate", MineUpgrade.spawnRateUpgradeLevels, "Время появления"),
+        explosionRadius: new Upgrade("radius", MineUpgrade.explosionRadiusUpgradeLevels, "Радиус насыщения"),
+        spawnRate: new Upgrade("spawnRate", MineUpgrade.spawnRateUpgradeLevels, "Время изготовки"),
         grades: new Upgrade("grades", MineUpgrade.upgradeLevels, "Улучшить характеристики мин")
     }
 }

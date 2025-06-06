@@ -1060,7 +1060,9 @@ body {
     margin: 0;
     top: 30%;
     font-size: 2rem;
-    color: #ff3b3b;
+    color: #a8cdfd;
+    font-family: 'Press Start 2P', sans-serif;
+    text-align: center;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
     z-index: 2;
 }
@@ -1178,6 +1180,23 @@ body {
     }
 }
 
+.level-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* Можно сделать полупрозрачный фон, чтобы было видно, что под ним игра на паузе */
+    background-color: rgba(0, 0, 0, 0.5);
+    /* Чтобы всё внутри выстраивалось по центру */
+    display: none; /* по умолчанию скрыт */
+    align-items: center;
+    justify-content: center;
+    /* Блокировать клики ниже */
+    pointer-events: all;
+    z-index: 400;
+}
+
 .start-level-panel {
     position: absolute;
     top: 50%;
@@ -1255,3 +1274,130 @@ body {
     transform: scale(1.05);
     box-shadow: 0 0 12px rgba(224,248,255,0.9);
 }
+
+.tower-menu {
+    position: absolute;
+    width: 13rem;
+    padding: 8px;
+    background: rgba(40, 60, 140, 0.85);
+    border: 1px solid rgba(200, 230, 255, 0.8);
+    box-shadow:
+            0 0 0 2px rgba(25, 40, 100, 0.9),
+            2px 2px 0 rgba(25, 40, 100, 0.9);
+    image-rendering: pixelated;
+    font-family: 'Press Start 2P', cursive;
+    color: #E0F0FF;
+    z-index: 100;
+    transform: translate(-50%, -50%);
+}
+.tower-menu.hidden {
+    display: none;
+}
+
+.tower-menu .title {
+    font-size: 0.7rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 0.4rem;
+    color: #F0FCFF;
+    text-shadow: 1px 1px 0 rgba(10, 20, 50, 0.7);
+}
+
+.tower-menu .desc {
+    line-height: 1.4;
+    font-size: 0.6rem;
+    color: #D0E8FF;
+    margin-bottom: 0.3rem;
+}
+
+.tower-menu .section {
+    margin-bottom: 0.3rem;
+}
+
+/* === Блок «Характеристики» (обёртка) === */
+.tower-menu .stats-block {
+    display: grid;
+    grid-template-rows: auto auto; /* 1-я строка — заголовок, 2-я — значения */
+    grid-template-columns: 1fr;    /* одна колонка во весь размер */
+    border-radius: 3px;
+    margin-bottom: 1rem;
+}
+
+/* Заголовок блока характеристик */
+.tower-menu .stats-header {
+    font-size: 0.7rem;
+    font-weight: bold;
+    text-align: center;
+    color: #E0F8FF;
+    text-shadow: 1px 1px 0 rgba(10, 20, 50, 0.6);
+    margin-bottom: 0.4rem;
+}
+
+/* Контейнер для строк «АТК» и «КД» */
+.tower-menu .stats-values {
+    display: grid;
+    row-gap: 0.5rem;     /* расстояние между строками (АТК и КД) */
+    width: 100%;      /* может быть 100%, потому что внутри .stat-row сами задают 55%/45% */
+}
+
+/* Каждая отдельная строка: метка слева (55%), значение справа (остальное) */
+.tower-menu .stat-row {
+    display: grid;
+    grid-template-columns: 55% auto;
+    align-items: center;
+}
+
+/* Левый столбец (название характеристики) */
+.tower-menu .stat-label {
+    font-size: 0.6rem;
+    color: #C8E8FF;
+}
+
+/* Правый столбец (само значение): выровнять по правому краю */
+.tower-menu .stat-value {
+    font-size: 0.6rem;
+    color: #C8E8FF;
+    text-align: right;
+    padding-right: 4px;
+}
+
+/* ===== Строки «Купить/Продать» ===== */
+.tower-menu .action-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.tower-menu .action-row .action-label {
+    font-size: 0.8rem;
+    color: #D0E8FF;
+}
+
+/* ===== Кнопки ===== */
+.tower-menu .btn {
+    padding: 5px 0px;
+    width: 4rem;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 12px;
+    text-align: center;
+    color: #FFFFFF;
+    background: linear-gradient(to bottom, #8FCFFF, #6AAED8);
+    border: 1px solid #356F9F;
+    box-shadow: 1px 1px 0 rgba(10, 20, 50, 0.7);
+    transition: background 0.12s;
+}
+
+.tower-menu .btn:hover {
+    background: linear-gradient(to bottom, #9FDFFF, #7ABDE8);
+}
+
+.tower-menu .btn.disabled {
+    filter: brightness(0.6);       /* затемняем кнопку */
+    cursor: not-allowed;           /* показываем, что клик недоступен */
+}
+
+.tower-menu .btn.disabled:hover {
+    /* Отключаем эффект hover, чтобы не было подсветки */
+    background: linear-gradient(to bottom, #8FCFFF, #6AAED8);
+}
+

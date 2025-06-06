@@ -14,6 +14,7 @@ export class LevelManager {
     constructor() {
         this.currentLevel = 0;
         this.levelsDescription = Game.levelData;
+        console.log(this.levelsDescription);
         this.levelCount = this.levelsDescription.levelCount;
         this.waveManager = new WaveManager();
 
@@ -27,7 +28,7 @@ export class LevelManager {
     }
 
     reset() {
-        this.currentLevel = 0;
+        this.currentLevel = 1;
         LevelManager.moneySpend = 0;
         LevelManager.enemiesFeed = 0;
         this.levelIsFinished = false;
@@ -74,8 +75,14 @@ export class LevelManager {
                 attack: EnemySpawner.enemyAttack.common,
                 reward: EnemySpawner.enemyReward.common,
             });
+
+
         }
 
+        Game.statsPanel.update({
+            gold: Game.points.currentPoints,
+            income: Game.levelManager.income
+        });
         this.waveManager.reset();
         this.waveManager.setLevelDescription(this.levelsDescription.levels[this.currentLevel]);
         Game.renderStart();
@@ -97,7 +104,10 @@ export class LevelManager {
         this.levelIsFinished = true;
         this.levelIsStarted = false;
         this.currentLevel += 1;
-        this.waveManager.currentWave = -1;
+        Game.statsPanel.update({
+            level: Game.levelManager.currentLevel + 1,
+        });
+        this.waveManager.currentWave = 0;
         this.waveManager.waveCount = 0;
         this.waveManager.nextWavePopup.hide();
         setTimeout(() => Game.pauseGame(), 150);

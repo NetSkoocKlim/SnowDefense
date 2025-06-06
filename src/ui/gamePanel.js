@@ -81,23 +81,35 @@ export class GamePanel {
         }
     }
 
+    flash(el ,newValue) {
+        if (el.textContent !== String(newValue)) {
+            el.classList.add('highlight');
+            setTimeout(() => el.classList.remove('highlight'), 500);
+        }
+        el.textContent = newValue;
+    }
+
     update(state) {
         const { elapsedMs, gold, level, wave, enemies, income } = state;
+        if (elapsedMs !== undefined) {
+            this.flash(this.uiTime, this._formatTime(elapsedMs));
+        }
+        if (gold !== undefined) {
+            this.flash(this.uiGold, gold);
+        }
+        if (level !== undefined) {
+            this.flash(this.uiLevel, level);
+        }
+        if (wave !== undefined) {
+            this.flash(this.uiWave, `${wave}/${Game.levelManager.waveManager.waveCount}`);
+        }
+        if (enemies !== undefined) {
+            this.flash(this.uiEnemies, enemies);
+        }
+        if (income !== undefined) {
+            this.flash(this.uiIncome, income);
+        }
 
-        const flash = (el, newValue) => {
-            if (el.textContent !== String(newValue)) {
-                el.classList.add('highlight');
-                setTimeout(() => el.classList.remove('highlight'), 500);
-            }
-            el.textContent = newValue;
-        };
-
-        flash(this.uiTime, this._formatTime(elapsedMs));
-        flash(this.uiGold, gold);
-        flash(this.uiLevel, level);
-        flash(this.uiWave, `${wave}/${Game.levelManager.waveManager.waveCount}`);
-        flash(this.uiEnemies, enemies);
-        flash(this.uiIncome, income);
     }
 
     _formatTime(secs) {

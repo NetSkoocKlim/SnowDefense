@@ -1,11 +1,11 @@
 import {CircleCollision, Collision} from "../../collision.js";
-import {TowerGunBullet} from "../bullet/";
+import {TowerGunBullet} from "../bullet/towerGunBullet.js";
 import {Gun} from "./gun.js";
 import {CooldownTimer} from "../../timer/timer.js";
 
 import {EnemySpawner} from "../enemy/enemySpawner.js";
-import {TowerUpgrade} from "../upgrade";
-import {Canvas} from "../../canvas";
+import {TowerUpgrade} from "../upgrade/towerUpgrade.js";
+import {Canvas} from "../../canvas/canvas.js";
 import {deepClone} from "../../utilities.js";
 
 
@@ -62,7 +62,7 @@ export class TowerGun extends Gun {
         }
     }
 
-    isEnemyInRadius() {
+    aimOnEnemy() {
         let targetEnemy = null;
         let dif = Infinity;
         EnemySpawner.enemies.forEach((enemy) => {
@@ -129,6 +129,8 @@ export class TowerGun extends Gun {
         Canvas.ctx.rotate(Math.PI/2 + this.currentAngle);
         Canvas.ctx.drawImage(this.gunImg, 0, 0, 290, 532, -this.width/2, -this.height/2, this.width, this.height);
         Canvas.ctx.restore();
+
+        this.aimOnEnemy();
         if (collision) this.attackRadiusShow.draw();
     }
 }

@@ -5,11 +5,11 @@ export class GameOverPanel {
     constructor() {
         this.root = Game.gameDiv;
         this.isActive = false;
-        this._createElements();
-        this._setupButtons();
+        this.createElements();
+        this.setupButtons();
     }
 
-    _createElements() {
+    createElements() {
         this.overlay = document.createElement('div');
         this.overlay.className = 'game-over-overlay';
 
@@ -45,7 +45,7 @@ export class GameOverPanel {
         this.root.appendChild(this.overlay);
     }
 
-    _setupButtons() {
+    setupButtons() {
         this.btnMenu.addEventListener('click', () => {
             this.hide();
             Game.mainMenu.show();
@@ -54,7 +54,6 @@ export class GameOverPanel {
         this.btnRestart.addEventListener('click', () => {
             this.hide();
             Game.continueGame();
-            Game.levelManager.startLevel();
             Game.resumeGame();
         });
     }
@@ -66,10 +65,10 @@ export class GameOverPanel {
         this.overlay.style.opacity = '1';
         await wait(1000);
         this.isActive = true;
+        Game.base.basePanel.show();
     }
 
     hide() {
-        if (!this.isActive) return;
         this.overlay.style.opacity = '0';
         this.overlay.style.visibility = 'hidden';
         this.overlay.classList.remove('active');

@@ -6,10 +6,10 @@ export class  EndLevelPanel {
     constructor({ parent, stats = {} }) {
         this.parent = parent;
         this.stats = { ...stats };
-        this._render();
+        this.render();
     }
 
-    _render() {
+    render() {
         this.overlay = document.createElement('div');
         this.overlay.className = 'elp-overlay';
 
@@ -24,7 +24,7 @@ export class  EndLevelPanel {
         this.statsContainer = document.createElement('div');
         this.statsContainer.className = 'elp-stats';
         this.panel.appendChild(this.statsContainer);
-        this._updateStats();
+        this.updateStats();
 
         const btnWrapper = document.createElement('div');
         btnWrapper.className = 'elp-buttons';
@@ -37,6 +37,7 @@ export class  EndLevelPanel {
         this.btnCont = document.createElement('button');
         this.btnCont.className = 'elp-btn';
         this.btnCont.textContent = 'Следующий уровень';
+
         this.btnCont.onclick = () => {
             this.hide();
             Game.continueGame();
@@ -53,7 +54,7 @@ export class  EndLevelPanel {
         this.hide();
     }
 
-    _updateStats() {
+    updateStats() {
         this.statsContainer.innerHTML = '';
         Object.entries(this.stats).forEach(([key, value]) => {
             const row = document.createElement('div');
@@ -82,7 +83,7 @@ export class  EndLevelPanel {
                 this.stats[key] = stats[key];
             }
         })
-        this._updateStats();
+        this.updateStats();
     }
 
     async toMainMenu() {
@@ -92,14 +93,15 @@ export class  EndLevelPanel {
 
     show() {
         this.btnCont.style.display = 'block';
-        Game.panel.el.classList.add('collapsed');
+        Game.statsPanel.el.classList.add('collapsed');
         this.overlay.style.display = 'flex';
         this.isActive = true;
         requestAnimationFrame(() => this.panel.classList.add('elp-panel--show'));
+        Game.base.basePanel.show();
     }
 
     showLast() {
-        Game.panel.el.classList.add('collapsed');
+        Game.statsPanel.el.classList.add('collapsed');
         Game.endLevelPanel.statsContainer.innerHTML = '';
         Game.endLevelPanel.title = "Последний уровень пройден! Поздравляем!";
         document.querySelector(".elp-title").innerHTML = Game.endLevelPanel.title;

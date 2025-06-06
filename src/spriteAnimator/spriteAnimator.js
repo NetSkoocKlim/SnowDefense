@@ -1,7 +1,7 @@
 import {CooldownTimer} from "../timer/timer.js";
-import {Canvas} from "../canvas";
+import {Canvas} from "../canvas/canvas.js";
 
-class SpriteAnimator {
+export class SpriteAnimator {
     constructor(name) {
         this.assetsPath = "./assets/";
         this.frameDelay = 0.2;
@@ -84,3 +84,4 @@ export class EnemyAnimator extends SpriteAnimator {
         this.changeAnimation(this.attackSpriteImg, this.attackSprite.width, this.attackSprite.height, this.attackSprite.frameCount);
     }
 }
+

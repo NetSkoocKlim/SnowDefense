@@ -1,11 +1,9 @@
 import {createDivElement, drawCircle} from "../../utilities.js";
-import {Canvas} from "../../canvas";
 import {Game} from "../../game.js";
-import {UpgradeMenu} from "../../gui/upgradeMenu.js";
 
 
 export class TowerPlace {
-    static towerCosts = [15, 30, 80, 160];
+    static towerCosts = [45, 60, 75, 90];
     static towerPlacedCount = 0;
 
     constructor(position, size) {
@@ -19,14 +17,16 @@ export class TowerPlace {
         this.towerPlaceImg.src = "./assets/map/towerPlace.png";
         this.towerPlaceImg.classList.add("towerPlace");
 
-        //this.buyMenu = new BuyMenu();
-        this.upgradeMenu = new UpgradeMenu();
-
+        this.setTower();
     }
 
     reset() {
+        TowerPlace.towerPlacedCount = 0;
         this.towerIsPlaced = false;
         this.isSelected = false;
+        this.placedTower.towerMenu.hide();
+        this.placedTower.towerMenu.buyRow.style.display = 'flex';
+        this.placedTower.towerMenu.sellRow.style.display = 'none';
     }
 
     static get towerCost() {
@@ -40,59 +40,22 @@ export class TowerPlace {
         }
     }
 
-    handleTowerPlaceClick() {
-        if (!this.towerIsPlaced) {
-            this.setTower()
-            //if (!buyMenuIsActive){
-            //buyMenuIsActive=true;
-            //this.buyMenu.show();
-            //}
-            //else{
-            //buyMenuIsActive=false;
-            //this.buyMenu.hide();
-            //}
-        }
-        else {
-            //if (!towerBuyMenuIsActive) {
-            //towerUpgradeMenuIsActive=true;
-            //this.upgradeMenu.show();
-            //}
-            //else{
-            //towerUpgradeMenuIsActive=false;
-            //this.upgradeMenu.hide();
-            //}
-        }
-    }
-
     setTower() {
-        Game.points.decrease(TowerPlace.towerCost);
         for (let i = 0;i<4;i++) {
             let tower = Game.towers[i];
-            if (tower.isActive === false) {
-                tower.isActive = true;
+            if (tower.isSetted  === false) {
+                tower.isSetted  = true;
+                tower.place = this;
                 tower.setPosition(this.center, this.size)
                 this.placedTower = tower;
-                TowerPlace.towerPlacedCount++;
                 break;
             }
         }
-        this.towerIsPlaced = true;
-        this.upgradeMenu.setUpgradable(this.placedTower.gun);
-        console.log("New tower cost is", TowerPlace.towerCost);
     }
 
-    sellTower() {
-        for (let i = 0;i<4;i++) {
-            let tower = Game.towers[i];
-            if (tower === this.placedTower) {
-                this.placedTower = null;
-                tower.isActive = false;
-                this.towerIsPlaced = false;
-                TowerPlace.towerPlacedCount--;
-                break;
-            }
-        }
-        Game.points.increase(Math.floor(TowerPlace.towerCost));
+    placeTower() {
+        this.towerIsPlaced = true;
+        this.placedTower.isActive = true;
     }
 
     draw() {

@@ -1,7 +1,6 @@
 import {Enemy} from "../enemy.js";
 import {EnemyAnimator} from "../../../spriteAnimator/spriteAnimator.js";
-import {Canvas} from "../../../canvas";
-import {EnemySpawner} from "../enemySpawner.js";
+import {Canvas} from "../../../canvas/canvas.js";
 
 export class DefaultEnemy extends Enemy {
     static width = 28 * 8 * 0.1;
