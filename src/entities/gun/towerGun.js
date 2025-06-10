@@ -4,7 +4,7 @@ import {Gun} from "./gun.js";
 import {CooldownTimer} from "../../timer/timer.js";
 
 import {EnemySpawner} from "../enemy/enemySpawner.js";
-import {TowerUpgrade} from "../upgrade/towerUpgrade.js";
+import {TowerUpgrade} from "../../upgrade/towerUpgrade.js";
 import {Canvas} from "../../canvas/canvas.js";
 import {deepClone} from "../../utilities.js";
 

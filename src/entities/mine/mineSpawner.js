@@ -1,6 +1,6 @@
 import {CooldownTimer} from "../../timer/timer.js";
 import {Mine} from "./mine.js";
-import {MineUpgrade} from "../upgrade/mineUpgrade.js";
+import {MineUpgrade} from "../../upgrade/mineUpgrade.js";
 import {Canvas} from "../../canvas/canvas.js";
 import {deepClone} from "../../utilities.js";
 

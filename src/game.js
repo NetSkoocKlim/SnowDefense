@@ -1,6 +1,6 @@
-import {Scene} from "./entities/scene/scene.js";
+import {Scene} from "./scene/scene.js";
 import {Canvas} from "./canvas/canvas.js";
-import {Points} from "./entities/points.js";
+import {Points} from "./points.js";
 import {IncrementTimer, Timer} from "./timer/timer.js";
 import {EnemySpawner} from "./entities/enemy/enemySpawner.js";
 import {LevelManager} from "./level/levelManager/levelManager.js";

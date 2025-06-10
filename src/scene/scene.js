@@ -1,8 +1,8 @@
-import {Collision} from "../../collision.js";
-import {Canvas} from "../../canvas/canvas.js";
-import {TowerPlace} from "../tower/towerPlace.js";
+import {Collision} from "../collision.js";
+import {Canvas} from "../canvas/canvas.js";
+import {TowerPlace} from "../entities/tower/towerPlace.js";
 import {Way} from "./way.js";
-import {Game} from "../../game.js";
+import {Game} from "../game.js";
 
 
 export class Scene {

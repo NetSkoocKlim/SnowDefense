@@ -1,6 +1,6 @@
 import {BaseGunBullet} from "../bullet/baseGunBullet.js";
 import {Gun} from "./gun.js";
-import {BaseUpgrade} from "../upgrade/baseUpgrade.js";
+import {BaseUpgrade} from "../../upgrade/baseUpgrade.js";
 import {Canvas} from "../../canvas/canvas.js";
 import {CooldownTimer} from "../../timer/timer.js";
 import {deepClone} from "../../utilities.js";

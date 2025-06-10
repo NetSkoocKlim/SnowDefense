@@ -1,4 +1,4 @@
-import {Scene} from "./entities/scene/scene.js";
+import {Scene} from "./scene/scene.js";
 import {Canvas} from "./canvas/canvas.js";
 import {Game} from "./game.js";
 

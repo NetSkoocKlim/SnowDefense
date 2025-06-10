@@ -1,4 +1,4 @@
-import {TowerUpgrade} from "../entities/upgrade/towerUpgrade.js";
+import {TowerUpgrade} from "../upgrade/towerUpgrade.js";
 import {TowerPlace} from "../entities/tower/towerPlace.js";
 import {Game} from "../game.js";
 

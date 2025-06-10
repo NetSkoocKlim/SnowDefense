@@ -1,5 +1,5 @@
-import {LevelManager} from "../level/levelManager/levelManager.js";
-import {Game} from "../game.js";
+import {LevelManager} from "./level/levelManager/levelManager.js";
+import {Game} from "./game.js";
 
 export class Points {
     constructor() {
