@@ -1,5 +1,5 @@
 import {rotatePoint} from "./utilities.js";
-import {Canvas} from "./entities/canvas/";
+import {Canvas} from "./canvas/canvas.js";
 
 
 export class Collision {
@@ -93,8 +93,6 @@ export class PolygonCollision {
     }
 
     getRotatedPoints() {
-        const cos = Math.cos(this.angle);
-        const sin = Math.sin(this.angle);
         return this.points.map(point => {
             let rotated_point = rotatePoint(point, this.angle);
             return {

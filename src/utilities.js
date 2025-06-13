@@ -1,28 +1,50 @@
-import {Game} from "./game.js";
 
-import {EnemySpawner} from "./entities/enemy/enemySpawner.js";
+import {Canvas} from "./canvas/canvas.js";
+
 
 export class ObjType {
     static Base = Symbol();
     static Tower = Symbol();
 }
 
+export function wait(ms) {
+    const overlay = document.createElement('div');
+    Object.assign(overlay.style, {
+        position: 'fixed',
+        top: '0',
+        left: '0',
+        width: '100%',
+        height: '100%',
+        zIndex: '800',
+        backgroundColor: 'transparent',
+    });
+    document.body.appendChild(overlay);
 
-export function createImg(src, parent, className){
-    const img = document.createElement("img");
-    img.src = src;
-    img.classList.add(className);
-    parent.appendChild(img);
+    const blockEvent = e => {
+        e.stopPropagation();
+        e.preventDefault();
+        return false;
+    };
 
-    return img;
-}
+    const events = [
+        'click', 'dblclick', 'mousedown', 'mouseup', 'mousemove',
+        'touchstart', 'touchmove', 'touchend',
+        'keydown', 'keyup', 'keypress',
+    ];
 
-export function createButton(text, parent, className){
-    const Button = document.createElement("button");
-    Button.innerText = text;
-    Button.classList.add(className);
-    parent.appendChild(Button);
-    return Button;
+    events.forEach(evt =>
+        document.addEventListener(evt, blockEvent, { capture: true })
+    );
+
+    return new Promise(resolve => {
+        setTimeout(() => {
+            document.body.removeChild(overlay);
+            events.forEach(evt =>
+                document.removeEventListener(evt, blockEvent, { capture: true })
+            );
+            resolve();
+        }, ms);
+    });
 }
 
 export function rotatePoint(point, angle) {
@@ -51,6 +73,23 @@ export function getTriangleBorder(width, height) {
     ];
 }
 
+export function createImg(src, parent, className){
+    const img = document.createElement("img");
+    img.src = src;
+    img.classList.add(className);
+    parent.appendChild(img);
+
+    return img;
+}
+
+export function createButton(text, parent, className){
+    const Button = document.createElement("button");
+    Button.innerText = text;
+    Button.classList.add(className);
+    parent.appendChild(Button);
+    return Button;
+}
+
 export function createDivElement(parent, position, width, height, className) {
     const div = document.createElement('div');
     div.classList.add(className);
@@ -65,54 +104,54 @@ export function createDivElement(parent, position, width, height, className) {
     return div;
 }
 
-export function drawCircle(ctx, x, y, radius, color) {
-    ctx.fillStyle = color;
-    ctx.beginPath();
-    ctx.arc(
+export function drawCircle(x, y, radius, color, stroke) {
+    Canvas.ctx.fillStyle = color;
+    Canvas.ctx.beginPath();
+    Canvas.ctx.arc(
         x,
         y,
         radius,
         0,
         Math.PI * 2
     );
-    ctx.fill();
-}
-
-export function drawPolygon(ctx, points, color) {
-    ctx.fillStyle = color;
-    ctx.beginPath();
-    ctx.moveTo(points[0].x, points[0].y);
-    points.slice(1).forEach(p => ctx.lineTo(p.x, p.y));
-    ctx.closePath();
-    ctx.fill();
-}
-
-export function processHit(source) {
-    for (let i = source.gun.bullets.length - 1; i >= 0; i--) {
-        let bullet = source.gun.bullets[i];
-        bullet.draw({collision: true});
-        if (source.type === ObjType.Base) {
-            if (bullet.checkWallConflict(source)) {
-               source.gun.bullets.splice(i, 1);
-            }
-        }
-        let wasHit = false;
-        for (let j = EnemySpawner.enemies.length - 1; j >= 0; j--) {
-            let enemy = EnemySpawner.enemies[j];
-            if (enemy.isAlive && bullet.checkHit(enemy)) {
-                source.gun.bullets.splice(i, 1);
-                enemy.handleDamage(source.gun.attackDamage);
-                wasHit = true;
-                break;
-            }
-        }
-        if (!wasHit) {
-            if (source.type === ObjType.Tower && bullet.checkEnd()) {
-                source.gun.bullets.splice(i, 1);
-            }
-            else {
-                bullet.update();
-            }
-        }
+    Canvas.ctx.fill();
+    if (stroke) {
+        Canvas.ctx.stroke();
     }
 }
+
+export function drawPolygon(points, color) {
+    Canvas.ctx.fillStyle = color;
+    Canvas.ctx.beginPath();
+    Canvas.ctx.moveTo(points[0].x, points[0].y);
+    points.slice(1).forEach(p => Canvas.ctx.lineTo(p.x, p.y));
+    Canvas.ctx.closePath();
+    Canvas.ctx.fill();
+}
+
+
+export function deepClone(obj, hash = new WeakMap()) {
+    if (Object(obj) !== obj) return obj;
+
+    if (hash.has(obj)) return hash.get(obj);
+
+    if (typeof obj.clone === 'function') {
+        const cloned = obj.clone();
+        hash.set(obj, cloned);
+        return cloned;
+    }
+
+    const result = Array.isArray(obj)
+        ? []
+        : obj.constructor
+            ? new obj.constructor()
+            : {};
+
+    hash.set(obj, result);
+
+    for (const key of Reflect.ownKeys(obj)) {
+        result[key] = deepClone(obj[key], hash);
+    }
+    return result;
+}
+
