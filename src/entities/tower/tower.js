@@ -1,39 +1,54 @@
-import {Canvas} from "../canvas/";
-import {createDivElement} from "../../utilities.js";
-import {TowerGun} from "../gun/";
+import {Canvas} from "../../canvas/canvas.js";
+import {TowerGun} from "../gun/towerGun.js";
 import {ObjType} from "../../utilities.js";
 import {Game} from "../../game.js";
-import {Map} from "../map/";
+import {TowerMenu} from "../../ui/towerMenu.js";
 
 export class Tower {
-    static cost = 5;
-    constructor(placeDiv, center, size) {
+
+    constructor() {
         this.type = ObjType.Tower;
-        this.center = center;
-        this.sizeDifference = 5;
-        this.attack = 5;
-        this.size = size + 2 * this.sizeDifference;
-        this.gun = new TowerGun(this.center, this.size * 0.4, this.size * 0.2);
-        this.towerDiv = createDivElement(placeDiv, {x: -this.sizeDifference, y:-this.sizeDifference}, this.size, this.size, 'tower');
+        this.isActive = false;
+        this.isSetted = false;
+        this.towerImg = new Image();
+        this.towerImg.src = "./assets/tower/tower.png";
+        this.gun = new TowerGun();
+        this.towerMenu = new TowerMenu(this.position);
     }
 
+    static initTowers() {
+        for (let i = 0;i<4;i++) {
+            Game.towers[i] = new Tower();
+        }
+    }
+
+    reset() {
+        this.isActive = false;
+        this.gun.reset();
+    }
+
+
     get position() {
+        if (this.center !== undefined)
         return {
             x: this.center.x - this.size / 2,
             y: this.center.y - this.size / 2,
         }
+        return {x: 0, y:0};
     }
 
-    static buyTower(place) {
-        Game.points.decrease(Tower.cost);
-        place.towerIsPlaced = true;
-        const tower = new Tower(place.towerPlaceDiv, place.center, place.size);
-        Map.towers.push(tower);
+    setPosition(center, size) {
+        this.center = center;
+        this.size = size;
+        this.towerMenu.setPosition(this.center);
+        this.towerMenu.tower = this;
+        this.gun.set(this.center, this.size * 0.4 , this.size * 0.9);
     }
+
 
     draw({collision=false}) {
-        Canvas.ctx.fillStyle = 'blue';
-        Canvas.ctx.fillRect(this.position.x, this.position.y, this.size, this.size);
+        Canvas.ctx.drawImage(this.towerImg, 0, 0, 781, 886, this.position.x, this.position.y, this.size, this.size * 1.134)
         this.gun.draw({collision: collision});
     }
+
 }

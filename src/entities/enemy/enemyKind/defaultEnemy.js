@@ -1,12 +1,39 @@
 import {Enemy} from "../enemy.js";
 import {EnemyAnimator} from "../../../spriteAnimator/spriteAnimator.js";
-import {Canvas} from "../../canvas";
+import {Canvas} from "../../../canvas/canvas.js";
 
 export class DefaultEnemy extends Enemy {
-    constructor() {
-        super(28 * Canvas.scale,65 * Canvas.scale, 0.35, DefaultEnemy.createAnimator());
-        this.reward = 5;
+    static width = 28 * 8 * 0.1;
+    static height = 65 * 8 * 0.1;
+    static speed = 0.35;
 
+    headCollisionScales = {
+        width: {
+            odd: 0.25,
+            even: 0.95
+        },
+        height: {
+            odd: 0.95,
+            even: 0.25
+        }
+    };
+
+    bodyCollisionScales = {
+        width: {
+            odd: 0.65,
+            even: 0.75
+        },
+        height: {
+            odd: 0.75,
+            even: 0.65
+        }
+    }
+
+    constructor() {
+        super(DefaultEnemy.width * Canvas.scale, DefaultEnemy.height * Canvas.scale, DefaultEnemy.speed * Canvas.scale, DefaultEnemy.createAnimator(), "common");
+        this.reward = null;
+        this.damage = null;
+        this.maxHP = null;
     }
 
     static createAnimator() {
@@ -16,11 +43,12 @@ export class DefaultEnemy extends Enemy {
             width: 896,
             height: 520
         }
+
         let attackSprite = {
-            path: "move/sprite.png",
+            path: "attack/sprite.png",
             frameCount: 4,
             width: 896,
-            height: 520
+            height: 704
         }
         return new EnemyAnimator("default", moveSprite, attackSprite);
     }
