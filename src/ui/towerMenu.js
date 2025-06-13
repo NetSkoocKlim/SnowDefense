@@ -17,7 +17,7 @@ export class TowerMenu {
 
         this.titleBlock = document.createElement('div');
         this.titleBlock.classList.add('title');
-        this.titleBlock.innerText = 'Арктический Пломбир';
+        this.titleBlock.innerText = 'Раздатчик мороженного';
         this.container.appendChild(this.titleBlock);
 
         this.descBlock = document.createElement('div');

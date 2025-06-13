@@ -201,7 +201,7 @@ export class Game {
 
         MineSpawner.mines.forEach(mine => {
             if (!mine.isExplode) {
-                mine.draw({collision: true});
+                mine.draw({collision: false});
                 if (mine.enemyInRadius()) mine.beginExplosion();
             }
         });

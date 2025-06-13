@@ -28,7 +28,7 @@ export class LevelManager {
     }
 
     reset() {
-        this.currentLevel = 0;
+        this.currentLevel = 1;
         LevelManager.moneySpend = 0;
         LevelManager.enemiesFeed = 0;
         this.levelIsFinished = false;

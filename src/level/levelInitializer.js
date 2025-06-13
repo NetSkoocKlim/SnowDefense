@@ -63,7 +63,7 @@ export class LevelInitializer {
         });
 
         creator.addLevel(35, 85,{common: 90, elite: 110},{common: 2, elite: 4},
-            0.2, {common: 10, elite: 20},level => {
+            0.2, {common: 10, elite: 30},level => {
             level.addWave(w =>
                 w.setEndWaveTime(12)
                     .addSpawn(3, {
@@ -87,7 +87,7 @@ export class LevelInitializer {
             level.addWave(w =>
                 w.setEndWaveTime(20)
                     .addSpawn(5, { common: [{ side: 1, count: 3 }, { side: 4, count: 2 }], elite:[]})
-                    .addRandomSpawn(10, 2.0, 10)
+                    .addRandomSpawn(10, 2.0, 6)
             );
         });
 
