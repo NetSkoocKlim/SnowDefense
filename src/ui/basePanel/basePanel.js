@@ -31,7 +31,6 @@ export class BasePanel {
         this.panel.classList.add('hidden');
         this.panel.style.left = 5 * Canvas.scale + 'px';
         this.panel.style.top = 5 * Canvas.scale + 'px';
-        this.panel.style.width = 205 * Canvas.scale + 'px';
 
 
         const hpWrapper = document.createElement('div');
